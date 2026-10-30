@@ -1,0 +1,15 @@
+{
+  "id": "adriensales/alone-with-a-stranger-gemma-4-e4b-it",
+  "title": "Alone With a Stranger - gemma-4-e4b-it",
+  "code_file": "country_bias_bench.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

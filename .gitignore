@@ -1,0 +1,13 @@
+# caches and build by-products
+.ruff_cache/
+__pycache__/
+.ipynb_checkpoints/
+report/data.rds
+report/*_files/
+report/*.log
+report/*.tex
+report/.quarto/
+# copies of analysis/data/ made for the Kaggle dataset upload
+kaggle/build/synthesis-data/*.jsonl
+kaggle/build/synthesis-data/*.csv
+report/pg-*.png

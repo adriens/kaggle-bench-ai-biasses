@@ -1,0 +1,20 @@
+{
+  "id": "adriensales/alone-with-a-stranger-judge",
+  "title": "Alone With a Stranger - judge",
+  "code_file": "judge.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [
+    "adriensales/alone-with-a-stranger-granite-4-2-8b",
+    "adriensales/alone-with-a-stranger-qwen3-5-9b",
+    "adriensales/alone-with-a-stranger-gemma-4-e4b-it",
+    "adriensales/alone-with-a-stranger-judge"
+  ],
+  "model_sources": []
+}

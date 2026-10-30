@@ -1,0 +1,15 @@
+{
+ "id": "adriensales/alone-with-a-stranger-synthese-des-juges",
+ "title": "alone-with-a-stranger-synthese-des-juges",
+ "code_file": "synthese_juges.ipynb",
+ "language": "python",
+ "kernel_type": "notebook",
+ "is_private": true,
+ "enable_gpu": false,
+ "enable_internet": false,
+ "dataset_sources": [
+  "adriensales/alone-with-a-stranger-analysis-data"
+ ],
+ "competition_sources": [],
+ "kernel_sources": []
+}
