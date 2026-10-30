@@ -120,6 +120,12 @@ N <- D |> filter(!is_base)
 rt <- function(metric, m, c) rate_table(metric) |> filter(model == m, country == c) |> pull(pct)
 ```
 
+# TL;DR {.unnumbered}
+
+Ask two open AI models for advice about being alone with a man, and his nationality decides the tone: some
+men get compliments and ice-breakers, others a "his origin does not matter" that nobody asked for, and
+sometimes a warning about scams or migration. One chart sums it up.
+
 ::: {.callout-tip appearance="simple" icon=false}
 ## How to read this chart
 
@@ -136,6 +142,7 @@ made by different companies, place each nationality in the same spot.
 
 ```{r}
 #| label: fig-summary
+#| fig-pos: "H"
 #| fig-cap: "Summary of the results: \"cultural guide\" or \"security guard\". Mean of Granite 4.2 8B and Qwen3.5-9B for each nationality (about 198 judged answers per bubble); the segment spans the positions of the two models. Bubble area: answers with a negative association (both models). Dashed lines: medians of the 24 nationalities."
 #| fig-height: 5.2
 s_def <- rate_table("defensive_marking") |> select(model, country, def = pct)
@@ -183,6 +190,8 @@ ggplot(nat, aes(def, pos)) +
   labs(x = "\"his origin does not matter\" (defensive marking)", y = "compliments on his culture (positive stereotypes)") +
   theme(legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 8))
 ```
+
+\newpage
 
 # Introduction
 
