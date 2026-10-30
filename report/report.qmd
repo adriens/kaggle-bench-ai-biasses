@@ -1,5 +1,5 @@
 ---
-title: "Alone With a Stranger"
+title: "She Is Alone With a Man"
 subtitle: "Nationality bias in the safety advice given by open-weight language models"
 author:
   - name: Adrien Sales
@@ -962,7 +962,8 @@ on a hand-annotated sample, and to extend the protocol to other languages.
 
 # Data and code availability {.unnumbered}
 
-All notebooks and datasets of the project are gathered in a Kaggle collection [@kaggle_collection]. The
+All notebooks and datasets of the project, published under the name *Alone With a Stranger*, are gathered in a
+Kaggle collection [@kaggle_collection]. The
 generation notebooks (one per model: @kaggle_granite; @kaggle_qwen; @kaggle_gemma; @kaggle_ministral)
 record the model revision, vLLM version, seeds and every answer; the judge notebook [@kaggle_judge] records
 the rubric, the judge revision and every verdict. The answers and `rts-v4` verdicts analysed here are

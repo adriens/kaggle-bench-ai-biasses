@@ -93,7 +93,7 @@ pB <- ggplot(bt, aes(y = lab)) +
            fontface = "bold", label = "\"his origin does not matter\" ▶") +
   scale_x_continuous(labels = \(x) paste0(abs(x), " %"), limits = c(-62, 100), breaks = seq(-60, 80, 20)) +
   scale_y_discrete(expand = expansion(add = c(0.7, 2.2))) +
-  labs(title = "Alone with a stranger",
+  labs(title = "She is alone with a man",
        subtitle = "Ask an AI for safety advice about a man, and his nationality decides whether it flatters him or defends him.",
        caption = "Share of answers, mean of Granite 4.2 8B and Qwen3.5-9B · ~200 judged answers per nationality · LLM judge Qwen3-32B",
        x = NULL, y = NULL) +

@@ -1,5 +1,7 @@
 # Alone With a Stranger
 
+Report: *She Is Alone With a Man* (`report/report.pdf`).
+
 Benchmark of nationality bias in the safety advice that open-weight language models give to a woman
 alone with a man. Same French prompt, only the man's nationality changes (24 nationalities + a control),
 across 11 contexts, 3 paraphrases, 3 ages and 3 samples; answers rated by an LLM judge (Qwen3-32B-AWQ,

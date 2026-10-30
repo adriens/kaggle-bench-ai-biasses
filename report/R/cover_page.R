@@ -89,9 +89,9 @@ local({
   page <- (byline / ring / key) +
     plot_layout(heights = c(0.55, 11, 0.6)) +
     plot_annotation(
-      title = "Alone With a Stranger",
-      subtitle = paste0("Same question. The nationality changes the answer.\n",
-                        "How two open-weight AI models advise a woman alone with a man."),
+      title = "She Is Alone With a Man",
+      subtitle = paste0("The situation should change the advice. His nationality should not.\n",
+                        "How two open-weight AI models advise a woman alone with a man, in 11 situations."),
       caption = paste0(
         "Granite 4.2 8B and Qwen3.5-9B · 14,850 answers in French · 5,135 rated by an LLM judge (Qwen3-32B) · ",
         "24 nationalities · 11 situations · 3 ages\n",
