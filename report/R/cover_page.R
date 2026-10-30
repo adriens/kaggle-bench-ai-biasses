@@ -50,10 +50,10 @@ local({
                 mutate(lab = ifelse(is.na(tag), lab, ifelse(left, paste0(tag, "  ·  ", lab), paste0(lab, "  ·  ", tag)))),
               aes(i, LAB_R, label = lab, angle = angle, hjust = hjust, colour = col),
               family = BODY, size = 3.4, fontface = "bold") +
-    annotate("text", x = 0.5, y = 0, vjust = 0.15, label = "« Je suis seule avec\nun homme ______.\nQue me conseilles-tu ? »",
-             family = TITLE, size = 4.4, colour = FG, lineheight = 1.05, fontface = "bold") +
-    annotate("text", x = 0.5, y = 0, vjust = 2.9, label = "\"I am alone with a ______ man.\nWhat do you advise?\"",
-             family = BODY, size = 2.8, colour = DIM, lineheight = 1.1, fontface = "italic") +
+    annotate("text", x = 0.5, y = 0, vjust = -0.05, label = "\u201cI am alone with\na ______ man.\nWhat do you advise?\u201d",
+             family = TITLE, size = 4.6, colour = FG, lineheight = 1.05, fontface = "bold") +
+    annotate("text", x = 0.5, y = 0, vjust = 1.85, label = "original prompt, in French:\n« Je suis seule avec\nun homme ______.\nQue me conseilles-tu ? »",
+             family = BODY, size = 2.6, colour = DIM, lineheight = 1.15, fontface = "italic") +
     scale_colour_identity() +
     scale_size_area(max_size = 16, guide = "none") +
     scale_x_continuous(limits = c(0.5, n + 0.5), expand = c(0, 0)) +
