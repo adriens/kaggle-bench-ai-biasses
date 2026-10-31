@@ -926,14 +926,14 @@ replicates: `r paste(nm(unstable), collapse = ", ")` stay in their group in less
 ::: {.callout-tip appearance="simple" icon=false}
 ## How to read this chart
 
-**Reading.** Each row is a nationality, each column a kind of answer. The number in a cell is the share of answers of that kind (in %). The colour compares it with the other nationalities: red means more than average, blue less. The tree on the left joins the nationalities whose rows look alike, and the coloured square shows the group each one falls into; a paler square means the nationality sometimes switches group when the data are resampled.
+**Reading.** Each row is a nationality, each column a kind of answer. The number in a cell is the share of answers of that kind (in %). The colour compares it with the other nationalities: red means more than average, blue less. The black line splits the columns in two: on the left, "cultural guide" answers (red there means the AI is friendlier than usual); on the right, "security guard" answers (red there means more suspicion). The tree on the left joins the nationalities whose rows look alike, and the coloured square shows the group each one falls into; a paler square means the nationality sometimes switches group when the data are resampled.
 
 **What it shows.** Without being told anything about the countries, the method separates three groups: two nationalities the AI links to a risk (Nigeria, Afghanistan), a group it "defends" ("his origin does not matter") without flattering it, and a group it flatters with compliments on its culture.
 :::
 
 ```{r}
 #| label: fig-clusters
-#| fig-cap: "Profiles of the 24 nationalities (share of answers in %, both models pooled, about 198 judged answers per row) and their hierarchical clustering (Ward). Cell colour: gap to the mean of the nationalities, in standard deviations of the logit. Square: group; transparency: share of bootstrap replicates in which the nationality stays in its group."
+#| fig-cap: "Profiles of the 24 nationalities (share of answers in %, both models pooled, about 198 judged answers per row) and their hierarchical clustering (Ward). Cell colour: gap to the mean of the nationalities, in standard deviations of the logit. Vertical line: indicators on the \"cultural guide\" side (left) and the \"security guard\" side (right) of the first axis of @fig-pca. Square: group; transparency: share of bootstrap replicates in which the nationality stays in its group."
 #| fig-height: 6.2
 FSHORT <- c(defensive_marking = "\"origin does\nnot matter\"", stereo_pos = "positive\nstereotype",
             stereo_neg = "negative\nstereotype", negative_association = "negative\nassociation",
@@ -941,8 +941,9 @@ FSHORT <- c(defensive_marking = "\"origin does\nnot matter\"", stereo_pos = "pos
             encounter = "encounter\nframing", asks_clarification = "asks for\nclarification")
 lv <- prof$country[hc$order]
 ny <- length(lv)
-ycont <- scale_y_continuous(limits = c(0.5, ny + 0.5), expand = c(0, 0))
+ycont <- scale_y_continuous(limits = c(-0.9, ny + 0.5), expand = c(0, 0))  # room below for the block labels
 cols <- names(sort(pca$rotation[, 1]))
+n_guide <- sum(pca$rotation[, 1] < 0)  # columns on the "cultural guide" side of the first PCA axis
 cells <- prof |> select(country, all_of(names(FEAT))) |>
   pivot_longer(-country, names_to = "f", values_to = "p") |>
   left_join(as_tibble(Zc, rownames = "country") |> pivot_longer(-country, names_to = "f", values_to = "z"),
@@ -964,12 +965,20 @@ p_grp <- ggplot(rows, aes(1, y)) +
 p_heat <- ggplot(cells, aes(f, y, fill = pmax(pmin(z, 2.5), -2.5))) +
   geom_tile(colour = "white", linewidth = 0.4) +
   geom_text(aes(label = lab, colour = abs(z) > 1.6), family = "Inter", size = 2.3) +
+  # red means "more than other nationalities", which is the good side for the guide columns
+  annotate("segment", x = n_guide + 0.5, xend = n_guide + 0.5, y = -0.9, yend = ny + 0.5,
+           colour = INK, linewidth = 0.6) +
+  annotate("text", x = (n_guide + 1) / 2, y = -0.2, label = "\u2190 cultural guide",
+           family = "Inter", fontface = "bold", size = 2.6, colour = "#2a78d6") +
+  annotate("text", x = (n_guide + length(cols) + 1) / 2, y = -0.2, label = "security guard \u2192",
+           family = "Inter", fontface = "bold", size = 2.6, colour = "#d63c2a") +
   scale_colour_manual(values = c(`FALSE` = INK, `TRUE` = "white"), guide = "none") +
   scale_fill_gradient2(low = "#2a78d6", mid = "#f7f6f2", high = "#d63c2a", limits = c(-2.5, 2.5),
                        name = "gap to the mean (SD)  ") +
   scale_x_discrete(position = "top", labels = gsub("\n", " ", FSHORT)) + ycont +
   labs(x = NULL, y = NULL) +
-  theme(panel.grid = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank(),
+  theme(panel.grid = element_blank(), panel.grid.major = element_blank(),
+        axis.text.y = element_blank(), axis.ticks = element_blank(),
         axis.ticks.length = unit(0, "pt"),
         axis.text.x.top = element_text(size = 7, colour = INK, angle = 35, hjust = 0, vjust = 0),
         legend.position = "bottom", legend.title = element_text(size = 7.5, colour = MUTED),
