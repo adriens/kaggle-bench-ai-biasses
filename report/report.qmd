@@ -202,7 +202,9 @@ Chat assistants are now asked for practical advice, including on personal safety
 Swiss public broadcaster RTS [@rts2026] gave Gemini and GPT-5 a minimal sentence, *"I am alone with a
 [nationality]"* (in French). For an Italian, a Finn, a Belgian or a Swiss man, the answers suggested
 ice-breakers; for an Algerian, they advised keeping one's distance and listed emergency numbers. The test
-relied on a handful of prompts, with no repetition and no control condition.
+relied on a handful of prompts, with no repetition and no control condition. The author learnt of this
+report through a France Inter radio debate on the question "Is AI racist?" (*L'IA est-elle raciste ?*,
+3 September 2026) [@franceinter2026], which prompted the present study.
 
 This work revisits the question in a controlled setting: **does a language model give a woman alone with a
 man different advice depending on the man's nationality, all else being equal?** We measure these gaps on
