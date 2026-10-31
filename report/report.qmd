@@ -93,8 +93,10 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(ggrepel)
   library(knitr)
+  library(patchwork)
 })
 source("R/prep.R")
+source("R/clusters.R")
 source("R/cover_page.R")  # regenerates covers/cover_page.pdf, inserted as page 1
 
 COL <- c("granite-4.2-8b" = "#2a78d6", "qwen3.5-9b" = "#eb6834")
@@ -448,7 +450,14 @@ nationality only, with a likelihood-ratio test between two logistic regressions,
 score is treated in the same way with a linear model (F test). Agreement between models on the ranking of
 nationalities is measured with Spearman's rank correlation [@spearman1904]. Negative associations for each
 nationality are compared with the other nationalities with Fisher's exact test, with Holm's correction over
-the 24 nationalities [@holm1979]. All analyses are done in R [@rcore]; the document is recomputed entirely
+the 24 nationalities [@holm1979]. To let groups of nationalities emerge from the data rather than from
+categories chosen in advance, each nationality is described by a profile of nine indicators (both models
+pooled, shares smoothed as $(k + 0.5)/(n + 1)$, on the logit scale and standardised). The profiles are
+grouped by hierarchical clustering (Euclidean distance, Ward's criterion [@ward1963]) and projected by
+principal component analysis [@jolliffe2016]. The stability of the groups is measured by resampling the
+answers within each nationality (500 bootstrap replicates) and matching each group to its closest
+replicate group with the Jaccard index [@hennig2007]; partitions are compared with the adjusted Rand index
+[@hubert1985]. All analyses are done in R [@rcore]; the document is recomputed entirely
 from the answer and verdict files published as a Kaggle dataset [@kaggle_data], which also feeds the
 Python synthesis notebook [@kaggle_synthesis].
 
@@ -859,6 +868,165 @@ ggplot(pa, aes(`granite-4.2-8b`, `qwen3.5-9b`)) +
   scale_x_continuous(labels = \(x) paste0(x, " %")) +
   scale_y_continuous(labels = \(x) paste0(x, " %")) +
   labs(x = "Granite 4.2 8B", y = "Qwen3.5-9B")
+```
+
+## Groups of nationalities, found by the data
+
+```{r}
+#| label: clust-stats
+prof <- profiles(N)
+Zc <- zmat(prof)
+hc <- hclust(dist(Zc), "ward.D2")
+boot <- bootstrap_clusters(N, B = 500)
+K <- 3
+grp <- boot[[as.character(K)]]$ref
+stay <- boot[[as.character(K)]]$stay
+jac <- boot[[as.character(K)]]$jaccard
+# group names follow the profiles of each group (see the text)
+GRP <- setNames(c("linked to a risk", "defended", "guided"),
+                c(grp[["NGA"]], grp[["IND"]], grp[["JPN"]]))
+GCOL <- c("linked to a risk" = "#b4232a", "defended" = "#eb6834", "guided" = "#2a78d6")
+gname <- function(iso) unname(GRP[as.character(grp[iso])])
+members <- function(g) { x <- names(grp)[gname(names(grp)) == g]; paste(nm(x[order(nm(x))]), collapse = ", ") }
+jac_of <- function(g) num(jac[as.integer(names(GRP)[GRP == g])], 2)
+k_ari <- sapply(boot, `[[`, "ari")
+pca <- prcomp(Zc)
+s1 <- sign(pca$rotation["defensive_marking", 1])  # axis 1 points towards "security guard"
+pca$x[, 1] <- s1 * pca$x[, 1]; pca$rotation[, 1] <- s1 * pca$rotation[, 1]
+ve <- 100 * pca$sdev^2 / sum(pca$sdev^2)
+rho_idx <- cor(pca$x[, 1], prof$defensive_marking - prof$stereo_pos, method = "spearman")
+pm <- profiles(N, c("model", "country"))
+g_mod <- lapply(names(MODELS), \(m) cluster_of(pm |> filter(model == m), K)) |> setNames(names(MODELS))
+ari_models <- ari(g_mod[[1]], g_mod[[2]])
+ari_pooled <- sapply(g_mod, \(g) ari(g, grp))
+unstable <- names(sort(stay[stay < 0.7]))
+```
+
+The previous sections test one indicator at a time. Here, each nationality is described by its whole
+profile (nine indicators, both models pooled), and a hierarchical clustering groups nationalities whose
+profiles look alike, without being told anything about regions, colour or religion. Three groups come out,
+and they are the most stable partition: the adjusted Rand index between the reference partition and its
+bootstrap replicates is `r num(k_ari[["3"]], 2)` with three groups, versus
+`r num(k_ari[["2"]], 2)` with two and `r num(k_ari[["4"]], 2)` with four.
+
+- **Linked to a risk** (`r members("linked to a risk")`, Jaccard stability `r jac_of("linked to a risk")`):
+  the most defensive marking, the fewest compliments and encounter framings, and almost all the negative
+  associations and high alarm.
+- **Defended** (`r members("defended")`, `r jac_of("defended")`): the AI often says "his origin does not
+  matter" and rarely compliments, but rarely names a risk.
+- **Guided** (`r members("guided")`, `r jac_of("guided")`): compliments on the culture and ice-breakers,
+  little defensive marking.
+
+The groups do not follow a single simple criterion. "Defended" mixes the Balkans, the Maghreb, Turkey,
+Russia and India; "guided" mixes Western Europe, Japan, Brazil and Fiji. One possible reading, which
+this study does not test, is that they follow how often each nationality appears in public debates on
+immigration, crime or geopolitics, more than any single geographic or religious category. Some nationalities sit on a border and change group in a sizeable share of
+replicates: `r paste(nm(unstable), collapse = ", ")` stay in their group in less than 70 % of replicates.
+
+::: {.callout-tip appearance="simple" icon=false}
+## How to read this chart
+
+**Reading.** Each row is a nationality, each column a kind of answer. The number in a cell is the share of answers of that kind (in %). The colour compares it with the other nationalities: red means more than average, blue less. The tree on the left joins the nationalities whose rows look alike, and the coloured square shows the group each one falls into; a paler square means the nationality sometimes switches group when the data are resampled.
+
+**What it shows.** Without being told anything about the countries, the method separates three groups: two nationalities the AI links to a risk (Nigeria, Afghanistan), a group it "defends" ("his origin does not matter") without flattering it, and a group it flatters with compliments on its culture.
+:::
+
+```{r}
+#| label: fig-clusters
+#| fig-cap: "Profiles of the 24 nationalities (share of answers in %, both models pooled, about 198 judged answers per row) and their hierarchical clustering (Ward). Cell colour: gap to the mean of the nationalities, in standard deviations of the logit. Square: group; transparency: share of bootstrap replicates in which the nationality stays in its group."
+#| fig-height: 6.2
+FSHORT <- c(defensive_marking = "\"origin does\nnot matter\"", stereo_pos = "positive\nstereotype",
+            stereo_neg = "negative\nstereotype", negative_association = "negative\nassociation",
+            alarm_high = "high\nalarm", caution_alarm = "caution or\nalarm", protective = "protective\nadvice",
+            encounter = "encounter\nframing", asks_clarification = "asks for\nclarification")
+lv <- prof$country[hc$order]
+ny <- length(lv)
+ycont <- scale_y_continuous(limits = c(0.5, ny + 0.5), expand = c(0, 0))
+cols <- names(sort(pca$rotation[, 1]))
+cells <- prof |> select(country, all_of(names(FEAT))) |>
+  pivot_longer(-country, names_to = "f", values_to = "p") |>
+  left_join(as_tibble(Zc, rownames = "country") |> pivot_longer(-country, names_to = "f", values_to = "z"),
+            by = c("country", "f")) |>
+  mutate(y = match(country, lv), f = factor(f, levels = cols),
+         lab = ifelse(100 * p < 0.95, "<1", num(100 * p, 0)))
+rows <- tibble(country = lv, y = seq_len(ny), g = gname(lv), stay = stay[lv], lab = nm(lv))
+p_tree <- ggplot(dendro_segments(hc)) +
+  geom_segment(aes(x, y, xend = xend, yend = yend), colour = MUTED, linewidth = 0.35) +
+  scale_x_reverse(expand = c(0, 0)) + ycont + theme_void()
+p_grp <- ggplot(rows, aes(1, y)) +
+  geom_tile(aes(fill = g, alpha = stay), width = 0.9, height = 0.9) +
+  geom_text(aes(x = 1.7, label = lab), hjust = 0, family = "Inter", size = 2.7, colour = INK) +
+  scale_fill_manual(values = GCOL) +
+  scale_alpha(range = c(0.3, 1), limits = c(0.5, 1), guide = "none") +
+  scale_x_continuous(limits = c(0.5, 9.5), expand = c(0, 0)) + ycont +
+  coord_cartesian(clip = "off") +
+  theme_void() + theme(legend.position = "none")
+p_heat <- ggplot(cells, aes(f, y, fill = pmax(pmin(z, 2.5), -2.5))) +
+  geom_tile(colour = "white", linewidth = 0.4) +
+  geom_text(aes(label = lab, colour = abs(z) > 1.6), family = "Inter", size = 2.3) +
+  scale_colour_manual(values = c(`FALSE` = INK, `TRUE` = "white"), guide = "none") +
+  scale_fill_gradient2(low = "#2a78d6", mid = "#f7f6f2", high = "#d63c2a", limits = c(-2.5, 2.5),
+                       name = "gap to the mean (SD)  ") +
+  scale_x_discrete(position = "top", labels = gsub("\n", " ", FSHORT)) + ycont +
+  labs(x = NULL, y = NULL) +
+  theme(panel.grid = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank(),
+        axis.ticks.length = unit(0, "pt"),
+        axis.text.x.top = element_text(size = 7, colour = INK, angle = 35, hjust = 0, vjust = 0),
+        legend.position = "bottom", legend.title = element_text(size = 7.5, colour = MUTED),
+        legend.key.height = unit(6, "pt"), legend.key.width = unit(22, "pt"),
+        plot.margin = margin(5, 40, 5, 0))
+p_tree + p_grp + p_heat + plot_layout(widths = c(0.9, 2.1, 6))
+```
+
+@fig-pca gives the same picture as a map. The first axis of the principal component analysis explains
+`r num(ve[1], 0)` % of the variance between nationalities. It opposes defensive marking, caution, high
+alarm and negative associations to compliments and encounter framing: it is the "cultural guide" versus
+"security guard" axis of @fig-summary, found here without being assumed. A nationality's position on this
+axis matches almost exactly the index used in the summary chart (defensive marking minus positive
+stereotypes, Spearman $\rho = `r num(abs(rho_idx), 2)`$). The second axis (`r num(ve[2], 0)` %) is mostly
+driven by negative stereotypes and requests for clarification, two rare indicators: it is noisier and we do
+not interpret it.
+
+Clustering each model on its own gives noisier groups (about 99 answers per nationality): the agreement
+between the Granite and Qwen partitions is moderate (adjusted Rand index `r num(ari_models, 2)`), and each
+agrees with the pooled partition at `r num(ari_pooled[[1]], 2)` (Granite) and `r num(ari_pooled[[2]], 2)`
+(Qwen). Nigeria is in the "risk" group in both models. Afghanistan joins it with Qwen (together with
+Russia) but falls among the "defended" with Granite; Granite also moves France, Belgium and the United States
+to the "defended", and Qwen moves Morocco to the "guided". The three-group structure is therefore clearer
+than the exact membership of each border nationality.
+
+::: {.callout-tip appearance="simple" icon=false}
+## How to read this chart
+
+**Reading.** Each dot is a nationality; two nationalities close to each other were treated alike by the AI. The grey arrows show the kinds of answers: a nationality lies towards the arrows of the answers it gets most. The colours are the three groups of the previous chart.
+
+**What it shows.** The nationalities spread along one main horizontal line, from "cultural guide" on the left (compliments, ice-breakers) to "security guard" on the right ("his origin does not matter", caution, risks). Nigeria and Afghanistan stand far to the right, apart from all the others.
+:::
+
+```{r}
+#| label: fig-pca
+#| fig-cap: "Principal component analysis of the 24 nationality profiles (standardised logits of nine indicators, both models pooled). Dots: nationalities, coloured by group (@fig-clusters). Arrows: indicators (loadings, rescaled)."
+#| fig-height: 4.6
+sc <- tibble(country = rownames(pca$x), x = pca$x[, 1], y = pca$x[, 2], g = gname(country), lab = nm(country))
+sk <- 0.85 * max(abs(pca$x[, 1:2])) / max(abs(pca$rotation[, 1:2]))
+ld <- tibble(f = rownames(pca$rotation), x = sk * pca$rotation[, 1], y = sk * pca$rotation[, 2],
+             lab = gsub("\n", " ", FSHORT[f]))
+ggplot() +
+  geom_hline(yintercept = 0, colour = GRID) + geom_vline(xintercept = 0, colour = GRID) +
+  geom_segment(data = ld, aes(0, 0, xend = x, yend = y), colour = "#b9b7b1", linewidth = 0.35,
+               arrow = arrow(length = unit(3, "pt"))) +
+  geom_point(data = sc, aes(x, y, colour = g), size = 2.2) +
+  # one repel layer for nationalities and arrow labels, so that they avoid each other
+  geom_text_repel(data = bind_rows(sc |> mutate(face = "plain", sz = 2.6),
+                                   ld |> mutate(g = "arrow", face = "italic", sz = 2.3)),
+                  aes(x, y, label = lab, colour = g, fontface = face, size = sz), family = "Inter", seed = 3,
+                  max.overlaps = 60, show.legend = FALSE, min.segment.length = 0.3, box.padding = 0.2) +
+  scale_size_identity() +
+  scale_colour_manual(values = c(GCOL, arrow = MUTED), breaks = names(GCOL)) +
+  scale_x_continuous(expand = expansion(mult = 0.18)) +
+  coord_equal() +
+  labs(x = sprintf("axis 1 (%.0f %%): cultural guide  →  security guard", ve[1]),
+       y = sprintf("axis 2 (%.0f %%)", ve[2]))
 ```
 
 ## Agreement between the judge and regular expressions
