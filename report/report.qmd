@@ -972,6 +972,13 @@ migration) for Nigerian, Afghan, Indian or Balkan men. Two models from different
 ranking. Next steps are to judge the models already generated (Gemma, Ministral), to validate the rubric
 on a hand-annotated sample, and to extend the protocol to other languages.
 
+# Acknowledgements {.unnumbered}
+
+Every generation and judging run of this study used the free GPU quota of Kaggle (two NVIDIA T4 per
+session): without it, this work would not have been possible. The evaluated models (Granite 4.2 8B by IBM,
+Qwen3.5-9B by Alibaba) and the judge (Qwen3-32B-AWQ) are released with open weights, which is what makes
+such an independent audit possible.
+
 # Data and code availability {.unnumbered}
 
 All notebooks and datasets of the project, published under the name *Alone With a Stranger*, are gathered in a

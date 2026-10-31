@@ -86,8 +86,29 @@ local({
     scale_y_continuous(limits = c(0, 1)) +
     theme_void() + theme(plot.background = element_rect(fill = BG, colour = NA))
 
-  page <- (byline / ring / key) +
-    plot_layout(heights = c(0.55, 11, 0.6)) +
+  # logo strip: models tested, judge, and Kaggle for the free GPU quota. Units are inches (coord_fixed),
+  # so the logos keep their aspect ratio.
+  logo <- function(file, x, h, y = STRIP_H / 2) {
+    img <- png::readPNG(file.path("logos", file))
+    w <- h * dim(img)[2] / dim(img)[1]
+    annotation_raster(img, xmin = x, xmax = x + w, ymin = y - h / 2, ymax = y + h / 2)
+  }
+  STRIP_W <- 7.6; STRIP_H <- 0.5; LH <- 0.34
+  tag <- function(x, txt) annotate("text", x = x, y = STRIP_H / 2, label = txt, hjust = 0, family = BODY,
+                                   size = 2.5, colour = DIM, fontface = "bold")
+  name <- function(x, txt) annotate("text", x = x, y = STRIP_H / 2, label = txt, hjust = 0, family = BODY,
+                                    size = 3.1, colour = FG)
+  strip <- ggplot() +
+    annotate("segment", x = 0, xend = STRIP_W, y = STRIP_H, yend = STRIP_H, colour = RING, linewidth = 0.4) +
+    tag(0, "MODELS") + logo("granite.png", 0.62, LH) + name(1.02, "Granite 4.2 8B") +
+    logo("qwen.png", 2.05, LH) + name(2.45, "Qwen3.5-9B") +
+    tag(3.47, "JUDGE") + logo("qwen.png", 4.0, LH) + name(4.4, "Qwen3-32B") +
+    tag(5.32, "GPUs") + logo("kaggle.png", 5.77, LH * 0.82) + name(6.58, "free quota, 2\u00d7 T4") +
+    coord_fixed(xlim = c(0, STRIP_W), ylim = c(0, STRIP_H), expand = FALSE, clip = "off") +
+    theme_void() + theme(plot.background = element_rect(fill = BG, colour = NA))
+
+  page <- (byline / ring / key / strip) +
+    plot_layout(heights = c(0.55, 11, 0.6, 0.85)) +
     plot_annotation(
       title = "She Is Alone With a Man",
       subtitle = paste0("The situation should change the advice. His nationality should not.\n",
@@ -96,7 +117,8 @@ local({
         "Granite 4.2 8B and Qwen3.5-9B · 14,850 answers in French · 5,135 rated by an LLM judge (Qwen3-32B) · ",
         "24 nationalities · 11 situations · 3 ages\n",
         "Petals: share of answers, mean of both models, sorted from \"cultural guide\" (blue) to \"security guard\" (coral).\n",
-        "The empty centre is \"a man\" with no nationality: he gets almost neither.\n\n",
+        "The empty centre is \"a man\" with no nationality: he gets almost neither.\n",
+        "All runs used Kaggle's free GPU quota: this work would not have been possible without it.\n\n",
         month.name[as.integer(format(Sys.Date(), "%m"))], " ", format(Sys.Date(), "%Y"),
         "   ·   x.com/rastadidi   ·   dev.to/adriens   ·   linkedin.com/in/adrien-sales   ·   kaggle.com/adriensales"),
       theme = theme(
