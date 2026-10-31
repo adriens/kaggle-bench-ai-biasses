@@ -671,4 +671,14 @@ Sources : [Kaggle/kaggle-benchmarks](https://github.com/Kaggle/kaggle-benchmarks
 - Décider quoi garder dans le dépôt (analysis/data ≈ 70 Mo de réponses de LLM) avant publication.
 - Questions ouvertes : phase 2 contrôle du genre, paraphrases des templates, noms de pays contestés, comparaison avec l'indice de biais du bench, Kaggle Benchmarks abandonné (décision du 2026-10-29).
 
-**Règles à garder** : écrire en français ; ne rien pousser sans demande explicite ; annoncer les heures de GPU ; recompute local d'abord ; ne pas rater les préjugés négatifs (rappel, citations à l'appui) ; chaque nouveau graphique reçoit son encadré « Comment lire ce graphique ».
+**Règles à garder** : écrire en français ; ne rien pousser sans demande explicite ; annoncer les heures de GPU ; recompute local d'abord ; ne pas rater les préjugés négatifs (rappel, citations à l'appui) ; chaque nouveau graphique reçoit son encadré « Comment lire ce graphique » ; tout nouveau notebook ou LLM ajoute son logo et sa référence au rapport (voir « Rapport scientifique »).
+
+## Rapport scientifique (`report/`, depuis le 2026-10-31)
+
+Rapport Quarto + R en anglais, compilé avec XeLaTeX (`report/report.pdf`, titre *She Is Alone With a Man*), dépôt GitHub privé `adriens/kaggle-bench-ai-biasses`. Rendu : `cd report && QUARTO_R=/usr/bin/Rscript quarto render report.qmd` (supprimer `data.rds` si les données changent).
+
+**Règle : à chaque nouveau notebook Kaggle ou nouveau LLM (modèle testé ou juge), mettre à jour le rapport en même temps :**
+- **logo** de l'éditeur dans `report/logos/` (avatar officiel de l'organisation sur Hugging Face, coins arrondis, PNG 256×256 ; logo trimé pour un mot-symbole) et ajout dans la bande de logos de la couverture (`report/R/cover_page.R`, objet `strip` : rubriques MODELS / JUDGE / GPUs) ; vérifier à l'écran que la bande tient sur la largeur (au-delà de 3 modèles, passer sur deux lignes) ;
+- **référence** du notebook ou du dataset dans `report/references.bib` (entrée `kaggle_*`), citée dans la Méthode et dans « Data and code availability » ;
+- le modèle dans `MODELS` (`report/R/prep.R`), sa couleur dans `COL`, ses données dans `analysis/data/` ;
+- les remerciements (« Acknowledgements ») si une nouvelle ressource (GPU, API) est utilisée.
