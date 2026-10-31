@@ -71,6 +71,9 @@ format:
         \definecolor{cMuted}{HTML}{5B5A56}
         \definecolor{cPaper}{HTML}{F6F5F2}
 bibliography: references.bib
+csl: ieee.csl
+link-citations: true
+link-bibliography: true
 execute:
   echo: false
   warning: false
@@ -973,7 +976,7 @@ on a hand-annotated sample, and to extend the protocol to other languages.
 
 All notebooks and datasets of the project, published under the name *Alone With a Stranger*, are gathered in a
 Kaggle collection [@kaggle_collection]. The
-generation notebooks (one per model: @kaggle_granite; @kaggle_qwen; @kaggle_gemma; @kaggle_ministral)
+generation notebooks, one per model [@kaggle_granite; @kaggle_qwen; @kaggle_gemma; @kaggle_ministral],
 record the model revision, vLLM version, seeds and every answer; the judge notebook [@kaggle_judge] records
 the rubric, the judge revision and every verdict. The answers and `rts-v4` verdicts analysed here are
 released under CC0-1.0 [@kaggle_data]. This report is a Quarto document that recomputes every figure,
