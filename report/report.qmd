@@ -1192,7 +1192,114 @@ Inside the second block, `r pc(min(magnet("NGA")[1], magnet("AFG")[1]))` to
 Nigerian or an Afghan man: the vocabulary of origin and caution that the AI uses for them is a milder
 version of the one it uses for the whole block. Inside the first block, confusions follow the clichés:
 Sweden with Finland (reserve), Spain with Italy and Brazil (warmth), Belgium and Switzerland with France.
-Lexicometry names the words behind these blocks (@fig-specificities).
+
+```{r}
+#| label: net-stats
+# The confusions as a network: an arrow A -> B when at least TH % of A's answers are guessed as B.
+conf_graph <- function(th) {
+  e <- as.data.frame(as.table(conf)) |> setNames(c("from", "to", "pct")) |>
+    mutate(across(c(from, to), as.character)) |> filter(from != to, pct >= th)
+  v <- tibble(name = rownames(conf), pulled = colSums(conf) - diag(conf))
+  igraph::graph_from_data_frame(e, vertices = v)
+}
+louvain <- function(g) {
+  set.seed(4)
+  igraph::cluster_louvain(igraph::as_undirected(g, mode = "collapse", edge.attr.comb = list(pct = "sum")))
+}
+NET_TH <- 5
+gnet <- conf_graph(NET_TH)
+cnet <- louvain(gnet)
+memb <- setNames(igraph::membership(cnet), igraph::V(gnet)$name)
+nb_comm <- function(th) length(unique(igraph::membership(louvain(conf_graph(th)))))
+same_as <- function(th) {
+  m <- setNames(igraph::membership(louvain(conf_graph(th))), rownames(conf))
+  ari(m[names(memb)], memb)
+}
+# community of the second block (the one Nigeria belongs to)
+b2 <- names(memb)[memb == memb[["NGA"]]]
+pulled <- sort(colSums(conf) - diag(conf), decreasing = TRUE)
+```
+
+@fig-network draws the same confusions as a network. A community detection algorithm (Louvain
+[@blondel2008]), which is given only the arrows, finds `r length(unique(memb))` groups (modularity
+`r num(igraph::modularity(cnet), 2)`): `r paste(nm(sort(b2)), collapse = ", ")` on one side, every other
+nationality on the other. The split does not depend on the threshold chosen to draw an arrow: with 6 % it
+is the same (adjusted Rand index `r num(same_as(6), 2)` with the 5 % partition) except that Japan, the
+easiest nationality to recognise, stands alone; with 4 % only Russia changes side (`r num(same_as(4), 2)`).
+The nationalities most often mistaken for others are
+`r paste(nm(names(pulled)[names(pulled) %in% b2][1:2]), collapse = " and ")` in the first group, and
+`r nm(names(pulled)[!names(pulled) %in% b2][1])` in the second.
+
+::: {.callout-tip appearance="simple" icon=false}
+## How to read this chart
+
+**Reading.** Each dot is a nationality. An arrow from A to B means that at least 5 % of the answers about A were mistaken for answers about B; the thicker the arrow, the more often. The bigger the dot, the more often other nationalities are mistaken for it. The colours are the two groups the computer found by itself, from the arrows alone.
+
+**What it shows.** Two separate worlds, joined by only a few thin arrows. In the red one, every nationality is mistaken for every other, and arrows converge on Nigeria and Afghanistan. In the blue one, the arrows follow clichés: Spain, Italy and Brazil (warmth), Finland and Sweden (reserve), Belgium, Switzerland and France (French-speaking).
+:::
+
+```{r}
+#| label: fig-network
+#| fig-cap: "The classifier's confusions as a network (shared vocabulary, four models). Arrow A → B: at least 5 % of A's answers guessed as B; width: that share. Dot size: share of the other nationalities' answers guessed as this one (sum over rows). Colour: Louvain communities computed from the arrows. Force-directed layout (Fruchterman–Reingold)."
+#| fig-height: 5.4
+igraph::V(gnet)$comm <- ifelse(memb[igraph::V(gnet)$name] == memb[["NGA"]], "origin", "qualities")
+igraph::V(gnet)$lab <- nm(igraph::V(gnet)$name)
+set.seed(4)
+ggraph::ggraph(gnet, layout = "fr", weights = igraph::E(gnet)$pct) +
+  ggraph::geom_edge_fan(aes(width = pct, alpha = pct), colour = "#7a7873",
+                        arrow = arrow(length = unit(2.6, "pt"), type = "closed"),
+                        end_cap = ggraph::circle(7, "pt")) +
+  ggraph::geom_node_point(aes(size = pulled, colour = comm)) +
+  ggraph::geom_node_text(aes(label = lab, colour = comm), size = 2.7, family = "Inter", fontface = "bold",
+                         repel = TRUE, bg.colour = "white", bg.r = 0.12, seed = 4) +
+  ggraph::scale_edge_width(range = c(0.15, 1.5), guide = "none") +
+  ggraph::scale_edge_alpha(range = c(0.25, 0.85), guide = "none") +
+  scale_size(range = c(1.8, 7), guide = "none") +
+  scale_colour_manual(values = c(origin = "#d63c2a", qualities = "#2a78d6"),
+                      labels = c(origin = "group 1", qualities = "group 2")) +
+  theme_void(base_family = "Inter") +
+  theme(legend.position = "top", legend.title = element_blank())
+```
+
+The classifier's own weights give a second graph (@fig-wordgraph): each nationality is linked to the five
+words that point to it most, and a word shared by several nationalities becomes a bridge between them.
+
+::: {.callout-tip appearance="simple" icon=false}
+## How to read this chart
+
+**Reading.** Coloured dots are nationalities; words in grey italics are the clues the computer uses to recognise them (in French, as the AI wrote them). A line joins a nationality to one of its five strongest clues; the thicker the line, the stronger the clue. A word with several lines is a clue shared by several nationalities.
+
+**What it shows.** The biggest hub is *origine* (origin): it links Albania, Algeria, India, Nigeria and Afghanistan, the men the AI talks about through where they come from. Nigeria is also tied to *argent* (money) and *arnaques* (scams), Afghanistan to *femmes* (women). On the other side, the hubs are compliments: *chaleureux* (warm) for Spain, Italy and Brazil, *réservés* (reserved) and *silence* for Finland, the United Kingdom and Japan, *ponctualité* for Germany and Switzerland, *humour* for the United Kingdom, Australia and Belgium.
+:::
+
+```{r}
+#| label: fig-wordgraph
+#| fig-cap: "Nationality–clue graph from the classifier's weights (logistic regression on the shared vocabulary of four models): each nationality is joined to its five single words with the largest positive coefficients; edge width: coefficient. Red: group 1 and blue: group 2 of @fig-network. Five leftover words are left out: four English or German words (small, hope, need, gut) and *usa*, which escaped masking."
+#| fig-height: 6.6
+LEFTOVER <- c("small", "hope", "need", "gut", "usa")
+tt <- read.csv(file.path(GUESS, "top_terms.csv")) |>
+  filter(setting == "shared", !grepl(" ", term), !term %in% LEFTOVER) |>
+  group_by(country) |> slice_max(coef, n = 5) |> ungroup()
+wn <- bind_rows(tibble(name = unique(tt$country), kind = "nat"), tibble(name = unique(tt$term), kind = "word")) |>
+  mutate(lab = ifelse(kind == "nat", nm(name), name),
+         grp = ifelse(kind == "word", "word", ifelse(name %in% b2, "origin", "qualities")))
+gw <- igraph::graph_from_data_frame(tt |> transmute(from = country, to = term, coef), vertices = wn)
+igraph::V(gw)$deg <- igraph::degree(gw)
+set.seed(3)
+ggraph::ggraph(gw, layout = "fr", niter = 3000) +
+  ggraph::geom_edge_link(aes(width = coef), colour = "#b9b7b1", alpha = 0.7) +
+  ggraph::geom_node_point(aes(filter = kind == "nat", colour = grp), size = 3.2) +
+  ggraph::geom_node_text(aes(filter = kind == "word", label = lab, size = deg), family = "Inter",
+                         fontface = "italic", colour = "#3a3936", bg.colour = "white", bg.r = 0.1) +
+  ggraph::geom_node_text(aes(filter = kind == "nat", label = lab, colour = grp), size = 2.7, family = "Inter",
+                         fontface = "bold", repel = TRUE, bg.colour = "white", bg.r = 0.12, seed = 3) +
+  scale_size(range = c(2, 3.8), guide = "none") +
+  ggraph::scale_edge_width(range = c(0.2, 1.5), guide = "none") +
+  scale_colour_manual(values = c(origin = "#d63c2a", qualities = "#2a78d6"), guide = "none") +
+  theme_void(base_family = "Inter")
+```
+
+Lexicometry confirms these words with a statistical test, nationality by nationality (@fig-specificities).
 
 ::: {.callout-tip appearance="simple" icon=false}
 ## How to read this chart
