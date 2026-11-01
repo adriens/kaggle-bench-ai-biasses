@@ -1202,47 +1202,59 @@ conf_graph <- function(th) {
   v <- tibble(name = rownames(conf), pulled = colSums(conf) - diag(conf))
   igraph::graph_from_data_frame(e, vertices = v)
 }
+# Louvain on the undirected graph, weighted by the confusion rates (A -> B and B -> A summed)
 louvain <- function(g) {
+  u <- igraph::as_undirected(g, mode = "collapse", edge.attr.comb = list(pct = "sum"))
   set.seed(4)
-  igraph::cluster_louvain(igraph::as_undirected(g, mode = "collapse", edge.attr.comb = list(pct = "sum")))
+  igraph::cluster_louvain(u, weights = igraph::E(u)$pct)
+}
+communities <- function(th) {
+  m <- igraph::membership(louvain(conf_graph(th)))
+  split(rownames(conf), m[rownames(conf)])
 }
 NET_TH <- 5
 gnet <- conf_graph(NET_TH)
 cnet <- louvain(gnet)
-memb <- setNames(igraph::membership(cnet), igraph::V(gnet)$name)
-nb_comm <- function(th) length(unique(igraph::membership(louvain(conf_graph(th)))))
-same_as <- function(th) {
-  m <- setNames(igraph::membership(louvain(conf_graph(th))), rownames(conf))
-  ari(m[names(memb)], memb)
-}
-# community of the second block (the one Nigeria belongs to)
-b2 <- names(memb)[memb == memb[["NGA"]]]
+comms <- communities(NET_TH)
+# group 1 is Nigeria's community, the others follow by decreasing size
+comms <- c(Filter(\(x) "NGA" %in% x, comms),
+           Filter(\(x) !"NGA" %in% x, comms)[order(-lengths(Filter(\(x) !"NGA" %in% x, comms)))])
+names(comms) <- paste("group", seq_along(comms))
+grp_of <- setNames(rep(names(comms), lengths(comms)), unlist(comms))
+b2 <- comms[["group 1"]]
+GRP_COL <- setNames(c("#d63c2a", "#2a78d6", "#1baf7a", "#eda100", "#6250d6", "#7a7873")[seq_along(comms)],
+                    names(comms))
+alt <- lapply(c(`4` = 4, `6` = 6), communities)
+g1_stable <- all(sapply(alt, \(cs) any(sapply(cs, \(x) setequal(x, b2)))))
+others_txt <- function(cs) paste(sapply(Filter(\(x) !setequal(x, b2), cs), \(x) paste(sort(nm(x)), collapse = ", ")),
+                                 collapse = "; ")
 pulled <- sort(colSums(conf) - diag(conf), decreasing = TRUE)
 ```
 
 @fig-network draws the same confusions as a network. A community detection algorithm (Louvain
-[@blondel2008]), which is given only the arrows, finds `r length(unique(memb))` groups (modularity
-`r num(igraph::modularity(cnet), 2)`): `r paste(nm(sort(b2)), collapse = ", ")` on one side, every other
-nationality on the other. The split does not depend on the threshold chosen to draw an arrow: with 6 % it
-is the same (adjusted Rand index `r num(same_as(6), 2)` with the 5 % partition) except that Japan, the
-easiest nationality to recognise, stands alone; with 4 % only Russia changes side (`r num(same_as(4), 2)`).
-The nationalities most often mistaken for others are
-`r paste(nm(names(pulled)[names(pulled) %in% b2][1:2]), collapse = " and ")` in the first group, and
-`r nm(names(pulled)[!names(pulled) %in% b2][1])` in the second.
+[@blondel2008], weighted by the confusion rates), which is given only the arrows, finds
+`r length(comms)` groups (modularity `r num(igraph::modularity(cnet), 2)`). Group 1 gathers
+`r paste(sort(nm(b2)), collapse = ", ")`; the other nationalities split into
+`r others_txt(comms)`. `r if (g1_stable) "Group 1 does not depend on the threshold chosen to draw an arrow: it is identical with 4 % and with 6 %." else "Group 1 changes with the threshold chosen to draw an arrow."`
+The rest is less stable: with 6 % it splits into the cliché families (`r others_txt(alt[["6"]])`),
+with 4 % into `r length(alt[["4"]]) - 1` groups, as with 5 %. The AI treats the nationalities of group 1 as one block, but
+tells the others apart by their stereotypes. The nationalities most often mistaken for others are
+`r paste(nm(names(pulled)[names(pulled) %in% b2][1:2]), collapse = " and ")` in group 1, and
+`r nm(names(pulled)[!names(pulled) %in% b2][1])` among the others.
 
 ::: {.callout-tip appearance="simple" icon=false}
 ## How to read this chart
 
-**Reading.** Each dot is a nationality. An arrow from A to B means that at least 5 % of the answers about A were mistaken for answers about B; the thicker the arrow, the more often. The bigger the dot, the more often other nationalities are mistaken for it. The colours are the two groups the computer found by itself, from the arrows alone.
+**Reading.** Each dot is a nationality. An arrow from A to B means that at least 5 % of the answers about A were mistaken for answers about B; the thicker the arrow, the more often. The bigger the dot, the more often other nationalities are mistaken for it. The colours are the groups the computer found by itself, from the arrows alone and their thickness.
 
-**What it shows.** Two separate worlds, joined by only a few thin arrows. In the red one, every nationality is mistaken for every other, and arrows converge on Nigeria and Afghanistan. In the blue one, the arrows follow clichés: Spain, Italy and Brazil (warmth), Finland and Sweden (reserve), Belgium, Switzerland and France (French-speaking).
+**What it shows.** Two separate worlds, joined by only a few thin arrows. In the red group, every nationality is mistaken for every other, and arrows converge on Nigeria and Afghanistan: the AI talks about all of them in nearly the same way. On the other side, the arrows follow clichés and form smaller families: Spain, Italy and Brazil (warmth) in green; Finland and Sweden (reserve), Belgium, Switzerland and France (French-speaking), the United Kingdom, the United States and Australia in blue.
 :::
 
 ```{r}
 #| label: fig-network
-#| fig-cap: "The classifier's confusions as a network (shared vocabulary, four models). Arrow A → B: at least 5 % of A's answers guessed as B; width: that share. Dot size: share of the other nationalities' answers guessed as this one (sum over rows). Colour: Louvain communities computed from the arrows. Force-directed layout (Fruchterman–Reingold)."
+#| fig-cap: "The classifier's confusions as a network (shared vocabulary, four models). Arrow A → B: at least 5 % of A's answers guessed as B; width: that share. Dot size: share of the other nationalities' answers guessed as this one (sum over rows). Colour: Louvain communities computed from the arrows, weighted by their share. Force-directed layout (Fruchterman–Reingold)."
 #| fig-height: 5.4
-igraph::V(gnet)$comm <- ifelse(memb[igraph::V(gnet)$name] == memb[["NGA"]], "origin", "qualities")
+igraph::V(gnet)$comm <- grp_of[igraph::V(gnet)$name]
 igraph::V(gnet)$lab <- nm(igraph::V(gnet)$name)
 set.seed(4)
 ggraph::ggraph(gnet, layout = "fr", weights = igraph::E(gnet)$pct) +
@@ -1255,8 +1267,7 @@ ggraph::ggraph(gnet, layout = "fr", weights = igraph::E(gnet)$pct) +
   ggraph::scale_edge_width(range = c(0.15, 1.5), guide = "none") +
   ggraph::scale_edge_alpha(range = c(0.25, 0.85), guide = "none") +
   scale_size(range = c(1.8, 7), guide = "none") +
-  scale_colour_manual(values = c(origin = "#d63c2a", qualities = "#2a78d6"),
-                      labels = c(origin = "group 1", qualities = "group 2")) +
+  scale_colour_manual(values = GRP_COL) +
   theme_void(base_family = "Inter") +
   theme(legend.position = "top", legend.title = element_blank())
 ```
@@ -1274,7 +1285,7 @@ words that point to it most, and a word shared by several nationalities becomes 
 
 ```{r}
 #| label: fig-wordgraph
-#| fig-cap: "Nationality–clue graph from the classifier's weights (logistic regression on the shared vocabulary of four models): each nationality is joined to its five single words with the largest positive coefficients; edge width: coefficient. Red: group 1 and blue: group 2 of @fig-network. Five leftover words are left out: four English or German words (small, hope, need, gut) and *usa*, which escaped masking."
+#| fig-cap: "Nationality–clue graph from the classifier's weights (logistic regression on the shared vocabulary of four models): each nationality is joined to its five single words with the largest positive coefficients; edge width: coefficient. Colours: the communities of @fig-network (not recomputed on this graph). Five leftover words are left out: four English or German words (small, hope, need, gut) and *usa*, which escaped masking."
 #| fig-height: 6.6
 LEFTOVER <- c("small", "hope", "need", "gut", "usa")
 tt <- read.csv(file.path(GUESS, "top_terms.csv")) |>
@@ -1282,7 +1293,7 @@ tt <- read.csv(file.path(GUESS, "top_terms.csv")) |>
   group_by(country) |> slice_max(coef, n = 5) |> ungroup()
 wn <- bind_rows(tibble(name = unique(tt$country), kind = "nat"), tibble(name = unique(tt$term), kind = "word")) |>
   mutate(lab = ifelse(kind == "nat", nm(name), name),
-         grp = ifelse(kind == "word", "word", ifelse(name %in% b2, "origin", "qualities")))
+         grp = ifelse(kind == "word", "word", grp_of[name]))
 gw <- igraph::graph_from_data_frame(tt |> transmute(from = country, to = term, coef), vertices = wn)
 igraph::V(gw)$deg <- igraph::degree(gw)
 set.seed(3)
@@ -1295,7 +1306,7 @@ ggraph::ggraph(gw, layout = "fr", niter = 3000) +
                          fontface = "bold", repel = TRUE, bg.colour = "white", bg.r = 0.12, seed = 3) +
   scale_size(range = c(2, 3.8), guide = "none") +
   ggraph::scale_edge_width(range = c(0.2, 1.5), guide = "none") +
-  scale_colour_manual(values = c(origin = "#d63c2a", qualities = "#2a78d6"), guide = "none") +
+  scale_colour_manual(values = GRP_COL, guide = "none") +
   theme_void(base_family = "Inter")
 ```
 
