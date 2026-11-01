@@ -1155,7 +1155,7 @@ chance level.
 
 **Reading.** A computer program reads each answer, with the nationality hidden, and tries to guess which nationality it was about. Each row is the true nationality, each column the program's guess. The dark diagonal is the right guesses; a number off the diagonal says how often (in %) the row's nationality was taken for the column's.
 
-**What it shows.** The mistakes are not random. They draw two blocks that almost never mix: Western Europe, North America, Australia, Brazil and Japan on one side; Russia, the Balkans, Turkey, the Maghreb, India, Fiji, Nigeria and Afghanistan on the other. Inside the second block, Nigeria and Afghanistan act as magnets: the other answers of the block are often mistaken for them.
+**What it shows.** The mistakes are not random. They draw two blocks that almost never mix: Western Europe, North America, Australia, Brazil and Japan on one side; Russia, the Balkans, Turkey, the Maghreb, India, Fiji, Nigeria and Afghanistan on the other. Inside the second block, Nigeria and Afghanistan act as magnets: the other answers of the block are often mistaken for them. The first block is less uniform: smaller families appear inside it, such as Brazil, Spain and Italy (the network of the next chart separates them as a third group).
 :::
 
 ```{r}
@@ -1247,7 +1247,7 @@ tells the others apart by their stereotypes. The nationalities most often mistak
 
 **Reading.** Each dot is a nationality. An arrow from A to B means that at least 5 % of the answers about A were mistaken for answers about B; the thicker the arrow, the more often. The bigger the dot, the more often other nationalities are mistaken for it. The colours are the groups the computer found by itself, from the arrows alone and their thickness.
 
-**What it shows.** Two separate worlds, joined by only a few thin arrows. In the red group, every nationality is mistaken for every other, and arrows converge on Nigeria and Afghanistan: the AI talks about all of them in nearly the same way. On the other side, the arrows follow clichés and form smaller families: Spain, Italy and Brazil (warmth) in green; Finland and Sweden (reserve), Belgium, Switzerland and France (French-speaking), the United Kingdom, the United States and Australia in blue.
+**What it shows.** Three groups, joined by only a few thin arrows, but they are not alike. The red group is one dense knot: every nationality in it is mistaken for every other, and arrows converge on Nigeria and Afghanistan, so the AI talks about all of them in nearly the same way. In the blue and green groups, the arrows follow clichés instead: Spain, Italy and Brazil (warmth) form the green group; in the blue one, Finland and Sweden (reserve), Belgium, Switzerland and France (French-speaking), the United Kingdom, the United States and Australia each pair up.
 :::
 
 ```{r}
