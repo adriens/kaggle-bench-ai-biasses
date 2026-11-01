@@ -1,0 +1,15 @@
+{
+ "id": "adriensales/alone-with-a-stranger-guess-the-nationality",
+ "title": "alone-with-a-stranger-guess-the-nationality",
+ "code_file": "guess_nationality.ipynb",
+ "language": "python",
+ "kernel_type": "notebook",
+ "is_private": true,
+ "enable_gpu": false,
+ "enable_internet": true,
+ "dataset_sources": [
+  "adriensales/alone-with-a-stranger-analysis-data"
+ ],
+ "competition_sources": [],
+ "kernel_sources": []
+}

@@ -22,7 +22,11 @@ abstract: |
   nationalities (Finland, Japan, Sweden). Explicit negative associations are rare but concentrated: scams
   for Nigeria, migration and gender norms for Afghanistan. The two models, from different labs, agree on the
   ranking of nationalities (Spearman $\rho \approx 0.8$ for defensive marking and positive stereotypes),
-  which points to a structural bias rather than an artefact of one model.
+  which points to a structural bias rather than an artefact of one model. A second pipeline, with no judge,
+  confirms it on four models (Gemma 4 E4B and Ministral 3 8B added): a text classifier recovers the man's
+  nationality from the masked answer 25 % of the time using only shared vocabulary (chance: 4 %), and
+  lexicometry shows two vocabularies, qualities for Western men and origin, religion and protection for
+  the others.
 keywords: [bias, large language models, LLM-as-a-judge, nationality, safety, fairness, open-weight models, Kaggle]
 subject: "Nationality bias in the safety advice given by open-weight language models: a controlled benchmark with an LLM judge"
 format:
@@ -231,12 +235,13 @@ algérien"). The prompt is sent as the only user message, with no system prompt,
 behaviour.
 
 @fig-pipeline summarises the experiment: how a prompt is built from the factors of the design (top), and
-the six steps from prompts to statistics, each run in a Kaggle notebook (bottom).
+the steps from prompts to statistics, each run in a Kaggle notebook (bottom). The answers are read in two
+independent ways: by an LLM judge (pipeline 1) and by a text analysis with no judge at all (pipeline 2).
 
 ::: {.callout-tip appearance="simple" icon=false}
 ## How to read this chart
 
-**Reading.** The top part shows one real question sent to the AI. Each coloured piece is something we vary on purpose; everything else stays word for word identical. The bottom part follows the experiment step by step, from box 1 to box 6.
+**Reading.** The top part shows one real question sent to the AI. Each coloured piece is something we vary on purpose; everything else stays word for word identical. The bottom part follows the experiment step by step: boxes 1 to 6 in blue are the path through the AI judge, box 7 in red is a second path that reads the answers with no judge.
 
 **What it shows.** Two questions we compare differ by a single word, the man's nationality, and the AI that grades the answers never sees that word. So any systematic difference between answers can be traced back to the nationality alone.
 :::
@@ -277,22 +282,28 @@ the six steps from prompts to statistics, each run in a Kaggle notebook (bottom)
 \node[stage] (b1) at (0,-2.45)
   {\textbf{Prompts}\\[1pt]$25 \times 11 \times 3 \times 3 \times 3$\\= \textbf{7,425} per model\\[2pt]{\scriptsize\itshape\color{cMuted}one parameterised source}};
 \node[stage] (b2) at (5.45,-2.45)
-  {\textbf{Generation}\\[1pt]Granite 4.2 8B, Qwen3.5-9B\\vLLM, fp16, 2 $\times$ T4\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle: one notebook per model}};
+  {\textbf{Generation}\\[1pt]Granite, Qwen, Gemma, Ministral\\vLLM, fp16, 2 $\times$ T4\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle: one notebook per model}};
 \node[stage] (b3) at (10.9,-2.45)
   {\textbf{Masking}\\[1pt]country and demonyms $\to$ \texttt{[X]}\\in prompt and answer\\[2pt]{\scriptsize\itshape\color{cMuted}judge never sees the nationality}};
 \node[stage] (b4) at (10.9,-5.35)
   {\textbf{Stratified sample}\\[1pt]3 per nationality $\times$ context $\times$ age\\6 per cell for the control\\= \textbf{2,574} answers per model};
 \node[stage] (b5) at (5.45,-5.35)
-  {\textbf{LLM judge}\\[1pt]Qwen3-32B-AWQ, greedy\\rubric \texttt{rts-v4}, JSON + quote\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle: judge notebook}};
+  {\textbf{LLM judge}\\[1pt]Qwen3-32B-AWQ, greedy, \texttt{rts-v4}\\Granite and Qwen answers\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle: judge notebook}};
 \node[stage] (b6) at (0,-5.35)
   {\textbf{Statistics}\\[1pt]Wilson CIs, likelihood-ratio tests,\\Spearman, Fisher + Holm\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle dataset $\to$ this report (R)}};
+\node[stage, draw=cNat, minimum height=2.0cm] (b7) at (5.45,-9.3)
+  {\textbf{Text analysis, no judge}\\[1pt]all masked answers of 4 models\\classifier, Lafon specificities,\\Reinert themes\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle: guess-the-nationality notebook}};
 \foreach \b/\n in {b1/1,b2/2,b3/3,b4/4,b5/5,b6/6}
   \node[num] at (\b.north east) {\n};
+\node[num, fill=cNat] at (b7.north east) {7};
+\node[lab, anchor=south west, text=cStep] at ($(b6.north west)+(0,0.03)$) {\textbf{pipeline 1}: LLM judge (steps 4--6)};
+\node[lab, anchor=south west, text=cNat] at ($(b7.north west)+(0,0.05)$) {\textbf{pipeline 2}: judge-free text analysis};
 \draw[flow] (b1.east) -- (b2.west);
 \draw[flow] (b2.east) -- (b3.west);
 \draw[flow] (b3.south) -- (b4.north);
 \draw[flow] (b4.west) -- (b5.west -| b4.west) -- (b5.east);
 \draw[flow] (b5.west) -- (b6.east);
+\draw[flow, draw=cNat] (b3.east) -- ++(0.2,0) |- (b7.east);
 % outputs
 \node[nb, anchor=north] at ($(b2.south)+(0,-0.05)$) {answers, seeds, model revision};
 \node[nb, anchor=north] at ($(b5.south)+(0,-0.05)$) {framing, alarm 0--5, defensive marking,};
@@ -303,8 +314,10 @@ the six steps from prompts to statistics, each run in a Kaggle notebook (bottom)
 How the experiment works. (a) Each prompt combines an age sentence, one of 11 contexts (3 paraphrases each)
 and a nationality adjective; the control drops the adjective ("un chauffeur"). (b) Prompts are generated by
 each model, the nationality is masked, a stratified sample is rated by the judge model against a fixed
-rubric, and the verdicts are analysed statistically. Steps 2 and 5 run as Kaggle notebooks
-[@kaggle_granite; @kaggle_qwen; @kaggle_judge]; step 6 reads the published dataset [@kaggle_data].
+rubric, and the verdicts are analysed statistically (pipeline 1). In parallel, every masked answer is
+analysed without a judge, by a classifier that tries to guess the nationality and by lexicometry (pipeline 2,
+step 7). Steps 2, 5 and 7 run as Kaggle notebooks [@kaggle_granite; @kaggle_qwen; @kaggle_judge;
+@kaggle_guess]; step 6 reads the published dataset [@kaggle_data].
 :::
 
 The design crosses five factors (@tbl-design): 25 nationality cells (24 nationalities and the control),
@@ -460,6 +473,32 @@ replicate group with the Jaccard index [@hennig2007]; partitions are compared wi
 [@hubert1985]. All analyses are done in R [@rcore]; the document is recomputed entirely
 from the answer and verdict files published as a Kaggle dataset [@kaggle_data], which also feeds the
 Python synthesis notebook [@kaggle_synthesis].
+
+## A second pipeline, without a judge {#sec-guess-method}
+
+The judge is itself a language model, with its own biases. The answers are therefore also read with no
+judge at all, by two text-analysis methods applied to **every** answer with a nationality, of the four
+generated models (Gemma and Ministral included, although not judged yet), with the same masking as for the
+judge [@kaggle_guess].
+
+**Guessing the nationality.** If the advice did not depend on the nationality, nothing in a masked answer
+could tell which nationality it was about, and a classifier would find it 1 time in 24 (4.2 %). Answers
+are represented by TF-IDF weights of words and word pairs, and the nationality is predicted by a logistic
+regression (fitted by stochastic gradient descent) and by gradient-boosted trees (XGBoost
+[@chen2016xgboost], on the 2,000 terms selected by a χ² test). Accuracy is measured by 5-fold stratified
+cross-validation. Two settings are compared: *masked*, the judge's masking; and *shared*, which also
+masks the article or preposition in front of the country name (French grammar gives it away: *aux* [X]
+for the United States), keeps only the terms found in answers about at least 20 of the 24 nationalities,
+and removes English function words and fragments of one or two letters. The shared setting removes
+geographic and linguistic clues (cities, greetings, hotline names) and leaves the common vocabulary of
+advice. The same pipeline fitted on randomly shuffled labels serves as a control.
+
+**Lexicometry.** Words are lemmatised and restricted to the shared vocabulary. For each nationality and
+each lemma, Lafon's specificity [@lafon1980] compares the number of uses with what chance would give
+(hypergeometric law); the score is $-\log_{10} p$, positive for over-use and negative for under-use. The
+answers are also cut into segments of 15 content lemmas and grouped into themes by a simplified Reinert
+descending classification [@reinert1983]: recursive splits along the first axis of a correspondence
+analysis, into 8 classes, found without knowing the nationality.
 
 # Results
 
@@ -1075,6 +1114,129 @@ rx |>
   kable(booktabs = TRUE, align = "llrrr")
 ```
 
+## Guessing the nationality without a judge
+
+```{r}
+#| label: guess-stats
+GUESS <- file.path("..", "analysis", "out", "guess")
+gm <- read.csv(file.path(GUESS, "metrics.csv"))
+gacc <- function(set, sc = "both", al = "logreg", col = "accuracy")
+  100 * gm[gm$setting == set & gm$scope == sc & gm$algo == al, col]
+GSLUG <- c(gemma = "gemma-4-e4b-it", granite = "granite-4.2-8b", ministral = "ministral-3-8b-instruct-2512",
+           qwen = "qwen3.5-9b")
+per_model <- sapply(GSLUG, \(m) gacc("shared", m))
+conf <- as.matrix(read.csv(file.path(GUESS, "confusion_shared.csv"), row.names = 1, check.names = FALSE))
+rein <- read.csv(file.path(GUESS, "reinert_by_country.csv"), row.names = 1, check.names = FALSE)
+rmean <- colMeans(rein)
+rv <- function(country, k) rein[country, k]
+byctx <- read.csv(file.path(GUESS, "accuracy_by_context.csv"), row.names = 1)
+ctx_mean <- rowMeans(byctx)
+n_guess <- gm$n[gm$setting == "shared" & gm$scope == "both" & gm$algo == "logreg"]
+# share of the answers of the other "second block" nationalities guessed as Nigeria or Afghanistan
+BLOCK2 <- c("RUS", "ROU", "MAR", "AFG", "ALB", "DZA", "FJI", "IND", "SRB", "NGA", "TUR")
+magnet <- function(iso) { r <- setdiff(BLOCK2, iso); range(conf[r, iso]) }
+```
+
+The second pipeline (@sec-guess-method) reads all `r num(n_guess, 0)` answers with a nationality of the four
+generated models, with no judge. With the judge's masking, a classifier finds the nationality in
+`r pc(gacc("masked"))` of cases. In the *shared* setting, with only the vocabulary used for nearly every
+nationality, it still finds it in `r pc(gacc("shared"))` of cases (top 3: `r pc(gacc("shared", col = "top3"))`),
+six times chance (4.2 %), and every model is concerned: Gemma 4 E4B `r pc(per_model[["gemma"]])`, Granite
+`r pc(per_model[["granite"]])`, Ministral 3 8B `r pc(per_model[["ministral"]])`, Qwen
+`r pc(per_model[["qwen"]])`. XGBoost does no better (`r pc(gacc("shared", al = "xgboost"))`): the clues are
+words, not complex combinations. With shuffled labels, the same pipeline falls to
+`r pc(gacc("shared", al = "shuffled labels"), 1)`. The nationality shows most when the AI talks about the man
+himself (first date `r pc(ctx_mean[["C10_date"]])`, work meeting `r pc(ctx_mean[["C1_work"]])`, averaged over
+the four models) and least in practical situations (plumber `r pc(ctx_mean[["C8_plumber"]])`), but never at
+chance level.
+
+::: {.callout-tip appearance="simple" icon=false}
+## How to read this chart
+
+**Reading.** A computer program reads each answer, with the nationality hidden, and tries to guess which nationality it was about. Each row is the true nationality, each column the program's guess. The dark diagonal is the right guesses; a number off the diagonal says how often (in %) the row's nationality was taken for the column's.
+
+**What it shows.** The mistakes are not random. They draw two blocks that almost never mix: Western Europe, North America, Australia, Brazil and Japan on one side; Russia, the Balkans, Turkey, the Maghreb, India, Fiji, Nigeria and Afghanistan on the other. Inside the second block, Nigeria and Afghanistan act as magnets: the other answers of the block are often mistaken for them.
+:::
+
+```{r}
+#| label: fig-confusion
+#| fig-cap: "Confusion matrix of the nationality classifier (shared vocabulary, logistic regression, out-of-fold predictions on the 28,512 answers with a nationality of four models). Cell: share of the row nationality's answers guessed as the column nationality (%); values of 5 % or more are printed. Rows and columns are ordered by average-linkage clustering of the confusions."
+#| fig-height: 6.4
+sym <- (conf + t(conf)) / 2
+diag(sym) <- 0
+o <- hclust(as.dist(1 - cor(t(sym))), "average")$order
+lev <- rownames(conf)[o]
+cd <- as.data.frame(as.table(conf)) |>
+  setNames(c("true", "guess", "pct")) |>
+  mutate(true = factor(true, rev(lev)), guess = factor(guess, lev))
+ggplot(cd, aes(guess, true, fill = pct)) +
+  geom_tile(colour = "white", linewidth = 0.3) +
+  geom_text(data = cd |> filter(pct >= 5), aes(label = round(pct), colour = pct > 35), size = 2.1,
+            family = "Inter", show.legend = FALSE) +
+  scale_colour_manual(values = c(`FALSE` = INK, `TRUE` = "white")) +
+  scale_fill_gradient(low = "#f7fbff", high = "#08306b", limits = c(0, 60), oob = scales::squish,
+                      name = "share of the row's answers (%)") +
+  scale_x_discrete(labels = \(x) nm(x), position = "top") +
+  scale_y_discrete(labels = \(x) nm(x)) +
+  labs(x = "guessed nationality", y = "true nationality") +
+  coord_equal(clip = "off") +
+  theme(panel.grid = element_blank(), panel.grid.major = element_blank(), axis.ticks.length = unit(0, "pt"),
+        plot.margin = margin(5, 45, 5, 5),
+        axis.text.x.top = element_text(angle = 50, hjust = 0, vjust = 0),
+        legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 8),
+        legend.key.height = unit(6, "pt"), legend.key.width = unit(28, "pt"))
+```
+
+Inside the second block, `r pc(min(magnet("NGA")[1], magnet("AFG")[1]))` to
+`r pc(max(magnet("NGA")[2], magnet("AFG")[2]))` of the answers about each other nationality are taken for a
+Nigerian or an Afghan man: the vocabulary of origin and caution that the AI uses for them is a milder
+version of the one it uses for the whole block. Inside the first block, confusions follow the clichés:
+Sweden with Finland (reserve), Spain with Italy and Brazil (warmth), Belgium and Switzerland with France.
+Lexicometry names the words behind these blocks (@fig-specificities).
+
+::: {.callout-tip appearance="simple" icon=false}
+## How to read this chart
+
+**Reading.** Each row is a word, in French as the AI wrote it; each column a nationality. Red means the AI uses this word for this nationality more than chance would explain; blue means it avoids it. The darker the cell, the less likely it is to be chance. Words and nationalities that go together are placed next to each other.
+
+**What it shows.** Two halves. For Western men, Brazilians and Japanese, the over-used words are qualities: *chaleureux* (warm), *ponctualité* (punctuality), *silence*, *humour*. For the others, they are about where the man comes from: *origine*, *ethnique*, *tradition*, *famille*, *religion*, *femme*, and *arnaque* (scam) and *argent* (money) for Nigeria. The blue cells are as telling: *humour*, *silence* and *apprécier* (to appreciate) are almost never used for the second half.
+:::
+
+```{r}
+#| label: fig-specificities
+#| fig-cap: "Lafon specificities of the three most over-used lemmas of each nationality (shared vocabulary, all answers of four models). Cell: signed $-\\log_{10} p$ of the hypergeometric test, red for over-use and blue for under-use, clipped at ±10. Rows and columns are ordered by average-linkage clustering."
+#| fig-height: 7.8
+sm <- read.csv(file.path(GUESS, "specificities_map.csv"), row.names = 1, check.names = FALSE)
+sd_ <- as.data.frame(as.table(as.matrix(sm))) |>
+  setNames(c("lemma", "country", "spec")) |>
+  mutate(lemma = factor(lemma, rev(rownames(sm))), country = factor(country, colnames(sm)),
+         spec = pmax(pmin(spec, 10), -10))
+ggplot(sd_, aes(country, lemma, fill = spec)) +
+  geom_tile(colour = "white", linewidth = 0.2) +
+  scale_fill_gradient2(low = "#2166ac", mid = "#f6f5f2", high = "#b2182b", limits = c(-10, 10),
+                       name = "specificity (signed −log10 p)") +
+  scale_x_discrete(labels = \(x) nm(x), position = "top") +
+  labs(x = NULL, y = NULL) +
+  coord_cartesian(clip = "off") +
+  theme(panel.grid = element_blank(), panel.grid.major = element_blank(), axis.ticks.length = unit(0, "pt"),
+        plot.margin = margin(5, 45, 5, 5),
+        axis.text.x.top = element_text(angle = 50, hjust = 0, vjust = 0),
+        axis.text.y = element_text(face = "italic", size = 7),
+        legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 8),
+        legend.key.height = unit(6, "pt"), legend.key.width = unit(28, "pt"))
+```
+
+The Reinert classification finds eight themes in the answers without knowing the nationality, among them
+small talk and politeness, culture, emergency calls, physical self-protection, taxi and identity checks,
+violence and support helplines. Their shares differ by nationality in the same direction. For Nigeria, the
+AI talks less about culture (`r pc(rv("Nigeria", 3))` of the segments, against `r pc(rmean[3])` on average)
+and polite conversation (`r pc(rv("Nigeria", 1))` against `r pc(rmean[1])`), and more about emergency calls
+(`r pc(rv("Nigeria", 2))` against `r pc(rmean[2])`) and checking the taxi, the name and the identity card
+(`r pc(rv("Nigeria", 6))` against `r pc(rmean[6])`). Afghanistan has the same profile without the taxi checks,
+and twice as much about violence and support helplines (`r pc(rv("Afghanistan", 7), 1)`, against
+`r pc(rv("Finland", 7), 1)` for Finland and `r pc(rv("Japan", 7), 1)` for Japan). The full charts and tables are
+in the notebook [@kaggle_guess].
+
 ## The worst answers
 
 ```{r}
@@ -1118,6 +1280,13 @@ mostly in the online first-date context, where the model links nationality to th
 Nigeria · scam signal, observed on Granite and declared before the Qwen run, is found again on Qwen: it is
 a confirmatory result.
 
+**Two pipelines, one picture.** The judge-free analysis reaches the same conclusion as the judge, with
+no judge, on four models instead of two, and on every answer instead of a sample. It also adds a finding
+the judge's rubric could not reach: the split of the nationalities into two vocabularies, one of qualities
+for Western men, Brazilians and Japanese, one of origin, tradition, religion and protection for the others.
+The clustering of the judge's indicators (@fig-clusters) and the classifier's confusions (@fig-confusion)
+draw the same line, and both single out Nigeria and Afghanistan.
+
 **Relation to the RTS report.** We find the "encounter" versus "distrust" contrast described by RTS, but
 attenuated: the small open models tested here almost never tip into outright alarm for a given
 nationality. The bias is subtler than in the report's examples, and becomes visible only with a repeated
@@ -1125,9 +1294,13 @@ design and a control.
 
 # Limitations {#sec-limitations}
 
-- **Only two models.** Gemma-4-E4B and Ministral-3-8B have been generated
-  [@kaggle_gemma; @kaggle_ministral] but not yet judged; Llama and
-  larger models remain to be done. The claim of a "structural" bias rests on the agreement of two models.
+- **Only two judged models.** Gemma-4-E4B and Ministral-3-8B have been generated
+  [@kaggle_gemma; @kaggle_ministral] but not yet judged; they enter only the judge-free pipeline. Llama and
+  larger models remain to be done.
+- **Leftovers in the judge-free pipeline.** A few words in the shared vocabulary still point to a place or a
+  language rather than to a stereotype (*Canada*, *SAMU*, *gendarmerie*, *small*, *gut*); they are visible in
+  the notebook and must not be read as bias. The Reinert classification is simplified (one segment size, no
+  double classification as in Iramuteq): its themes are robust enough to read, not to count to the decimal.
 - **The judge is a language model.** Qwen3-32B-AWQ can be wrong, and it belongs to the same family as
   Qwen3.5-9B (self-preference cannot be ruled out). The rubric has not been validated against a
   human-annotated sample; reading the quotes shows false positives (for instance a sentence reassuring the
@@ -1148,8 +1321,10 @@ safety advice that two open language models give to a woman alone with him, hold
 constant. The bias shows less in alarm than in an asymmetry of register: cultural flattery for Northern
 Europeans and Japanese men, defensive justification and, more rarely, explicit associations (scam,
 migration) for Nigerian, Afghan, Indian or Balkan men. Two models from different labs agree on this
-ranking. Next steps are to judge the models already generated (Gemma, Ministral), to validate the rubric
-on a hand-annotated sample, and to extend the protocol to other languages.
+ranking, and a second pipeline with no judge finds the same split on four models: the nationality can be
+guessed from the masked answer six times more often than by chance. Next steps are to judge the models
+already generated (Gemma, Ministral), to validate the rubric on a hand-annotated sample, and to extend the
+protocol to other languages.
 
 # Acknowledgements {.unnumbered}
 
@@ -1164,7 +1339,8 @@ All notebooks and datasets of the project, published under the name *Alone With 
 Kaggle collection [@kaggle_collection]. The
 generation notebooks, one per model [@kaggle_granite; @kaggle_qwen; @kaggle_gemma; @kaggle_ministral],
 record the model revision, vLLM version, seeds and every answer; the judge notebook [@kaggle_judge] records
-the rubric, the judge revision and every verdict. The answers and `rts-v4` verdicts analysed here are
+the rubric, the judge revision and every verdict; the judge-free notebook [@kaggle_guess] recomputes the
+classifier and the lexicometry from every answer of every model. The answers and `rts-v4` verdicts analysed here are
 released under CC0-1.0 [@kaggle_data]. This report is a Quarto document that recomputes every figure,
 table and number from that dataset.
 
