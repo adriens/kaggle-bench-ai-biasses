@@ -1229,6 +1229,26 @@ g1_stable <- all(sapply(alt, \(cs) any(sapply(cs, \(x) setequal(x, b2)))))
 others_txt <- function(cs) paste(sapply(Filter(\(x) !setequal(x, b2), cs), \(x) paste(sort(nm(x)), collapse = ", ")),
                                  collapse = "; ")
 pulled <- sort(colSums(conf) - diag(conf), decreasing = TRUE)
+# The confusion matrix is row-stochastic: a Markov chain. On the mistakes only (diagonal removed), its
+# stationary distribution and PageRank (damping 0.85) say where the errors end up; ×24 so that 1 = average.
+Cm <- conf; diag(Cm) <- 0
+Qm <- Cm / rowSums(Cm)
+stat_q <- Re(eigen(t(Qm))$vectors[, 1]); stat_q <- setNames(stat_q / sum(stat_q), rownames(conf))
+efull <- as.data.frame(as.table(Cm)) |> setNames(c("from", "to", "w")) |> filter(w > 0)
+gfull <- igraph::graph_from_data_frame(efull, vertices = rownames(conf))
+prank <- igraph::page_rank(gfull, weights = igraph::E(gfull)$w, damping = 0.85)$vector[rownames(conf)] * 24
+prank5 <- igraph::page_rank(gnet, weights = igraph::E(gnet)$pct, damping = 0.85)$vector[rownames(conf)] * 24
+pr_top <- sort(prank, decreasing = TRUE)
+lam_q <- Mod(eigen(Qm)$values)
+# second eigenvector of the full chain: its slowest mode, oriented so that Nigeria is positive
+Pm <- conf / rowSums(conf)
+ep <- eigen(Pm)
+v2 <- setNames(Re(ep$vectors[, 2]), rownames(conf))
+v2 <- v2 / max(abs(v2)) * sign(v2[["NGA"]])
+judge_idx <- setNames(nat$def - nat$pos, nat$country)
+rho_v2 <- cor(v2[names(judge_idx)], judge_idx, method = "spearman")
+v2_pos <- names(v2)[v2 > 0.05]
+v2_border <- names(v2)[abs(v2) <= 0.05]
 ```
 
 @fig-network draws the same confusions as a network. A community detection algorithm (Louvain
@@ -1238,26 +1258,45 @@ pulled <- sort(colSums(conf) - diag(conf), decreasing = TRUE)
 `r others_txt(comms)`. `r if (g1_stable) "Group 1 does not depend on the threshold chosen to draw an arrow: it is identical with 4 % and with 6 %." else "Group 1 changes with the threshold chosen to draw an arrow."`
 The rest is less stable: with 6 % it splits into the cliché families (`r others_txt(alt[["6"]])`),
 with 4 % into `r length(alt[["4"]]) - 1` groups, as with 5 %. The AI treats the nationalities of group 1 as one block, but
-tells the others apart by their stereotypes. The nationalities most often mistaken for others are
-`r paste(nm(names(pulled)[names(pulled) %in% b2][1:2]), collapse = " and ")` in group 1, and
-`r nm(names(pulled)[!names(pulled) %in% b2][1])` among the others.
+tells the others apart by their stereotypes. The arrows are cut at 5 % for readability only; every measure below uses the full matrix.
+
+Because each row of the confusion matrix sums to 100 %, the matrix is a Markov chain: an answer about A is
+labelled B with probability $P(A \to B)$. Three properties of this chain summarise the network without any
+threshold. **Where do the mistakes end up?** On the mistakes only (diagonal removed), the PageRank of each
+nationality [@brin1998] (equivalently, here, the stationary distribution of the chain: Spearman
+`r num(cor(prank, stat_q, method = "spearman"), 2)`) measures how much it attracts the classifier's errors.
+The strongest magnets are `r nm(names(pr_top)[1])` (`r num(pr_top[[1]], 2)` times the average) and
+`r nm(names(pr_top)[2])` (`r num(pr_top[[2]], 2)`), then `r paste(nm(names(pr_top)[3:5]), collapse = ", ")`; the
+weakest are `r paste(nm(rev(names(pr_top))[1:3]), collapse = ", ")` (`r num(min(prank), 2)` to
+`r num(sort(prank)[3], 2)`). Computed on the graph cut at 5 %, the same score would change a lot (Spearman
+`r num(cor(prank, prank5, method = "spearman"), 2)`), hence the use of the full matrix. **How many
+structures?** The eigenvalues of the mistakes chain drop from `r num(lam_q[2], 2)` (second) to
+`r num(lam_q[3], 2)` (third): when the classifier is wrong, one structure dominates, the split between the
+two blocks; the cliché families of the other nationalities are second-order. **One axis.** The second
+eigenvector of the full chain (its slowest mode) is positive for `r paste(sort(nm(v2_pos)), collapse = ", ")`,
+`r if (length(v2_border)) paste0("close to zero for ", paste(nm(v2_border), collapse = ", "), ", ") else ""`and
+negative for every other nationality: the same split as Louvain, found without threshold. Its values also
+order the nationalities along a scale (@fig-eigen).
 
 ::: {.callout-tip appearance="simple" icon=false}
 ## How to read this chart
 
-**Reading.** Each dot is a nationality. An arrow from A to B means that at least 5 % of the answers about A were mistaken for answers about B; the thicker the arrow, the more often. The bigger the dot and the name, the more often other nationalities are mistaken for it. The closer two dots, the more often they are confused. The colours are the groups the computer found by itself, from the arrows alone and their thickness.
+**Reading.** Each dot is a nationality. An arrow from A to B means that at least 5 % of the answers about A were mistaken for answers about B; the thicker the arrow, the more often. The bigger the dot and the name, the more the classifier's mistakes end up on this nationality (its PageRank). The closer two dots, the more often they are confused. The colours are the groups the computer found by itself, from the arrows alone and their thickness.
 
 **What it shows.** Three groups, joined by only a few thin arrows, but they are not alike. The red group is one dense knot: every nationality in it is mistaken for every other, and arrows converge on Nigeria and Afghanistan, so the AI talks about all of them in nearly the same way. In the blue and green groups, the arrows follow clichés instead: Spain, Italy and Brazil (warmth) form the green group; in the blue one, Finland and Sweden (reserve), Belgium, Switzerland and France (French-speaking), the United Kingdom, the United States and Australia each pair up.
 :::
 
 ```{r}
 #| label: fig-network
-#| fig-cap: "The classifier's confusions as a network (shared vocabulary, four models). Arrow A → B: at least 5 % of A's answers guessed as B; width: that share. Dot and label size: sum of the arrows received. Colour: Louvain communities computed from the arrows, weighted by their share; an arrow takes the colour of the nationality it leaves. Stress-majorisation layout weighted by the rates (distance = 1 / rate, both directions summed): the more often two nationalities are confused, the closer they are drawn."
+#| fig-cap: "The classifier's confusions as a network (shared vocabulary, four models). Arrow A → B: at least 5 % of A's answers guessed as B; width: that share. Dot and label size: PageRank of the nationality in the full matrix of mistakes (where the classifier's errors end up). Colour: Louvain communities computed from the arrows, weighted by their share; an arrow takes the colour of the nationality it leaves. Stress-majorisation layout weighted by the rates (distance = 1 / rate, both directions summed): the more often two nationalities are confused, the closer they are drawn."
 #| fig-height: 5.4
 # Gephi-like drawing: stress layout, curved edges coloured by their source, size = arrows received
 igraph::V(gnet)$grp <- grp_of[igraph::V(gnet)$name]
 igraph::V(gnet)$lab <- nm(igraph::V(gnet)$name)
-igraph::V(gnet)$received <- igraph::strength(gnet, mode = "in", weights = igraph::E(gnet)$pct)
+igraph::V(gnet)$received <- prank[igraph::V(gnet)$name]
+r01 <- (igraph::V(gnet)$received - min(prank)) / diff(range(prank))
+igraph::V(gnet)$psize <- 2.5 + 8.5 * r01  # dot size
+igraph::V(gnet)$tsize <- 2.2 + 1.8 * r01  # label size
 igraph::E(gnet)$ecol <- grp_of[igraph::ends(gnet, igraph::E(gnet))[, 1]]
 # weighted layout: A -> B and B -> A summed, distance = 1 / rate, so strong confusions are drawn close
 unet <- igraph::as_undirected(gnet, mode = "collapse", edge.attr.comb = list(pct = "sum", "ignore"))
@@ -1267,8 +1306,8 @@ ggraph::ggraph(gnet, layout = "manual", x = xy[, 1], y = xy[, 2]) +
   ggraph::geom_edge_arc(aes(colour = ecol, width = pct, alpha = pct), strength = 0.18, lineend = "round",
                         arrow = arrow(length = unit(2.2, "pt"), type = "closed"),
                         end_cap = ggraph::circle(6, "pt")) +
-  ggraph::geom_node_point(aes(size = received, fill = grp), shape = 21, colour = "white", stroke = 0.7) +
-  ggraph::geom_node_text(aes(label = lab, colour = grp, size = received / 9 + 2.2), family = "Inter",
+  ggraph::geom_node_point(aes(size = psize, fill = grp), shape = 21, colour = "white", stroke = 0.7) +
+  ggraph::geom_node_text(aes(label = lab, colour = grp, size = tsize), family = "Inter",
                          fontface = "bold", repel = TRUE, bg.colour = "white", bg.r = 0.15,
                          point.padding = unit(6, "pt"), box.padding = unit(5, "pt"), force = 3,
                          max.time = 3, seed = 2, show.legend = FALSE) +
@@ -1277,11 +1316,42 @@ ggraph::ggraph(gnet, layout = "manual", x = xy[, 1], y = xy[, 2]) +
   ggraph::scale_edge_alpha(range = c(0.25, 0.75), guide = "none") +
   scale_fill_manual(values = GRP_COL, name = NULL) +
   scale_colour_manual(values = GRP_COL, guide = "none") +
-  scale_size_continuous(range = c(2.5, 11), guide = "none") +
+  scale_size_identity() +
   guides(fill = guide_legend(override.aes = list(size = 4))) +
   theme_void(base_family = "Inter") +
   theme(legend.position = "top")
 ```
+
+::: {.callout-tip appearance="simple" icon=false}
+## How to read this chart
+
+**Reading.** Each dot is a nationality. Horizontally, the AI judge's verdict (pipeline 1): how much more often the AI says "his origin does not matter" than it pays him a cultural compliment. Vertically, the position of the nationality on the main axis of the classifier's mistakes (pipeline 2), which uses no judge at all. The colours are the groups of the previous chart.
+
+**What it shows.** The two pipelines rank the nationalities in nearly the same order: the dots climb from bottom left (Finland, Japan, Sweden: compliments, and answers easy to tell apart) to top right (Nigeria, Afghanistan: justification, and answers that look alike). Two methods that share nothing but the AI's answers see the same thing.
+:::
+
+```{r}
+#| label: fig-eigen
+#| fig-cap: !expr 'sprintf("Two pipelines, one ranking. x: judge index of the TL;DR chart (defensive marking minus positive stereotypes, percentage points, mean of Granite and Qwen, LLM judge). y: second eigenvector of the classifier\x27s confusion chain (four models, no judge), scaled to a maximum of 1 and oriented so that Nigeria is positive. Spearman ρ = %s. Colour: groups of @fig-network.", num(rho_v2, 2))'
+#| fig-height: 4.2
+ed <- tibble(country = names(judge_idx), x = judge_idx, y = v2[names(judge_idx)], g = grp_of[names(judge_idx)],
+             lab = nm(names(judge_idx)))
+ggplot(ed, aes(x, y, colour = g)) +
+  geom_hline(yintercept = 0, colour = GRID) +
+  geom_smooth(aes(group = 1), method = "lm", formula = y ~ x, se = FALSE, colour = "#b9b7b1",
+              linewidth = 0.4, linetype = "dashed") +
+  geom_point(size = 2.2) +
+  ggrepel::geom_text_repel(aes(label = lab), size = 2.6, family = "Inter", seed = 3, show.legend = FALSE,
+                           min.segment.length = 0.3, box.padding = 0.2) +
+  scale_colour_manual(values = GRP_COL, name = NULL) +
+  labs(x = "judge: defensive marking − compliments (points)  →  security guard",
+       y = "classifier: 2nd eigenvector of the mistakes") +
+  theme(legend.position = "top")
+```
+
+The second eigenvector agrees with the judge: its Spearman correlation with the index of the TL;DR chart
+(defensive marking minus positive stereotypes) is `r num(rho_v2, 2)` (@fig-eigen). The two pipelines share
+nothing but the answers, and they do not even cover the same models (two judged, four classified).
 
 The classifier's own weights give a second graph (@fig-wordgraph): each nationality is linked to the five
 words that point to it most, and a word shared by several nationalities becomes a bridge between them.
@@ -1291,7 +1361,7 @@ words that point to it most, and a word shared by several nationalities becomes 
 
 **Reading.** Large dots are nationalities; words in italics are the clues the computer uses to recognise them (in French, as the AI wrote them). A line joins a nationality to one of its five strongest clues; the thicker the line, the stronger the clue. A word with several lines is a clue shared by several nationalities; it is grey when it links nationalities of different groups.
 
-**What it shows.** The biggest hub is *origine* (origin): it links Albania, Algeria, India, Nigeria and Afghanistan, the men the AI talks about through where they come from. Nigeria is also tied to *argent* (money) and *arnaques* (scams), Afghanistan to *femmes* (women). On the other side, the hubs are compliments: *chaleureux* (warm) for Spain, Italy and Brazil, *réservés* (reserved) and *silence* for Finland, the United Kingdom and Japan, *ponctualité* for Germany and Switzerland, *humour* for the United Kingdom, Australia and Belgium.
+**What it shows.** The biggest hub is *origine* (origin), also the word with the highest PageRank in this graph: it links Albania, Algeria, India, Nigeria and Afghanistan, the men the AI talks about through where they come from. Nigeria is also tied to *argent* (money) and *arnaques* (scams), Afghanistan to *femmes* (women). On the other side, the hubs are compliments: *chaleureux* (warm) for Spain, Italy and Brazil, *réservés* (reserved) and *silence* for Finland, the United Kingdom and Japan, *ponctualité* for Germany and Switzerland, *humour* for the United Kingdom, Australia and Belgium.
 :::
 
 ```{r}
