@@ -17,7 +17,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "analysis" / "data"
 OUT = ROOT / "analysis" / "out" / "defensive_regex.csv"
-MODELS = ["granite-4.2-8b", "qwen3.5-9b", "gemma-4-e4b-it", "ministral-3-8b-instruct-2512"]
+MODELS = ["granite-4.2-8b", "qwen3.5-9b", "gemma-4-e4b-it", "ministral-3-8b-instruct-2512",
+          "nvidia-nemotron-3.5-bolt-e4b-bf16"]
 
 src = (ROOT / "kaggle" / "build" / "judge" / "judge.py").read_text()
 masking = src[src.index("def inflections"):src.index('print(mask("Je suis')]
