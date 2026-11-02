@@ -103,10 +103,11 @@ local({
                                        size = 3.1, colour = FG)
   strip <- ggplot() +
     annotate("segment", x = 0, xend = STRIP_W, y = STRIP_H, yend = STRIP_H, colour = RING, linewidth = 0.4) +
-    tag(0, "MODELS", Y1) + logo("granite.png", 0.62, LH, Y1) + name(1.02, "Granite 4.2 8B", Y1) +
-    logo("qwen.png", 2.35, LH, Y1) + name(2.75, "Qwen3.5-9B", Y1) +
-    logo("google.png", 3.95, LH, Y1) + name(4.35, "Gemma 4 E4B", Y1) +
-    logo("mistral.png", 5.6, LH, Y1) + name(6.0, "Ministral 3 8B", Y1) +
+    tag(0, "MODELS", Y1) + logo("granite.png", 0.62, LH, Y1) + name(0.99, "Granite 4.2 8B", Y1) +
+    logo("qwen.png", 2.05, LH, Y1) + name(2.42, "Qwen3.5-9B", Y1) +
+    logo("google.png", 3.32, LH, Y1) + name(3.69, "Gemma 4 E4B", Y1) +
+    logo("mistral.png", 4.7, LH, Y1) + name(5.07, "Ministral 3 8B", Y1) +
+    logo("nvidia.png", 6.15, LH, Y1) + name(6.52, "Nemotron 3.5", Y1) +
     tag(0, "JUDGE", Y2) + logo("qwen.png", 0.62, LH, Y2) + name(1.02, "Qwen3-32B", Y2) +
     tag(2.35, "GPUs", Y2) + logo("kaggle.png", 2.8, LH * 0.82, Y2) + name(3.61, "free quota, 2\u00d7 T4", Y2) +
     coord_fixed(xlim = c(0, STRIP_W), ylim = c(0, STRIP_H), expand = FALSE, clip = "off") +
@@ -117,12 +118,12 @@ local({
     plot_annotation(
       title = "She Is Alone With a Man",
       subtitle = paste0("The situation should change the advice. His nationality should not.\n",
-                        "How four open-weight AI models advise a woman alone with a man, in 11 situations."),
+                        "How five open-weight AI models advise a woman alone with a man, in 11 situations."),
       caption = paste0(
-        "Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E4B and Ministral 3 8B · ",
+        "Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E4B, Ministral 3 8B and Nemotron 3.5 Bolt E4B\n",
         format(nrow(R), big.mark = ","), " answers in French · ", format(nrow(D), big.mark = ","),
-        " rated by an LLM judge (Qwen3-32B)\n24 nationalities · 11 situations · 3 ages\n",
-        "Petals: share of answers, mean of the four models, sorted from \"cultural guide\" (blue) to \"security guard\" (coral).\n",
+        " rated by an LLM judge (Qwen3-32B) · 24 nationalities · 11 situations · 3 ages\n",
+        "Petals: share of answers, mean of the five models, sorted from \"cultural guide\" (blue) to \"security guard\" (coral).\n",
         "The empty centre is \"a man\" with no nationality: he gets almost neither.\n",
         "All runs used Kaggle's free GPU quota: this work would not have been possible without it.\n\n",
         month.name[as.integer(format(Sys.Date(), "%m"))], " ", format(Sys.Date(), "%Y"),

@@ -42,6 +42,7 @@ MODELS = {
     "qwen3.5-9b": "#eb6834",
     "gemma-4-e4b-it": "#1baf7a",
     "ministral-3-8b-instruct-2512": "#6250d6",
+    "nvidia-nemotron-3.5-bolt-e4b-bf16": "#eda100",
 }
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 plt.rcParams.update({
@@ -112,7 +113,7 @@ def rate_table(metric):
 # > **Comment lire ce graphique**
 #
 # > Chaque ligne est un pays. On a posé à des modèles d'IA la même question, une jeune femme seule avec un homme, en ne changeant que sa nationalité.
-# > Chaque couleur de point est un modèle d'IA différent (bleu Granite, orange Qwen, vert Gemma, violet Ministral). Plus un point est à droite, plus l'IA a multiplié les mises en garde, les avertissements, les « méfie-toi » pour ce pays.
+# > Chaque couleur de point est un modèle d'IA différent (bleu Granite, orange Qwen, vert Gemma, violet Ministral, ambre Nemotron). Plus un point est à droite, plus l'IA a multiplié les mises en garde, les avertissements, les « méfie-toi » pour ce pays.
 # > Les traits pointillés montrent la réponse quand on ne précise aucune nationalité : c'est la référence. Tout ce qui s'en éloigne vers la droite est un traitement différencié.
 # > Les pays en couleur sont les cinq où l'écart est le plus fort. Si tous les pays étaient traités pareil, tous les points seraient alignés sur les pointillés.
 

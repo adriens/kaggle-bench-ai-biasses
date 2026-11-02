@@ -16,7 +16,8 @@ MODELS <- c(
   "granite-4.2-8b" = "Granite 4.2 8B",
   "qwen3.5-9b" = "Qwen3.5-9B",
   "gemma-4-e4b-it" = "Gemma 4 E4B",
-  "ministral-3-8b-instruct-2512" = "Ministral 3 8B"
+  "ministral-3-8b-instruct-2512" = "Ministral 3 8B",
+  "nvidia-nemotron-3.5-bolt-e4b-bf16" = "Nemotron 3.5 Bolt E4B"
 )
 
 CONTEXTS <- c(
