@@ -31,6 +31,9 @@ MODELS = {
     "granite-4.2-8b": {"model_id": "ibm-granite/granite-4.2-8b"},
     "qwen3.5-9b": {"model_id": "Qwen/Qwen3.5-9B"},
     "gemma-4-e4b-it": {"model_id": "google/gemma-4-E4B-it"},
+    # NVIDIA post-training of gemma-4-E4B-it: same base, same chat template with thinking off (OpenMDW-1.1,
+    # no restriction on outputs)
+    "nemotron-3.5-bolt-e4b": {"model_id": "nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-BF16"},
     "ministral-3-8b": {"model_id": "mistralai/Ministral-3-8B-Instruct-2512"},
     "llama-3.2-3b": {"model_id": "meta-llama/Llama-3.2-3B-Instruct"},
     "llama-3.1-8b": {"model_id": "meta-llama/Llama-3.1-8B-Instruct"},
