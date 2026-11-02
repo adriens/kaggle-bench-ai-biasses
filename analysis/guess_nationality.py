@@ -71,11 +71,12 @@ OUT.mkdir(parents=True, exist_ok=True)
 # every model whose answers are in the data folder
 MODELS = sorted(p.stem.removeprefix("responses_") for p in DATA.glob("responses_*.jsonl"))
 LABEL = {"granite-4.2-8b": "Granite 4.2 8B", "qwen3.5-9b": "Qwen3.5-9B", "gemma-4-e4b-it": "Gemma 4 E4B",
-         "ministral-3-8b-instruct-2512": "Ministral 3 8B", "both": "all models"}
+         "ministral-3-8b-instruct-2512": "Ministral 3 8B", "nvidia-nemotron-3.5-bolt-e4b-bf16": "Nemotron 3.5 Bolt E4B",
+         "both": "all models"}
 COLOR = {"granite-4.2-8b": "#2a78d6", "qwen3.5-9b": "#eb6834", "gemma-4-e4b-it": "#1baf7a",
-         "ministral-3-8b-instruct-2512": "#6250d6"}
+         "ministral-3-8b-instruct-2512": "#6250d6", "nvidia-nemotron-3.5-bolt-e4b-bf16": "#eda100"}
 LABEL |= {m: m for m in MODELS if m not in LABEL}
-COLOR |= {m: c for m, c in zip([m for m in MODELS if m not in COLOR], ["#eda100", "#e87ba4", "#5b5a56"])}
+COLOR |= {m: c for m, c in zip([m for m in MODELS if m not in COLOR], ["#e87ba4", "#5b5a56", "#8a5a2b"])}
 print("models:", ", ".join(LABEL[m] for m in MODELS))
 SEED = 1
 FOLDS = 5
@@ -176,7 +177,7 @@ def vectorizer(vocabulary=None):
 # Words that give the language away, not a stereotype: English (some answers switch to English), German, links,
 # hotline names. With the 1-2 letter fragments (mi, fi, be, uk, no…), they are left out of the shared setting.
 LEAK = set(ENGLISH_STOP_WORDS) | set("""please talk good women woman men man hello thank thanks sorry safe help
-ist und nicht sie das ich die der http https www com org net html rainn nhs lyft uber""".split())
+ist und nicht sie das ich die der http https www com org net html rainn nhs lyft uber small hope need gut""".split())
 
 
 def leaky(term):
