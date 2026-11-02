@@ -40,6 +40,8 @@ RUBRIC = "rts-v4"
 MODELS = {
     "granite-4.2-8b": "#2a78d6",
     "qwen3.5-9b": "#eb6834",
+    "gemma-4-e4b-it": "#1baf7a",
+    "ministral-3-8b-instruct-2512": "#6250d6",
 }
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 plt.rcParams.update({
@@ -110,7 +112,7 @@ def rate_table(metric):
 # > **Comment lire ce graphique**
 #
 # > Chaque ligne est un pays. On a posé à des modèles d'IA la même question, une jeune femme seule avec un homme, en ne changeant que sa nationalité.
-# > Le point bleu et le point orange sont deux modèles d'IA différents. Plus un point est à droite, plus l'IA a multiplié les mises en garde, les avertissements, les « méfie-toi » pour ce pays.
+# > Chaque couleur de point est un modèle d'IA différent (bleu Granite, orange Qwen, vert Gemma, violet Ministral). Plus un point est à droite, plus l'IA a multiplié les mises en garde, les avertissements, les « méfie-toi » pour ce pays.
 # > Les traits pointillés montrent la réponse quand on ne précise aucune nationalité : c'est la référence. Tout ce qui s'en éloigne vers la droite est un traitement différencié.
 # > Les pays en couleur sont les cinq où l'écart est le plus fort. Si tous les pays étaient traités pareil, tous les points seraient alignés sur les pointillés.
 
@@ -319,7 +321,7 @@ def heatmap(metric, title, fname, cmap="Blues", vmax=None):
     piv = piv.loc[order]
     fig, ax = plt.subplots(figsize=(1.6 + 1.5 * len(MODELS), 0.28 * len(piv) + 1.4))
     im = ax.imshow(piv.values, cmap=cmap, aspect="auto", vmin=0, vmax=vmax or np.nanmax(piv.values))
-    ax.set_xticks(range(len(piv.columns)), piv.columns, rotation=0)
+    ax.set_xticks(range(len(piv.columns)), piv.columns, rotation=20, ha="right")
     ax.set_yticks(range(len(piv)), [countries.country_name_fr.get(c, c) for c in piv.index])
     ax.grid(False)
     top = np.nanmax(piv.values) * 0.6
@@ -336,7 +338,7 @@ def heatmap(metric, title, fname, cmap="Blues", vmax=None):
     plt.show()
 
 
-heatmap("negative_association", "Associations négatives explicites par nationalité (%)", "fig1_associations_negatives", vmax=20)
+heatmap("negative_association", "Associations négatives explicites par nationalité (%)", "fig1_associations_negatives", vmax=40)
 
 # %% [markdown]
 # Les intervalles de Wilson à 95 % (n ≈ 99 par pays) montrent ce qui est distinguable du bruit.
@@ -352,11 +354,12 @@ def forest(metric, title, fname, top=12):
     t = rate_table(metric)
     t = t[t.country != "BASE"]
     keep = t.groupby("country").pct.mean().sort_values(ascending=False).index[:top][::-1]
-    fig, ax = plt.subplots(figsize=(7, 0.42 * len(keep) + 1.2))
+    fig, ax = plt.subplots(figsize=(7, 0.2 * len(MODELS) * len(keep) + 1.2))
     for k, (m, col) in enumerate(MODELS.items()):
         s = t[t.model == m].set_index("country").loc[keep]
-        y = np.arange(len(keep)) + (k - (len(MODELS) - 1) / 2) * 0.28
-        ax.errorbar(s.pct, y, xerr=[s.pct - s.lo, s.hi - s.pct], fmt="o", ms=5, color=col, lw=1.5,
+        y = np.arange(len(keep)) + (k - (len(MODELS) - 1) / 2) * 0.8 / len(MODELS)
+        err = [(s.pct - s.lo).clip(lower=0), (s.hi - s.pct).clip(lower=0)]  # borne de Wilson ≈ 0 à 0 %
+        ax.errorbar(s.pct, y, xerr=err, fmt="o", ms=5, color=col, lw=1.5,
                     mec="#fcfcfb", mew=1, label=m, capsize=0)
     base = rate_table(metric).query("country == 'BASE'").set_index("model").pct
     for m, col in MODELS.items():
@@ -414,22 +417,22 @@ heatmap("stereo_pos", "Stéréotypes positifs par nationalité (%)", "fig3_stere
 # > **Comment lire ce graphique**
 #
 # > Chaque pays a un score d'alarme : la part des réponses où l'IA parle d'un danger sérieux. Ce graphique empile les pays par score : sur l'axe horizontal, le score (plus c'est à droite, plus l'IA est alarmiste) ; la hauteur d'une barre dit combien de pays ont ce score.
-# > Le trait pointillé de chaque couleur est le score du modèle quand aucune nationalité n'est donnée. Si les barres sont regroupées autour du trait, la nationalité change peu l'alarme ; si certaines barres sont loin à droite, ces pays sont traités plus durement.
+# > Un panneau par modèle. Le trait pointillé est le score du modèle quand aucune nationalité n'est donnée. Si les barres sont regroupées autour du trait, la nationalité change peu l'alarme ; si certaines barres sont loin à droite, ces pays sont traités plus durement.
 
 # %%
 t = rate_table("alarm_high")
-fig, ax = plt.subplots(figsize=(7, 3.4))
 rows = t[t.country != "BASE"]
-for k, (m, col) in enumerate(MODELS.items()):
+fig, axes = plt.subplots(len(MODELS), 1, figsize=(7, 1.3 * len(MODELS) + 1), sharex=True, sharey=True)
+for ax, (m, col) in zip(axes, MODELS.items()):
     s = rows[rows.model == m]
-    ax.hist(s.pct, bins=np.arange(0, 60, 2.5), alpha=0.65, color=col, label=m, edgecolor="#fcfcfb")
+    ax.hist(s.pct, bins=np.arange(0, max(60, rows.pct.max() + 5), 2.5), color=col, edgecolor="#fcfcfb")
     b = t[(t.model == m) & (t.country == "BASE")].pct.iloc[0]
-    ax.axvline(b, color=col, ls=":", lw=1.5)
-ax.set_xlabel("% de réponses à alarme élevée par nationalité (pointillés : baseline)")
-ax.set_ylabel("nombre de pays")
-ax.set_title("Alarme élevée : le niveau de base varie plus d'un modèle à l'autre que d'un pays à l'autre",
-             loc="left", fontsize=10)
-ax.legend(frameon=False)
+    ax.axvline(b, color=INK, ls=":", lw=1.5)
+    ax.text(0.99, 0.85, m, transform=ax.transAxes, ha="right", fontsize=9, color=col, fontweight="bold")
+axes[-1].set_xlabel("% de réponses à alarme élevée par nationalité (pointillés : baseline)")
+axes[len(MODELS) // 2].set_ylabel("nombre de pays")
+axes[0].set_title("Alarme élevée : le niveau de base varie plus d'un modèle à l'autre que d'un pays à l'autre",
+                  loc="left", fontsize=10)
 save(fig, "fig4_alarme")
 plt.show()
 print(t.pivot(index="country", columns="model", values="pct").round(0).sort_values(list(MODELS)[0], ascending=False).head(8))
@@ -447,15 +450,18 @@ print(t.pivot(index="country", columns="model", values="pct").round(0).sort_valu
 
 # %%
 neg = D[D.negative_association & (D.country != "BASE")]
-types = neg.groupby(["model", "association_type"]).size().unstack(fill_value=0)
+palette = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#a9a8a2"]
+typ = neg.association_type.replace("", "other").fillna("other")
+main = [c for c in typ.value_counts().index if c != "other"][: len(palette) - 1]
+typ = typ.where(typ.isin(main), "autre")  # types rares et « other » regroupés
+types = neg.groupby(["model", typ]).size().unstack(fill_value=0).reindex(list(MODELS)[::-1], fill_value=0)[main + ["autre"]]
 fig, ax = plt.subplots(figsize=(6.5, 2.6 + 0.3 * len(types)))
 bottom = np.zeros(len(types))
-palette = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#6250d6"]
 for c, col in zip(types.columns, palette):
     ax.barh(types.index, types[c], left=bottom, color=col, label=c, edgecolor="#fcfcfb", linewidth=2, height=0.55)
     bottom += types[c].values
 ax.set_xlabel("nombre d'associations négatives relevées")
-ax.legend(frameon=False, ncol=3, loc="lower right", fontsize=8)
+ax.legend(frameon=False, ncol=6, loc="upper center", bbox_to_anchor=(0.45, -0.22), fontsize=8)
 ax.set_title("Types d'association négative par modèle", loc="left", fontsize=10)
 save(fig, "fig5_types")
 plt.show()
@@ -470,7 +476,7 @@ print(neg.pivot_table(index="country", columns="association_type", values="respo
 # %% [markdown]
 # > **Comment lire ce graphique**
 #
-# > On se demande si deux modèles d'IA différents « pensent » la même chose des mêmes pays. Chaque point est un pays. Sa position horizontale est ce que fait le premier modèle, sa position verticale ce que fait le second.
+# > On se demande si deux modèles d'IA différents « pensent » la même chose des mêmes pays. Un panneau par paire de modèles ; chaque point est un pays. Sa position horizontale est ce que fait le premier modèle, sa position verticale ce que fait le second.
 # > Si les points suivent la diagonale, les deux modèles sont d'accord : les mêmes pays sont jugés méfiants par les deux. Plus ils sont dispersés, moins ils sont d'accord. Le chiffre (de 0 à 1) résume cet accord : près de 1, c'est total.
 
 # %%
@@ -486,17 +492,24 @@ for metric in ["defensive_marking", "alarm_high", "negative_association", "stere
                           for i, a in enumerate(ms) for b in ms[i + 1:]})
 
 piv = rate_table("defensive_marking").query("country != 'BASE'").pivot(index="country", columns="model", values="pct")
-a, b = list(MODELS)[:2]
-fig, ax = plt.subplots(figsize=(5.2, 5.2))
-ax.scatter(piv[a], piv[b], s=40, color=MODELS[a], edgecolor="#fcfcfb", linewidth=1.5, zorder=3)
+pairs = [(a, b) for i, a in enumerate(MODELS) for b in list(MODELS)[i + 1:]]
+ncol = min(3, len(pairs))
+nrow = -(-len(pairs) // ncol)
+fig, axes = plt.subplots(nrow, ncol, figsize=(3.6 * ncol, 3.6 * nrow), squeeze=False)
 lim = [0, max(piv.max()) * 1.05]
-ax.plot(lim, lim, color=GRID, lw=1)
-for c, r in piv.iterrows():
-    if r[a] > piv[a].quantile(0.8) or r[b] > piv[b].quantile(0.8) or r[a] < piv[a].quantile(0.1):
-        ax.annotate(c, (r[a], r[b]), textcoords="offset points", xytext=(5, 4), fontsize=8, color=INK)
-ax.set_xlabel(f"{a} — % marquage défensif")
-ax.set_ylabel(f"{b} — % marquage défensif")
-ax.set_title(f"Mêmes pays méfiants ? (Spearman {spearman(piv[a], piv[b]):.2f})", loc="left", fontsize=10)
+for ax, (a, b) in zip(axes.flat, pairs):
+    ax.scatter(piv[a], piv[b], s=30, color=INK, alpha=0.75, edgecolor="#fcfcfb", linewidth=1, zorder=3)
+    ax.plot(lim, lim, color=GRID, lw=1)
+    for c, r in piv.iterrows():
+        if r[a] > piv[a].quantile(0.85) or r[b] > piv[b].quantile(0.85):
+            ax.annotate(c, (r[a], r[b]), textcoords="offset points", xytext=(4, 3), fontsize=7, color=INK)
+    ax.set_xlabel(a, fontsize=8, color=MODELS[a])
+    ax.set_ylabel(b, fontsize=8, color=MODELS[b])
+    ax.set_title(f"Spearman {spearman(piv[a], piv[b]):.2f}", loc="left", fontsize=9)
+for ax in axes.flat[len(pairs):]:
+    ax.axis("off")
+fig.suptitle("Mêmes pays méfiants ? Marquage défensif (%) par paire de modèles", x=0.01, ha="left", fontsize=11)
+fig.tight_layout()
 save(fig, "fig6_accord_modeles")
 plt.show()
 
