@@ -9,24 +9,25 @@ lang: en-GB
 abstract: |
   A report by Swiss public broadcaster RTS [@rts2026] showed that chat assistants advise a woman "alone with a man"
   differently depending on the man's nationality: ice-breakers for an Italian or a Swiss man, warnings and
-  emergency numbers for an Algerian. We turn this anecdotal observation into a controlled protocol. Two
-  open-weight models of about 8 billion parameters (Granite 4.2 8B and Qwen3.5-9B) each receive 7,425
-  French-language prompts crossing 24 nationalities and a no-nationality control, 11 contexts (from a work
-  meeting to an isolated street), 3 paraphrases, 3 ages and 3 samples. A stratified sample of 2,574
-  answers per model, with the nationality masked, is rated by a judge model (Qwen3-32B-AWQ) against a fixed
-  rubric: framing, alarm score, defensive marking, stereotypes and negative associations. Nationality has a
-  significant effect on every indicator, holding context and age constant (likelihood-ratio tests,
-  $p < 10^{-3}$). The bias is mostly indirect and reserved for some groups: the assistant defends itself
-  against a prejudice nobody voiced ("his origin does not matter") in 16 to 76 % of answers depending on
-  the nationality, versus 0 to 4 % for the control, and keeps flattering stereotypes for favoured
-  nationalities (Finland, Japan, Sweden). Explicit negative associations are rare but concentrated: scams
-  for Nigeria, migration and gender norms for Afghanistan. The two models, from different labs, agree on the
-  ranking of nationalities (Spearman $\rho \approx 0.8$ for defensive marking and positive stereotypes),
-  which points to a structural bias rather than an artefact of one model. A second pipeline, with no judge,
-  confirms it on four models (Gemma 4 E4B and Ministral 3 8B added): a text classifier recovers the man's
-  nationality from the masked answer 25 % of the time using only shared vocabulary (chance: 4 %), and
-  lexicometry shows two vocabularies, qualities for Western men and origin, religion and protection for
-  the others.
+  emergency numbers for an Algerian. We turn this anecdotal observation into a controlled protocol. Four
+  open-weight models of 4 to 9 billion parameters, from four labs (Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E4B
+  and Ministral 3 8B), each receive 7,425 French-language prompts crossing 24 nationalities and a
+  no-nationality control, 11 contexts (from a work meeting to an isolated street), 3 paraphrases, 3 ages
+  and 3 samples. A stratified sample of 2,574 answers per model, with the nationality masked, is rated by a
+  judge model (Qwen3-32B-AWQ) against a fixed rubric: framing, alarm score, defensive marking, stereotypes
+  and negative associations. Nationality has a significant effect on the answers of every model, holding
+  context and age constant (likelihood-ratio tests). Two biases are shared by all four models. Compliments
+  go to the same nationalities (Spearman $\rho$ from 0.79 to 0.90 between every pair of models): Finland,
+  Italy or Japan get one in a third to a half of the answers, Afghanistan almost never (0 to 8 %). Explicit
+  negative associations, when a model makes them, target the same two nationalities: scams for Nigeria,
+  migration and gender norms for Afghanistan. The register of the bias, however, depends on the model.
+  Granite and Qwen defend themselves against a prejudice nobody voiced ("his origin does not matter") in
+  up to 76 % of answers for some nationalities; Ministral states the risk outright (11 % of its answers,
+  40 % for an Afghan and 39 % for a Nigerian man); Gemma does neither, yet keeps the same unequal
+  compliments. A second pipeline, with no judge, finds the same split on the four models: a text
+  classifier recovers the man's nationality from the masked answer 25 % of the time using only shared
+  vocabulary (chance: 4 %), and lexicometry shows two vocabularies, qualities for Western men and origin,
+  religion and protection for the others.
 keywords: [bias, large language models, LLM-as-a-judge, nationality, safety, fairness, open-weight models, Kaggle]
 subject: "Nationality bias in the safety advice given by open-weight language models: a controlled benchmark with an LLM judge"
 format:
@@ -113,7 +114,8 @@ source("R/prep.R")
 source("R/clusters.R")
 source("R/cover_page.R")  # regenerates covers/cover_page.pdf, inserted as page 1
 
-COL <- c("granite-4.2-8b" = "#2a78d6", "qwen3.5-9b" = "#eb6834")
+COL <- c("granite-4.2-8b" = "#2a78d6", "qwen3.5-9b" = "#eb6834", "gemma-4-e4b-it" = "#1baf7a",
+         "ministral-3-8b-instruct-2512" = "#6250d6")
 LAB <- MODELS
 INK <- "#1b1b1b"; MUTED <- "#5b5a56"; GRID <- "#e4e3df"
 
@@ -137,13 +139,16 @@ nm <- function(iso) unname(country_lbl[iso])
 
 N <- D |> filter(!is_base)
 rt <- function(metric, m, c) rate_table(metric) |> filter(model == m, country == c) |> pull(pct)
+GR <- "granite-4.2-8b"; QW <- "qwen3.5-9b"; GE <- "gemma-4-e4b-it"; MI <- "ministral-3-8b-instruct-2512"
+by_model <- function(df, m, v) df[[v]][df$model == m]
 ```
 
 # TL;DR {.unnumbered}
 
-Ask two open AI models for advice about being alone with a man, and his nationality decides the tone: some
-men get compliments and ice-breakers, others a "his origin does not matter" that nobody asked for, and
-sometimes a warning about scams or migration. One chart sums it up.
+Ask four open AI models for advice about being alone with a man, and his nationality decides the tone: some
+men get compliments and ice-breakers, others a "his origin does not matter" that nobody asked for, or a
+warning about scams or migration. The four models agree on who gets the compliments; they differ on how they
+treat the others. One chart sums it up.
 
 ::: {#fig-summary fig-pos="H"}
 
@@ -153,13 +158,13 @@ sometimes a warning about scams or migration. One chart sums it up.
 
 **Reading.** Each bubble is a nationality ("I am alone with a … man"). The further right, the more often the AI
 says, without being asked, that the man's origin does not matter. The higher up, the more often it compliments his
-culture. The bigger the bubble, the more often it links him to a specific risk (scam, migration…). The thin line
-through a bubble joins the positions of the two AIs tested; the star is the man with no nationality.
+culture. The bigger the bubble, the more often it links him to a specific risk (scam, migration…). Each bubble is
+the average of the four AIs tested; the star is the man with no nationality.
 
 **What it shows.** The AI treats nationalities in two ways. Top left, a *cultural guide*: compliments and
 ice-breakers (Finland, Japan, Sweden). Bottom right, a *security guard*: it reassures that origin does not matter,
-which presupposes a suspicion, and sometimes names a risk (Nigeria, Afghanistan). Short lines mean that the two AIs,
-made by different companies, place each nationality in the same spot.
+which presupposes a suspicion, or names a risk outright (Nigeria, Afghanistan). The four AIs, made by four
+different companies, agree most on the vertical axis: who gets the compliments.
 
 ```{=latex}
 \end{howtoread}
@@ -171,8 +176,6 @@ s_def <- rate_table("defensive_marking") |> select(model, country, def = pct)
 s_pos <- rate_table("stereo_pos") |> select(model, country, pos = pct)
 s_neg <- rate_table("negative_association") |> select(model, country, neg = k)
 pm <- s_def |> inner_join(s_pos, by = c("model", "country")) |> inner_join(s_neg, by = c("model", "country"))
-seg <- pm |> filter(country != "BASE") |> select(model, country, def, pos) |>
-  pivot_wider(names_from = model, values_from = c(def, pos))
 mid <- pm |> group_by(country) |>
   summarise(def = mean(def), pos = mean(pos), neg = sum(neg), .groups = "drop") |>
   mutate(lab = nm(country),
@@ -180,22 +183,20 @@ mid <- pm |> group_by(country) |>
 nat <- mid |> filter(country != "BASE")
 ctl <- mid |> filter(country == "BASE")
 mx <- median(nat$def); my <- median(nat$pos)
+XMAX <- 10 * ceiling(max(nat$def) / 10) + 12; YMAX <- 10 * ceiling(max(nat$pos) / 10) + 2
 ggplot(nat, aes(def, pos)) +
   annotate("rect", xmin = -Inf, xmax = mx, ymin = my, ymax = Inf, fill = "#2a78d6", alpha = 0.06) +
   annotate("rect", xmin = mx, xmax = Inf, ymin = -Inf, ymax = my, fill = "#d63c2a", alpha = 0.06) +
   geom_vline(xintercept = mx, linetype = "dashed", colour = GRID) +
   geom_hline(yintercept = my, linetype = "dashed", colour = GRID) +
-  annotate("text", x = 1, y = 61, hjust = 0, vjust = 1, family = "Inter", fontface = "bold",
+  annotate("text", x = 1, y = YMAX - 1, hjust = 0, vjust = 1, family = "Inter", fontface = "bold",
            size = 3.3, colour = "#2a78d6", label = "CULTURAL GUIDE") +
-  annotate("text", x = 1, y = 57.5, hjust = 0, vjust = 1, family = "Inter", size = 2.6,
+  annotate("text", x = 1, y = YMAX - 4, hjust = 0, vjust = 1, family = "Inter", size = 2.6,
            colour = MUTED, label = "compliments, ice-breakers") +
-  annotate("text", x = mx + 1.5, y = 3.6, hjust = 0, vjust = 0, family = "Inter", fontface = "bold",
+  annotate("text", x = XMAX - 1, y = my - 1, hjust = 1, vjust = 1, family = "Inter", fontface = "bold",
            size = 3.3, colour = "#d63c2a", label = "SECURITY GUARD") +
-  annotate("text", x = mx + 1.5, y = 0.2, hjust = 0, vjust = 0, family = "Inter", size = 2.6,
-           colour = MUTED, label = "\"his origin does not matter\", named risks") +
-  geom_segment(data = seg, aes(x = `def_granite-4.2-8b`, y = `pos_granite-4.2-8b`,
-                               xend = `def_qwen3.5-9b`, yend = `pos_qwen3.5-9b`),
-               colour = "#b9b7b1", linewidth = 0.3, alpha = 0.6, inherit.aes = FALSE) +
+  annotate("text", x = XMAX - 1, y = my - 4, hjust = 1, vjust = 1, family = "Inter", size = 2.6,
+           colour = MUTED, label = "\"his origin does not matter\",\nnamed risks") +
   geom_point(aes(size = neg, fill = lean), shape = 21, colour = "white", stroke = 0.6, alpha = 0.95) +
   geom_point(data = ctl, shape = 8, size = 3, colour = INK, stroke = 0.8) +
   annotate("text", x = ctl$def + 2, y = ctl$pos + 2.2, hjust = 0, family = "Inter", size = 2.6,
@@ -204,16 +205,16 @@ ggplot(nat, aes(def, pos)) +
                   point.padding = 0.9, box.padding = 0.35, min.segment.length = 0.3,
                   segment.colour = "#cfcdc7", max.overlaps = 40) +
   scale_fill_gradient2(low = "#2a78d6", mid = "#b9b7b1", high = "#d63c2a", midpoint = 0, guide = "none") +
-  scale_size(range = c(1.8, 11), limits = c(0, 26), breaks = c(0, 5, 15, 25),
-             name = "answers linking him to a risk (both AIs)") +
+  scale_size(range = c(1.8, 11), limits = c(0, max(nat$neg)), breaks = c(0, 10, 30, 60),
+             name = "answers linking him to a risk (four AIs)") +
   guides(size = guide_legend(override.aes = list(fill = "#b9b7b1"))) +
-  scale_x_continuous(labels = \(x) paste0(x, " %"), limits = c(-1.5, 82), expand = c(0, 0)) +
-  scale_y_continuous(labels = \(x) paste0(x, " %"), limits = c(-2, 62), expand = c(0, 0)) +
+  scale_x_continuous(labels = \(x) paste0(x, " %"), limits = c(-1.5, XMAX), expand = c(0, 0)) +
+  scale_y_continuous(labels = \(x) paste0(x, " %"), limits = c(-2, YMAX), expand = c(0, 0)) +
   labs(x = "\"his origin does not matter\" (defensive marking)", y = "compliments on his culture (positive stereotypes)") +
   theme(legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 8))
 ```
 
-Summary of the results: "cultural guide" or "security guard". Mean of Granite 4.2 8B and Qwen3.5-9B for each nationality (about 198 judged answers per bubble); the segment spans the positions of the two models. Bubble area: answers with a negative association (both models). Dashed lines: medians of the 24 nationalities.
+Summary of the results: "cultural guide" or "security guard". Mean of Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E4B and Ministral 3 8B for each nationality (about 396 judged answers per bubble). Bubble area: answers with a negative association (four models). Dashed lines: medians of the 24 nationalities.
 :::
 
 \newpage
@@ -309,7 +310,7 @@ independent ways: by an LLM judge (pipeline 1) and by a text analysis with no ju
 \node[stage] (b4) at (10.9,-5.35)
   {\textbf{Stratified sample}\\[1pt]3 per nationality $\times$ context $\times$ age\\6 per cell for the control\\= \textbf{2,574} answers per model};
 \node[stage] (b5) at (5.45,-5.35)
-  {\textbf{LLM judge}\\[1pt]Qwen3-32B-AWQ, greedy, \texttt{rts-v4}\\Granite and Qwen answers\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle: judge notebook}};
+  {\textbf{LLM judge}\\[1pt]Qwen3-32B-AWQ, greedy, \texttt{rts-v4}\\answers of the 4 models\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle: judge notebook}};
 \node[stage] (b6) at (0,-5.35)
   {\textbf{Statistics}\\[1pt]Wilson CIs, likelihood-ratio tests,\\Spearman, Fisher + Holm\\[2pt]{\scriptsize\itshape\color{cMuted}Kaggle dataset $\to$ this report (R)}};
 \node[stage, draw=cNat, minimum height=2.0cm] (b7) at (5.45,-9.3)
@@ -337,8 +338,8 @@ and a nationality adjective; the control drops the adjective ("un chauffeur"). (
 each model, the nationality is masked, a stratified sample is rated by the judge model against a fixed
 rubric, and the verdicts are analysed statistically (pipeline 1). In parallel, every masked answer is
 analysed without a judge, by a classifier that tries to guess the nationality and by lexicometry (pipeline 2,
-step 7). Steps 2, 5 and 7 run as Kaggle notebooks [@kaggle_granite; @kaggle_qwen; @kaggle_judge;
-@kaggle_guess]; step 6 reads the published dataset [@kaggle_data].
+step 7). Steps 2, 5 and 7 run as Kaggle notebooks [@kaggle_granite; @kaggle_qwen; @kaggle_gemma;
+@kaggle_ministral; @kaggle_judge; @kaggle_guess]; step 6 reads the published dataset [@kaggle_data].
 :::
 
 The design crosses five factors (@tbl-design): 25 nationality cells (24 nationalities and the control),
@@ -403,11 +404,14 @@ distrust of a kind gesture; C10 (first date through an app) tests cultural stere
 
 ## Models and generation
 
-Two models of about 8 billion parameters, from labs with different alignment policies, were evaluated:
-**Granite 4.2 8B** (`ibm-granite/granite-4.2-8b`, IBM) and **Qwen3.5-9B** (`Qwen/Qwen3.5-9B`, Alibaba,
-thinking mode disabled). Generation uses vLLM [@kwon2023vllm] in fp16 on two T4 GPUs (Kaggle), with each
-model's chat template, temperature 0.7, top-p 0.9 and at most 2,048 tokens per answer. Each model runs
-in its own Kaggle notebook built from a single parameterised source [@kaggle_granite; @kaggle_qwen].
+Four models of 4 to 9 billion parameters, from four labs with different alignment policies, were
+evaluated: **Granite 4.2 8B** (`ibm-granite/granite-4.2-8b`, IBM), **Qwen3.5-9B** (`Qwen/Qwen3.5-9B`,
+Alibaba, thinking mode disabled), **Gemma 4 E4B** (`google/gemma-4-E4B-it`, Google) and **Ministral 3 8B**
+(`mistralai/Ministral-3-8B-Instruct-2512`, Mistral AI). Generation uses vLLM [@kwon2023vllm] in fp16 on two
+T4 GPUs (Kaggle), with each model's chat template, temperature 0.7, top-p 0.9 and at most 2,048 tokens per
+answer, the same settings for every model rather than each vendor's recommended ones. Each model runs in
+its own Kaggle notebook built from a single parameterised source [@kaggle_granite; @kaggle_qwen;
+@kaggle_gemma; @kaggle_ministral].
 
 ```{r}
 #| label: gen-stats
@@ -417,10 +421,12 @@ g <- R |> group_by(model) |>
 gs <- function(m, v) g[[v]][g$model == m]
 ```
 
-Granite's answers are long (`r num(gs("granite-4.2-8b","tok"),0)` tokens on average,
-`r pc(gs("granite-4.2-8b","trunc"),1)` truncated at 2,048 tokens); Qwen3.5-9B's are shorter
-(`r num(gs("qwen3.5-9b","tok"),0)` tokens, `r sum(R$model == "qwen3.5-9b" & R$finish_reason == "length")`
-truncated answer). Truncated answers are excluded from the judged sample.
+Granite and Ministral write long answers (`r num(gs(GR,"tok"),0)` and `r num(gs(MI,"tok"),0)` tokens on
+average, `r pc(gs(GR,"trunc"),1)` and `r pc(gs(MI,"trunc"),1)` truncated at 2,048 tokens); Qwen and Gemma
+write shorter ones (`r num(gs(QW,"tok"),0)` and `r num(gs(GE,"tok"),0)` tokens,
+`r sum(R$model == QW & R$finish_reason == "length")` and `r sum(R$model == GE & R$finish_reason == "length")`
+truncated answers). Truncated answers are excluded from the judged sample, which leaves Ministral 3 cells
+one answer short (2,571 answers).
 
 ## Masking and sampling for the judge
 
@@ -463,8 +469,8 @@ tibble::tribble(
 The rubric went through four versions as verdicts were reviewed. Version `rts-v4` excludes emergency
 numbers and practical facts from negative associations (a regular-expression guard also drops a flag whose
 quote is only an emergency number). The families of negative associations (scam, migration, religion…)
-were declared **before** the Qwen3.5-9B run, based on what had been observed on Granite: Qwen's results on
-these families are confirmatory, Granite's exploratory.
+were declared **before** the Qwen3.5-9B run, based on what had been observed on Granite: the results of
+Qwen, Gemma and Ministral on these families are confirmatory, Granite's exploratory.
 
 ```{r}
 #| label: judge-stats
@@ -473,7 +479,9 @@ jv <- n_judged |> group_by(model) |> summarise(tot = sum(n), ok = sum(n[parse_ok
 
 Of `r num(sum(jv$tot), 0)` requested verdicts, `r num(sum(jv$ok), 0)`
 (`r pc(100 * sum(jv$ok) / sum(jv$tot), 1)`) are valid JSON conforming to the rubric; the others are
-discarded.
+discarded. Most of them are Gemma's (`r num(by_model(jv, GE, "tot") - by_model(jv, GE, "ok"), 0)`), for which
+the judge put "asks for clarification" in the framing field, a value outside the rubric; they are spread
+over every nationality.
 
 ## Statistical analysis
 
@@ -485,7 +493,7 @@ score is treated in the same way with a linear model (F test). Agreement between
 nationalities is measured with Spearman's rank correlation [@spearman1904]. Negative associations for each
 nationality are compared with the other nationalities with Fisher's exact test, with Holm's correction over
 the 24 nationalities [@holm1979]. To let groups of nationalities emerge from the data rather than from
-categories chosen in advance, each nationality is described by a profile of nine indicators (both models
+categories chosen in advance, each nationality is described by a profile of nine indicators (four models
 pooled, shares smoothed as $(k + 0.5)/(n + 1)$, on the logit scale and standardised). The profiles are
 grouped by hierarchical clustering (Euclidean distance, Ward's criterion [@ward1963]) and projected by
 principal component analysis [@jolliffe2016]. The stability of the groups is measured by resampling the
@@ -499,7 +507,7 @@ Python synthesis notebook [@kaggle_synthesis].
 
 The judge is itself a language model, with its own biases. The answers are therefore also read with no
 judge at all, by two text-analysis methods applied to **every** answer with a nationality, of the four
-generated models (Gemma and Ministral included, although not judged yet), with the same masking as for the
+models, with the same masking as for the
 judge [@kaggle_guess].
 
 **Guessing the nationality.** If the advice did not depend on the nationality, nothing in a masked answer
@@ -559,10 +567,11 @@ tests |>
   kable(booktabs = TRUE, align = "lrr")
 ```
 
-For both models, nationality has a significant effect on every indicator (@tbl-lrt). The strongest
-effects are on defensive marking and positive stereotypes; the effect on high alarm is real but weaker. In
-other words, nationality changes less *how much* danger is evoked than *how* the assistant talks about the
-man.
+Nationality has a significant effect on the answers of every model (@tbl-lrt), on positive stereotypes
+above all. The only test that finds nothing is Gemma's on negative associations: with a single such answer
+in 2,300, there is nothing to test. The effect on high alarm is weaker than on the
+way the assistant talks about the man: nationality changes less *how much* danger is evoked than *how* the
+man is described.
 
 ## Defensive marking: defending against a prejudice nobody voiced
 
@@ -572,16 +581,36 @@ dm <- rate_table("defensive_marking")
 dnat <- dm |> filter(country != "BASE")
 drng <- dnat |> group_by(model) |> summarise(lo = min(pct), hi = max(pct), .groups = "drop")
 dbase <- dm |> filter(country == "BASE")
+drx <- read.csv(file.path("..", "analysis", "out", "defensive_regex.csv"))
+rx_nat <- drx |> filter(country != "BASE") |> group_by(model) |>
+  summarise(judge = 100 * sum(judge) / sum(n), regex = 100 * sum(regex) / sum(n), .groups = "drop")
+rx_rho <- sapply(names(MODELS), function(m) {
+  x <- drx |> filter(model == m, country != "BASE")
+  cor(x$judge / x$n, x$regex / x$n, method = "spearman")
+})
+dr <- function(m, v) by_model(drng, m, v)
+db <- function(m) by_model(dbase, m, "pct")
 ```
 
-The clearest signal is **defensive marking**: the answer volunteers that the man's origin does not matter
-("[X] or any other man", "his origin has no bearing"). For the control, such a sentence has no reason to
-exist; it appears in `r pc(dbase$pct[dbase$model == "granite-4.2-8b"], 1)` (Granite) and
-`r pc(dbase$pct[dbase$model == "qwen3.5-9b"], 1)` (Qwen) of answers. With a nationality, it ranges from
-`r pc(drng$lo[1])` to `r pc(drng$hi[1])` for Granite and from `r pc(drng$lo[2])` to `r pc(drng$hi[2])` for
-Qwen (@fig-defensive). French, Spanish and British men are at the bottom of the ranking; India,
-Afghanistan, Nigeria, Serbia, Albania and Morocco at the top. This marking looks benevolent, but it shows
-that the model anticipates suspicion for some nationalities and not for others.
+**Defensive marking** is when the answer volunteers that the man's origin does not matter ("[X] or any
+other man", "his origin has no bearing"). For the control, such a sentence has no reason to exist; it
+appears in at most `r pc(max(dbase$pct), 1)` of the control answers of any model. With a nationality, it
+is the strongest signal of Granite and Qwen: from `r pc(dr(GR,"lo"))` to `r pc(dr(GR,"hi"))` of answers
+for Granite and from `r pc(dr(QW,"lo"))` to `r pc(dr(QW,"hi"))` for Qwen (@fig-defensive). French, Spanish,
+British and American men are at the bottom of their ranking; India, Afghanistan, Nigeria, Serbia, Albania
+and Morocco at the top. This marking looks benevolent, but it shows that the model anticipates suspicion
+for some nationalities and not for others.
+
+The two other models use this register much less. Gemma marks `r pc(dr(GE,"lo"))` to `r pc(dr(GE,"hi"))`
+of answers, with no nationality standing out much. For Ministral, the judge finds
+`r pc(dr(MI,"lo"))` to `r pc(dr(MI,"hi"))`, but its verdicts are less reliable there. The bench's own
+regular expression for defensive marking (a sentence naming [X] together with a phrase that puts it in
+perspective, such as "or any other man") finds it in `r pc(by_model(rx_nat, MI, "regex"))` of Ministral's
+answers against `r pc(by_model(rx_nat, MI, "judge"))` for the judge, and the two rank the nationalities
+differently (Spearman $\rho = `r num(rx_rho[[MI]], 2)`$, against `r num(min(rx_rho[c(GR, QW, GE)]), 2)` to
+`r num(max(rx_rho[c(GR, QW, GE)]), 2)` for the other three models). Reading Ministral's flagged answers
+explains it: the judge often takes a generic safety sentence ("your safety comes first") for a defensive
+one. Ministral's defensive marking is therefore not interpreted further.
 
 ::: {#fig-defensive}
 
@@ -589,34 +618,34 @@ that the model anticipates suspicion for some nationalities and not for others.
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
-**Reading.** Each row is a nationality. Each dot is the share of answers in which the AI says, without being asked, that the man's origin does not matter ("whether he is [X] or not"). Blue is Granite, orange is Qwen. The thin horizontal line around a dot is the margin of uncertainty. The dotted vertical lines show the same measure when no nationality is given: close to zero.
+**Reading.** Each row is a nationality. Each dot is the share of answers in which the AI says, without being asked, that the man's origin does not matter ("whether he is [X] or not"). Blue is Granite, orange Qwen, green Gemma, purple Ministral. The thin horizontal line around a dot is the margin of uncertainty. The dotted vertical lines show the same measure when no nationality is given: close to zero.
 
-**What it shows.** Nobody raised the man's origin, yet the AI feels the need to defend it far more often for an Afghan, Indian or Nigerian man than for a French or Spanish one. This reflex reveals which groups the AI silently associates with suspicion.
+**What it shows.** Nobody raised the man's origin, yet Granite and Qwen feel the need to defend it far more often for an Afghan, Indian or Nigerian man than for a French or Spanish one. This reflex reveals which groups they silently associate with suspicion. Gemma almost never does it; Ministral's dots are less reliable (see the text).
 
 ```{=latex}
 \end{howtoread}
 ```
 
 ```{r}
-#| fig-height: 5.6
+#| fig-height: 6.5
 ord <- dnat |> group_by(country) |> summarise(m = mean(pct)) |> arrange(m) |> pull(country)
 dnat |>
   mutate(lab = factor(nm(country), levels = nm(ord))) |>
   ggplot(aes(pct, lab, colour = model)) +
   geom_vline(data = dbase, aes(xintercept = pct, colour = model), linetype = "dotted",
              linewidth = 0.6, show.legend = FALSE) +
-  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, alpha = 0.45,
-                 position = position_dodge(width = 0.6)) +
-  geom_point(size = 1.8, position = position_dodge(width = 0.6)) +
-  scale_colour_manual(values = COL, labels = LAB) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, alpha = 0.4,
+                 position = position_dodge(width = 0.75)) +
+  geom_point(size = 1.5, position = position_dodge(width = 0.75)) +
+  scale_colour_manual(values = COL, labels = LAB, breaks = names(MODELS)) +
   scale_x_continuous(labels = \(x) paste0(x, " %"), limits = c(0, 90), expand = c(0, 0)) +
   labs(x = "answers with defensive marking", y = NULL)
 ```
 
-Share of answers with defensive marking, per nationality and model (95 % Wilson intervals, about 99 answers per point). Dotted lines: "a man" control with no nationality. Nationalities sorted by the mean of both models.
+Share of answers with defensive marking, per nationality and model (95 % Wilson intervals, about 99 answers per point). Dotted lines: "a man" control with no nationality. Nationalities sorted by the mean of the four models.
 :::
 
-## An asymmetry: flattering some, justifying oneself for others
+## An asymmetry shared by the four models: who gets the compliments
 
 ```{r}
 #| label: asym-stats
@@ -630,19 +659,61 @@ asym <- lapply(names(MODELS), function(m) {
 }) |> setNames(names(MODELS))
 ```
 
-The stereotypes found by the judge are almost all **positive**: `r sc("granite-4.2-8b","positive")`
-positive versus `r sc("granite-4.2-8b","negative")` negative for Granite, `r sc("qwen3.5-9b","positive")`
-versus `r sc("qwen3.5-9b","negative")` for Qwen. The models almost never disparage explicitly; they
-compliment ("Finns value punctuality", "Japanese politeness"). But these compliments go mostly to
-nationalities that are already favoured: for Granite, `r pc(rt("stereo_pos","granite-4.2-8b","FIN"))` of
-answers for a Finnish man, `r pc(rt("stereo_pos","granite-4.2-8b","JPN"))` for a Japanese man, versus
-`r pc(rt("stereo_pos","granite-4.2-8b","NGA"))` for a Nigerian or an Afghan man.
+The stereotypes found by the judge are almost all **positive**: `r sc(GR,"positive")` positive versus
+`r sc(GR,"negative")` negative for Granite, `r sc(QW,"positive")` versus `r sc(QW,"negative")` for Qwen,
+`r sc(GE,"positive")` versus none for Gemma, `r sc(MI,"positive")` versus `r sc(MI,"negative")` for
+Ministral. The models rarely disparage through a stereotype; they compliment ("Finns value punctuality",
+"Japanese politeness"). But these compliments go to the same nationalities in all four models
+(@fig-stereo): a Finnish man gets one in `r pc(min(sapply(names(MODELS), \(m) rt("stereo_pos", m, "FIN"))))`
+to `r pc(max(sapply(names(MODELS), \(m) rt("stereo_pos", m, "FIN"))))` of the answers depending on the
+model, an Afghan man `r pc(min(sapply(names(MODELS), \(m) rt("stereo_pos", m, "AFG"))))` to
+`r pc(max(sapply(names(MODELS), \(m) rt("stereo_pos", m, "AFG"))))`. Afghanistan is the least
+complimented nationality for every model, Nigeria among the three least.
 
-@fig-asymmetry crosses the two indicators. The more defensive marking a nationality receives, the fewer
-flattering stereotypes it gets (Spearman $\rho = `r num(asym[[1]]$estimate, 2)`$ for Granite,
-$\rho = `r num(asym[[2]]$estimate, 2)`$ for Qwen, `r fp(max(asym[[1]]$p.value, asym[[2]]$p.value))` at
-most). The models switch between two registers: a **cultural guide** for some nationalities, a
-**security guard who justifies himself** for others.
+::: {#fig-stereo}
+
+```{=latex}
+\begin{howtoread}\textbf{How to read this chart}\par\smallskip
+```
+
+**Reading.** Each row is a nationality, each column one of the four AIs. The number in a cell is the share of answers in which the AI pays the man a compliment about his culture ("Finns are punctual", "Italian warmth"); the darker the cell, the more often.
+
+**What it shows.** The four columns look alike: whatever the company that made the AI, Northern Europeans, Japanese, Italians and Australians are complimented, while Afghans, Nigerians, Algerians, Russians and Indians almost never are.
+
+```{=latex}
+\end{howtoread}
+```
+
+```{r}
+#| fig-height: 5.4
+#| out-width: "80%"
+spw <- sp |> filter(country != "BASE")
+ords <- spw |> group_by(country) |> summarise(m = mean(pct)) |> arrange(m) |> pull(country)
+spw |>
+  mutate(lab = factor(nm(country), levels = nm(ords)), mod = factor(LAB[model], levels = LAB)) |>
+  ggplot(aes(mod, lab, fill = pct)) +
+  geom_tile(colour = "white", linewidth = 0.4) +
+  geom_text(aes(label = round(pct), colour = pct > 38), family = "Inter", size = 2.5, show.legend = FALSE) +
+  scale_colour_manual(values = c(`FALSE` = INK, `TRUE` = "white")) +
+  scale_fill_gradient(low = "#f4faf6", high = "#0b6b45", limits = c(0, 65), name = "answers with a positive stereotype (%)") +
+  scale_x_discrete(position = "top") +
+  labs(x = NULL, y = NULL) +
+  theme(panel.grid = element_blank(), panel.grid.major = element_blank(), legend.position = "bottom",
+        legend.title = element_text(colour = MUTED, size = 8), legend.key.height = unit(6, "pt"),
+        legend.key.width = unit(28, "pt"))
+```
+
+Share of answers with a positive stereotype, per nationality and model (about 99 judged answers per cell). Nationalities sorted by the mean of the four models. No control answer receives one.
+:::
+
+For Granite and Qwen, the compliments mirror defensive marking (@fig-asymmetry): the more a nationality is
+"defended", the fewer compliments it gets (Spearman $\rho = `r num(asym[[GR]]$estimate, 2)`$ for Granite,
+$\rho = `r num(asym[[QW]]$estimate, 2)`$ for Qwen, `r fp(max(asym[[GR]]$p.value, asym[[QW]]$p.value))` at
+most). These two models switch between two registers: a **cultural guide** for some nationalities, a
+**security guard who justifies himself** for others. For Gemma and Ministral the two indicators are not
+linked ($\rho = `r num(asym[[GE]]$estimate, 2)`$ and `r num(asym[[MI]]$estimate, 2)`): the unequal
+compliments remain, but the other nationalities are not "defended" instead. Ministral names a risk
+(next section); Gemma simply says less about them.
 
 ::: {#fig-asymmetry}
 
@@ -652,7 +723,7 @@ most). The models switch between two registers: a **cultural guide** for some na
 
 **Reading.** Each dot is a nationality. The further right, the more often the AI says "his origin does not matter". The higher up, the more often it pays the nationality a compliment ("Finns are punctual"). The grey line shows the overall trend.
 
-**What it shows.** The dots slope down from top left to bottom right. Nationalities that are flattered (Finland, Japan, Sweden) are rarely "defended", and those that are defended (Afghanistan, Nigeria, India) are rarely flattered: two different treatments for the same question.
+**What it shows.** The dots slope down from top left to bottom right. Nationalities that are flattered (Finland, Japan, Sweden) are rarely "defended", and those that are defended (Afghanistan, Nigeria, India) are rarely flattered: two different treatments for the same question. This chart uses Granite and Qwen only, the two models whose defensive marking is frequent and reliable.
 
 ```{=latex}
 \end{howtoread}
@@ -667,8 +738,8 @@ reg6 <- function(r) dplyr::case_when(
   grepl("Asia", r) ~ "Asia",
   grepl("America", r) ~ "Americas",
   TRUE ~ "Oceania")
-both <- dnat |> group_by(country) |> summarise(def = mean(pct)) |>
-  inner_join(sp |> filter(country != "BASE") |> group_by(country) |> summarise(pos = mean(pct)),
+both <- dnat |> filter(model %in% c(GR, QW)) |> group_by(country) |> summarise(def = mean(pct)) |>
+  inner_join(sp |> filter(country != "BASE", model %in% c(GR, QW)) |> group_by(country) |> summarise(pos = mean(pct)),
              by = "country") |>
   mutate(reg = reg6(region[country]), lab = nm(country))
 ggplot(both, aes(def, pos)) +
@@ -684,10 +755,10 @@ ggplot(both, aes(def, pos)) +
   guides(colour = guide_legend(nrow = 2))
 ```
 
-Defensive marking (x) and positive stereotypes (y) per nationality, mean of both models. Colour: grouped UN M49 region.
+Defensive marking (x) and positive stereotypes (y) per nationality, mean of Granite and Qwen. Colour: grouped UN M49 region.
 :::
 
-## Explicit negative associations: rare but concentrated
+## Explicit negative associations: concentrated, and frequent for Ministral
 
 ```{r}
 #| label: neg-stats
@@ -701,26 +772,37 @@ fish <- N |> group_by(model) |> group_modify(function(s, k) {
            n = sum(s$country == c), or = unname(ft$estimate), p = ft$p.value)
   })
 }) |> mutate(p_holm = p.adjust(p, "holm")) |> ungroup()
-sig <- fish |> filter(p_holm < 0.05) |> arrange(model, p_holm)
+sig <- fish |> filter(p_holm < 0.05) |> arrange(match(model, names(MODELS)), p_holm)
+nn <- function(m) by_model(nneg, m, "n")
+np_ <- function(m) pc(100 * nn(m) / sum(N$model == m), 1)
+neg_rt <- function(m, c) pc(rt("negative_association", m, c), 1)
 ```
 
-A negative association (a risk tied to the man's origin rather than to any man) is found in
-`r nneg$n[1]` answers with a nationality for Granite
-(`r pc(100 * nneg$n[1] / sum(N$model == "granite-4.2-8b"), 1)`) and `r nneg$n[2]` for Qwen
-(`r pc(100 * nneg$n[2] / sum(N$model == "qwen3.5-9b"), 1)`), and in **no** answer to the control. They
-concentrate on two nationalities (@fig-negative, @tbl-fisher):
+A negative association (a risk tied to the man's origin rather than to any man) is found in **no** answer
+to the control, and in very different amounts depending on the model: `r nn(GE)` answer with a nationality
+for Gemma (`r np_(GE)`), `r nn(GR)` for Granite (`r np_(GR)`), `r nn(QW)` for Qwen (`r np_(QW)`) and
+`r nn(MI)` for Ministral (`r np_(MI)`). Whatever their number, they fall on the same two nationalities
+first (@fig-negative, @tbl-fisher):
 
-- **Nigeria · scam**: `r pc(rt("negative_association","granite-4.2-8b","NGA"), 1)` of answers for Granite,
-  `r pc(rt("negative_association","qwen3.5-9b","NGA"), 1)` for Qwen, mostly in the first-date (C10),
-  car-breakdown (C6) and no-context (C0) situations. The answers mention "419 scams", fake profiles and
+- **Nigeria · scam**: `r neg_rt(GR, "NGA")` of answers for Granite, `r neg_rt(QW, "NGA")` for Qwen,
+  `r neg_rt(MI, "NGA")` for Ministral. Gemma's single association also falls on a Nigerian man, but it is a
+  generic warning about romance scams that does not name his origin. They come mostly in the first-date
+  (C10), car-breakdown (C6) and no-context (C0) situations, and mention "419 scams", fake profiles and
   requests for money.
-- **Afghanistan · migration and gender norms**: `r pc(rt("negative_association","granite-4.2-8b","AFG"), 1)`
-  for Granite (refugee status, "smuggler", displacement), `r pc(rt("negative_association","qwen3.5-9b","AFG"), 1)`
-  for Qwen ("very strict" gender roles, religion).
+- **Afghanistan · migration and gender norms**: `r neg_rt(GR, "AFG")` for Granite (refugee status,
+  "smuggler", displacement), `r neg_rt(QW, "AFG")` for Qwen ("very strict" gender roles, religion),
+  `r neg_rt(MI, "AFG")` for Ministral (control of women, early marriage, migration, terrorism).
 
-Qwen also spreads more diffuse associations over other nationalities (Russia, Serbia, Turkey, Brazil,
-United States: "especially if he is a foreigner", supposed insistence towards foreign women), each below
-the significance threshold after correction.
+Ministral goes further than the other three. Beyond Nigeria and Afghanistan, it ties Russia
+(`r neg_rt(MI, "RUS")`: scams, crime), Albania (`r neg_rt(MI, "ALB")`), Romania (`r neg_rt(MI, "ROU")`)
+and Serbia (`r neg_rt(MI, "SRB")`) to a risk, mostly scams, and only Belgium, Germany, Australia and France
+stay at 3 % or less. Qwen spreads more diffuse associations over Russia, Serbia, Turkey, Brazil or the
+United States ("especially if he is a foreigner", supposed insistence towards foreign women), each below
+the significance threshold after correction. Ministral's associations are not all well founded: reading
+a sample shows generic warnings counted as associations ("beware of romance scams", with no link to the
+nationality), and `r num(100 * mean(grepl("[X]", neg$association_quote[neg$model == MI], fixed = TRUE)), 0)` %
+of its quotes name the nationality ([X]). Even halved, its rate would remain the highest of the four
+models.
 
 ::: {#fig-negative}
 
@@ -728,31 +810,35 @@ the significance threshold after correction.
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
-**Reading.** Each bar counts the answers (out of about 99 per nationality) in which the AI links the man to a specific risk because of where he comes from. The colour gives the kind of risk: scam, migration, crime, religion, treatment of women. Left panel: Granite; right panel: Qwen.
+**Reading.** Each bar counts the answers (out of about 99 per nationality) in which the AI links the man to a specific risk because of where he comes from. The colour gives the kind of risk: scam, migration, crime, religion, treatment of women. One panel per AI; Gemma, with a single such answer, is left out.
 
-**What it shows.** Such remarks are rare overall, but they are not spread at random: Nigeria with scams and Afghanistan with migration or gender norms stand out in both AIs. A man with no nationality never receives one.
+**What it shows.** These remarks are not spread at random: Nigeria with scams and Afghanistan with migration or gender norms stand out in every AI that makes them. Ministral makes many more, and extends scams to Russia, Romania and Albania. A man with no nationality never receives one.
 
 ```{=latex}
 \end{howtoread}
 ```
 
 ```{r}
-#| fig-height: 3.9
+#| fig-height: 4.6
 TYPES <- c(scam = "scam", migration = "migration", crime = "crime", religion = "religion",
-           women = "treatment of women", other = "other")
+           women = "treatment of women", terrorism = "terrorism", alcohol = "alcohol", other = "other")
 neg |>
+  filter(model != GE) |>
+  mutate(association_type = ifelse(association_type %in% names(TYPES), association_type, "other"),
+         model = factor(model, levels = names(MODELS))) |>
   count(model, country, association_type) |>
   mutate(lab = nm(country), type = factor(TYPES[association_type], levels = TYPES)) |>
   group_by(lab) |> mutate(tot = sum(n)) |> ungroup() |>
   ggplot(aes(n, reorder(lab, tot), fill = type)) +
   geom_col(width = 0.7) +
-  facet_wrap(~ LAB[model]) +
-  scale_fill_manual(values = c("#d63c2a", "#2a78d6", "#6250d6", "#eda100", "#e87ba4", "#9a9893")) +
+  facet_wrap(~ model, labeller = as_labeller(LAB), scales = "free_x") +
+  scale_fill_manual(values = c("#d63c2a", "#2a78d6", "#6250d6", "#eda100", "#e87ba4", "#1baf7a", "#8a5a2b",
+                               "#9a9893")) +
   labs(x = "answers with a negative association", y = NULL) +
   guides(fill = guide_legend(nrow = 2))
 ```
 
-Negative associations per nationality, by type as labelled by the judge (number of answers out of about 99 per nationality and model). Nationalities with no association are omitted.
+Negative associations per nationality, by type as labelled by the judge (number of answers out of about 99 per nationality and model; free horizontal scales). Nationalities with no association are omitted; Gemma (one association, Nigeria · scam) is not shown.
 :::
 
 ```{r}
@@ -782,7 +868,12 @@ QUOTES <- tibble::tribble(
   "les rôles de genre sont très stricts", "In many conservative families and circles in [X], gender roles are very strict.",
   "Si le plombier est musulman", "If the plumber is Muslim (which is likely given his [X] origin)",
   "il est courant que les hommes soient très insistants", "In [X], it is common for men to be very insistent with foreign women, sometimes to the point of seeming intrusive.",
-  "les étrangers sont parfois utilisés comme couverture", "in safety statistics, foreigners are sometimes used as a cover for illicit activities targeting minors"
+  "les étrangers sont parfois utilisés comme couverture", "in safety statistics, foreigners are sometimes used as a cover for illicit activities targeting minors",
+  "sont souvent associés à des arnaques sentimentales", "[X] men (or men from other African countries) are often associated with romance scams",
+  "patriarcat, mariage précoce", "[X] norms (patriarchy, early marriage, control of women) may clash with your values.",
+  "Les réseaux criminels (y compris", "Criminal networks (including some groups linked to [X] or to the former USSR) have sometimes been involved in trafficking or confinement (even if this is not a generalisation)",
+  "Les scams [X] sont très organisés", "[X] scams are very organised: they create fake profiles, play on empathy, and isolate you little by little.",
+  "Les escrocs [X] (souvent des arnaqueurs", "[X] crooks (often scammers or traffickers) target young people through dating apps."
 )
 clean <- function(s, n = 170) {
   s <- gsub("\\s+", " ", gsub("[’]", "'", s))
@@ -807,14 +898,16 @@ ctx <- D |>
 cx <- function(m, c, g) ctx$ca[ctx$model == m & ctx$context_id == c & ctx$grp == g]
 ```
 
-High alarm varies more between models than between nationalities: Qwen is clearly more alarmist than
-Granite whatever the country (mean score `r num(mean(D$alarm_score[D$model == "qwen3.5-9b"]), 2)` versus
-`r num(mean(D$alarm_score[D$model == "granite-4.2-8b"]), 2)`). Framing depends mostly on context
+High alarm varies more between models than between nationalities: whatever the country, Ministral is the
+most alarmist (mean score `r num(mean(D$alarm_score[D$model == MI], na.rm = TRUE), 2)`), then Qwen
+(`r num(mean(D$alarm_score[D$model == QW], na.rm = TRUE), 2)`), Gemma
+(`r num(mean(D$alarm_score[D$model == GE], na.rm = TRUE), 2)`) and Granite
+(`r num(mean(D$alarm_score[D$model == GR], na.rm = TRUE), 2)`). Framing depends mostly on context
 (@fig-context). Notably, **naming a nationality often reduces caution** compared with the control: in the
-elevator, `r pc(cx("granite-4.2-8b","C9_elevator","control"))` of Granite's answers to the control are
-cautious or alarmist versus `r pc(cx("granite-4.2-8b","C9_elevator","nationalities"))` on average with a
-nationality; in the taxi, `r pc(cx("qwen3.5-9b","C3_taxi","control"))` versus
-`r pc(cx("qwen3.5-9b","C3_taxi","nationalities"))` for Qwen. The "a man" control is therefore not a neutral
+elevator, `r pc(cx(GR,"C9_elevator","control"))` of Granite's answers to the control are
+cautious or alarmist versus `r pc(cx(GR,"C9_elevator","nationalities"))` on average with a
+nationality; in the taxi, `r pc(cx(QW,"C3_taxi","control"))` versus
+`r pc(cx(QW,"C3_taxi","nationalities"))` for Qwen. The "a man" control is therefore not a neutral
 level: it also measures the effect of naming (or not naming) an identity. This is why gaps between
 nationalities are more informative than gaps to the control.
 
@@ -833,18 +926,18 @@ nationalities are more informative than gaps to the control.
 ```
 
 ```{r}
-#| fig-height: 4.2
+#| fig-height: 4.4
 ctx |>
-  mutate(lab = factor(CONTEXTS[context_id], levels = rev(CONTEXTS))) |>
+  mutate(lab = factor(CONTEXTS[context_id], levels = rev(CONTEXTS)), model = factor(model, levels = names(MODELS))) |>
   ggplot(aes(ca, lab)) +
   geom_line(aes(group = lab), colour = GRID, linewidth = 1.2) +
   geom_point(aes(shape = grp, colour = model), size = 2.2, stroke = 0.9) +
-  facet_wrap(~ LAB[model]) +
+  facet_wrap(~ model, labeller = as_labeller(LAB), nrow = 1) +
   scale_colour_manual(values = COL, guide = "none") +
   scale_shape_manual(values = c("nationalities" = 16, "control" = 1)) +
   scale_x_continuous(labels = \(x) paste0(x, " %"), limits = c(0, 100), breaks = c(0, 50, 100)) +
   labs(x = "caution or alarm framing", y = NULL) +
-  theme(panel.spacing.x = unit(1.2, "lines"))
+  theme(panel.spacing.x = unit(1.1, "lines"))
 ```
 
 Share of answers framed as caution or alarm, per context: mean of the 24 nationalities (filled dot) and no-nationality control (circle). About 216 verdicts per point for nationalities, 18 for the control.
@@ -858,7 +951,7 @@ Share of answers framed as caution or alarm, per context: mean of the 24 nationa
 
 **Reading.** Rows are nationalities, columns are situations. Each square compares a nationality with the others in the same situation: red means the AI is more alarming than usual, blue less alarming, white about average.
 
-**What it shows.** The rows for Nigeria, Afghanistan, Russia and Serbia are mostly red, especially in the first-date column, while Japan, Italy and the United Kingdom lean blue. Each square rests on few answers: read the overall pattern, not single squares.
+**What it shows.** The rows for Nigeria, Afghanistan, Russia and Romania are mostly red, especially in the first-date column, while Finland, Japan, the United Kingdom and Italy lean blue. Each square rests on few answers: read the overall pattern, not single squares.
 
 ```{=latex}
 \end{howtoread}
@@ -882,12 +975,12 @@ heat |>
         legend.title = element_text(colour = MUTED, size = 8), panel.grid = element_blank())
 ```
 
-Mean alarm score per nationality and context, as a gap to the mean of the nationalities in the same context (mean over both models and three ages). Red: more alarm than other nationalities in the same context. Exploratory: about 18 verdicts per cell.
+Mean alarm score per nationality and context, as a gap to the mean of the nationalities in the same context (mean over the four models and three ages). Red: more alarm than other nationalities in the same context. Exploratory: about 36 verdicts per cell.
 :::
 
 @fig-map locates the gaps. The **first date** (C10) holds the largest gaps: Nigeria, Afghanistan and
-Serbia receive clearly more alarm there than other nationalities, Japan and Finland clearly less. With
-about eighteen verdicts per cell, this map guides the reading; it does not support conclusions cell by
+Russia receive clearly more alarm there than other nationalities, Japan and Finland clearly less. With
+about 36 verdicts per cell, this map guides the reading; it does not support conclusions cell by
 cell.
 
 ## Minors: protection should not depend on nationality
@@ -901,43 +994,59 @@ mp <- function(m, g) m15$pct[m15$model == m & m15$grp == g]
 p15 <- rate_table("protective", D |> filter(age %in% 15, !is_base)) |>
   group_by(model) |> summarise(lo = min(pct), hi = max(pct),
                                cmin = country[which.min(pct)], cmax = country[which.max(pct)])
+p15m <- function(m, v) by_model(p15, m, v)
 ```
 
 For a 15-year-old girl, the expected answer is protective (trusted adult, helpline, do not stay alone)
-whatever the nationality. Answers to the control are protective in `r pc(mp("granite-4.2-8b","control"))`
-(Granite) and `r pc(mp("qwen3.5-9b","control"))` (Qwen) of cases, versus
-`r pc(mp("granite-4.2-8b","nat"))` and `r pc(mp("qwen3.5-9b","nat"))` on average with a nationality. The
-spread between nationalities remains wide: from `r pc(p15$lo[1])` (`r nm(p15$cmin[1])`) to
-`r pc(p15$hi[1])` (`r nm(p15$cmax[1])`) for Granite, from `r pc(p15$lo[2])` (`r nm(p15$cmin[2])`) to
-`r pc(p15$hi[2])` (`r nm(p15$cmax[2])`) for Qwen, on about 33 verdicts per nationality, so these extremes
-should be read with care. A minor thus gets protective advice that varies with the man's origin, although
-her need does not change.
+whatever the nationality. The level depends first on the model: answers to the control are protective in
+`r pc(mp(GR,"control"))` of cases for Granite, `r pc(mp(GE,"control"))` for Gemma,
+`r pc(mp(QW,"control"))` for Qwen and `r pc(mp(MI,"control"))` for Ministral, versus
+`r pc(mp(GR,"nat"))`, `r pc(mp(GE,"nat"))`, `r pc(mp(QW,"nat"))` and `r pc(mp(MI,"nat"))` on average with
+a nationality. The spread between nationalities remains wide within each model, for instance from
+`r pc(p15m(GR,"lo"))` (`r nm(p15m(GR,"cmin"))`) to `r pc(p15m(GR,"hi"))` (`r nm(p15m(GR,"cmax"))`) for
+Granite and from `r pc(p15m(QW,"lo"))` (`r nm(p15m(QW,"cmin"))`) to `r pc(p15m(QW,"hi"))`
+(`r nm(p15m(QW,"cmax"))`) for Qwen, on about 33 verdicts per nationality, so these extremes should be read
+with care. A minor thus gets protective advice that varies with the man's origin, although her need does
+not change.
 
-## The two models agree on the same nationalities
+## The four models agree on who is complimented, not on who is defended
 
 ```{r}
 #| label: agree
+SHORT <- c("granite-4.2-8b" = "Granite", "qwen3.5-9b" = "Qwen", "gemma-4-e4b-it" = "Gemma",
+           "ministral-3-8b-instruct-2512" = "Ministral")
+PAIRS <- combn(names(MODELS), 2, simplify = FALSE)
 agree <- purrr::map_dfr(names(IND)[names(IND) != "alarm_score"], function(y) {
   p <- rate_table(y) |> filter(country != "BASE") |> select(model, country, pct) |>
     pivot_wider(names_from = model, values_from = pct)
-  ct <- cor.test(p[[2]], p[[3]], method = "spearman", exact = FALSE)
-  tibble(Indicator = IND[y], rho = unname(ct$estimate), p = ct$p.value)
+  purrr::map_dfr(PAIRS, \(x) tibble(Indicator = IND[y], pair = paste(SHORT[x], collapse = " × "),
+                                    rho = cor(p[[x[1]]], p[[x[2]]], method = "spearman")))
 })
+ag <- function(y, a, b) agree$rho[agree$Indicator == IND[y] & agree$pair == paste(SHORT[a], SHORT[b], sep = " × ")]
+ag_rng <- function(y) range(agree$rho[agree$Indicator == IND[y]])
 ```
 
 ```{r}
 #| label: tbl-agreement
-#| tbl-cap: "Agreement between Granite and Qwen on the ranking of the 24 nationalities (Spearman rank correlation)."
-agree |> arrange(desc(rho)) |>
-  transmute(Indicator, `Spearman ρ` = num(rho, 2), p = pstr(p)) |>
-  kable(booktabs = TRUE, align = "lrr")
+#| tbl-cap: "Agreement between models on the ranking of the 24 nationalities (Spearman rank correlation, for each pair of models). With 24 nationalities, $\\rho$ above 0.41 is significant at the 5 % level."
+agree |>
+  mutate(rho = num(rho, 2)) |>
+  pivot_wider(names_from = pair, values_from = rho) |>
+  kable(booktabs = TRUE, align = c("l", rep("r", length(PAIRS))))
 ```
 
-Granite and Qwen come from different labs (IBM, Alibaba), with distinct data and alignment procedures. Yet
-they rank nationalities very similarly for defensive marking and positive stereotypes (@tbl-agreement,
-@fig-agreement). Agreement is weaker for high alarm, whose gaps between nationalities are small relative
-to noise. High agreement between independent models suggests a **structural** bias, probably inherited from
-shared training data, rather than an artefact of one model.
+The four models come from four labs (IBM, Alibaba, Google, Mistral AI), with distinct data and alignment
+procedures. They agree strongly on one thing only: which nationalities get **compliments** (Spearman
+$\rho$ from `r num(ag_rng("stereo_pos")[1], 2)` to `r num(ag_rng("stereo_pos")[2], 2)` over the six pairs,
+@tbl-agreement). On **defensive marking**, Granite and Qwen agree as strongly
+($\rho = `r num(ag("defensive_marking", GR, QW), 2)`$), but neither agrees with Gemma or Ministral
+($\rho$ from `r num(min(ag("defensive_marking", GR, GE), ag("defensive_marking", QW, GE), ag("defensive_marking", GR, MI), ag("defensive_marking", QW, MI)), 2)`
+to `r num(max(ag("defensive_marking", GR, GE), ag("defensive_marking", QW, GE), ag("defensive_marking", GR, MI), ag("defensive_marking", QW, MI)), 2)`):
+this reflex belongs to some models, not to all (@fig-agreement). Agreement on negative associations is
+moderate, limited by how rare they are in most models. High agreement on compliments between independent
+models suggests a **structural** bias, probably inherited from shared training data; the way each model
+deals with the other nationalities (defending them, naming a risk, or saying little) looks more like a
+choice of alignment.
 
 ::: {#fig-agreement}
 
@@ -945,31 +1054,31 @@ shared training data, rather than an artefact of one model.
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
-**Reading.** Each dot is a nationality. Its horizontal position is how often Granite says "his origin does not matter", its vertical position how often Qwen does. On the diagonal line, both AIs give the same value.
+**Reading.** Each square compares two AIs on one kind of answer. The number is their agreement on the ranking of the 24 nationalities, from 0 (none) to 1 (same order); the darker, the stronger.
 
-**What it shows.** The dots follow the diagonal: two AIs built by different companies (IBM and Alibaba) single out the same nationalities. This suggests the bias comes from shared sources, such as the texts they learnt from, rather than from one product.
+**What it shows.** The "positive stereotype" row is dark everywhere: the four AIs, from four companies, compliment the same nationalities. The "his origin does not matter" row is dark for Granite and Qwen only: the other two AIs do not single out the same nationalities in that way.
 
 ```{=latex}
 \end{howtoread}
 ```
 
 ```{r}
-#| fig-height: 3.9
-#| out-width: "70%"
-pa <- dnat |> select(model, country, pct) |> pivot_wider(names_from = model, values_from = pct) |>
-  mutate(lab = nm(country))
-ggplot(pa, aes(`granite-4.2-8b`, `qwen3.5-9b`)) +
-  geom_abline(colour = GRID, linewidth = 0.6) +
-  geom_point(colour = INK, size = 1.8) +
-  geom_text_repel(aes(label = lab), size = 2.6, family = "Inter", colour = MUTED, seed = 2,
-                  max.overlaps = 30) +
-  coord_equal(xlim = c(10, 80), ylim = c(10, 80)) +
-  scale_x_continuous(labels = \(x) paste0(x, " %")) +
-  scale_y_continuous(labels = \(x) paste0(x, " %")) +
-  labs(x = "Granite 4.2 8B", y = "Qwen3.5-9B")
+#| fig-height: 2.8
+agree |>
+  mutate(pair = factor(pair, levels = unique(pair)), Indicator = factor(Indicator, levels = rev(unique(Indicator)))) |>
+  ggplot(aes(pair, Indicator, fill = rho)) +
+  geom_tile(colour = "white", linewidth = 0.6) +
+  geom_text(aes(label = num(rho, 2), colour = rho > 0.6), family = "Inter", size = 2.7, show.legend = FALSE) +
+  scale_colour_manual(values = c(`FALSE` = INK, `TRUE` = "white")) +
+  scale_fill_gradient(low = "#f6f5f2", high = "#1b4f9c", limits = c(0, 1), name = "Spearman ρ") +
+  scale_x_discrete(position = "top") +
+  labs(x = NULL, y = NULL) +
+  theme(panel.grid = element_blank(), panel.grid.major = element_blank(), legend.position = "right",
+        axis.text.x.top = element_text(angle = 20, hjust = 0, vjust = 0),
+        legend.title = element_text(colour = MUTED, size = 8))
 ```
 
-Defensive marking per nationality: Granite (x) versus Qwen (y). Diagonal: perfect agreement.
+Agreement between each pair of models on the ranking of the 24 nationalities, per indicator (Spearman $\rho$, values of @tbl-agreement).
 :::
 
 ## Groups of nationalities, found by the data
@@ -993,19 +1102,21 @@ members <- function(g) { x <- names(grp)[gname(names(grp)) == g]; paste(nm(x[ord
 jac_of <- function(g) num(jac[as.integer(names(GRP)[GRP == g])], 2)
 k_ari <- sapply(boot, `[[`, "ari")
 pca <- prcomp(Zc)
-s1 <- sign(pca$rotation["defensive_marking", 1])  # axis 1 points towards "security guard"
+s1 <- sign(pca$rotation["negative_association", 1])  # axis 1 points towards "security guard"
 pca$x[, 1] <- s1 * pca$x[, 1]; pca$rotation[, 1] <- s1 * pca$rotation[, 1]
 ve <- 100 * pca$sdev^2 / sum(pca$sdev^2)
 rho_idx <- cor(pca$x[, 1], prof$defensive_marking - prof$stereo_pos, method = "spearman")
 pm <- profiles(N, c("model", "country"))
 g_mod <- lapply(names(MODELS), \(m) cluster_of(pm |> filter(model == m), K)) |> setNames(names(MODELS))
-ari_models <- ari(g_mod[[1]], g_mod[[2]])
+ari_pairs <- sapply(PAIRS, \(x) ari(g_mod[[x[1]]], g_mod[[x[2]]]))
+ari_models <- ari(g_mod[[GR]], g_mod[[QW]])
+memb <- sapply(g_mod, \(g) g[c("NGA", "AFG", "IND", "JPN", "FIN", "RUS", "MAR")])  # for the text
 ari_pooled <- sapply(g_mod, \(g) ari(g, grp))
 unstable <- names(sort(stay[stay < 0.7]))
 ```
 
 The previous sections test one indicator at a time. Here, each nationality is described by its whole
-profile (nine indicators, both models pooled), and a hierarchical clustering groups nationalities whose
+profile (nine indicators, four models pooled), and a hierarchical clustering groups nationalities whose
 profiles look alike, without being told anything about regions, colour or religion. Three groups come out,
 and they are the most stable partition: the adjusted Rand index between the reference partition and its
 bootstrap replicates is `r num(k_ari[["3"]], 2)` with three groups, versus
@@ -1019,8 +1130,9 @@ bootstrap replicates is `r num(k_ari[["3"]], 2)` with three groups, versus
 - **Guided** (`r members("guided")`, `r jac_of("guided")`): compliments on the culture and ice-breakers,
   little defensive marking.
 
-The groups do not follow a single simple criterion. "Defended" mixes the Balkans, the Maghreb, Turkey,
-Russia and India; "guided" mixes Western Europe, Japan, Brazil and Fiji. One possible reading, which
+The groups do not follow a single simple criterion. "Defended" mixes the Balkans, Romania, Algeria, Turkey,
+Russia and India (with Ministral, several of them are also tied to scams); "guided" mixes Western Europe,
+Japan, Brazil, Fiji and Morocco. One possible reading, which
 this study does not test, is that they follow how often each nationality appears in public debates on
 immigration, crime or geopolitics, more than any single geographic or religious category. Some nationalities sit on a border and change group in a sizeable share of
 replicates: `r paste(nm(unstable), collapse = ", ")` stay in their group in less than 70 % of replicates.
@@ -1093,25 +1205,27 @@ p_heat <- ggplot(cells, aes(f, y, fill = pmax(pmin(z, 2.5), -2.5))) +
 p_tree + p_grp + p_heat + plot_layout(widths = c(0.9, 2.1, 6))
 ```
 
-Profiles of the 24 nationalities (share of answers in %, both models pooled, about 198 judged answers per row) and their hierarchical clustering (Ward). Cell colour: gap to the mean of the nationalities, in standard deviations of the logit. Vertical line: indicators on the "cultural guide" side (left) and the "security guard" side (right) of the first axis of @fig-pca. Square: group; transparency: share of bootstrap replicates in which the nationality stays in its group.
+Profiles of the 24 nationalities (share of answers in %, four models pooled, about 396 judged answers per row) and their hierarchical clustering (Ward). Cell colour: gap to the mean of the nationalities, in standard deviations of the logit. Vertical line: indicators on the "cultural guide" side (left) and the "security guard" side (right) of the first axis of @fig-pca. Square: group; transparency: share of bootstrap replicates in which the nationality stays in its group.
 :::
 
 @fig-pca gives the same picture as a map. The first axis of the principal component analysis explains
-`r num(ve[1], 0)` % of the variance between nationalities. It opposes defensive marking, caution, high
-alarm and negative associations to compliments and encounter framing: it is the "cultural guide" versus
-"security guard" axis of @fig-summary, found here without being assumed. A nationality's position on this
+`r num(ve[1], 0)` % of the variance between nationalities. It opposes negative associations, caution, high
+alarm and protective advice to compliments and encounter framing: it is the "cultural guide" versus
+"security guard" axis of @fig-summary, found here without being assumed. Defensive marking, whose
+ranking differs from one model to the next, now loads mostly on the second axis. A nationality's position on this
 axis matches almost exactly the index used in the summary chart (defensive marking minus positive
-stereotypes, Spearman $\rho = `r num(abs(rho_idx), 2)`$). The second axis (`r num(ve[2], 0)` %) is mostly
-driven by negative stereotypes and requests for clarification, two rare indicators: it is noisier and we do
-not interpret it.
+stereotypes, Spearman $\rho = `r num(abs(rho_idx), 2)`$). The second axis (`r num(ve[2], 0)` %) opposes defensive marking and
+negative stereotypes to requests for clarification: it is noisier and we do not interpret it.
 
-Clustering each model on its own gives noisier groups (about 99 answers per nationality): the agreement
-between the Granite and Qwen partitions is moderate (adjusted Rand index `r num(ari_models, 2)`), and each
-agrees with the pooled partition at `r num(ari_pooled[[1]], 2)` (Granite) and `r num(ari_pooled[[2]], 2)`
-(Qwen). Nigeria is in the "risk" group in both models. Afghanistan joins it with Qwen (together with
-Russia) but falls among the "defended" with Granite; Granite also moves France, Belgium and the United States
-to the "defended", and Qwen moves Morocco to the "guided". The three-group structure is therefore clearer
-than the exact membership of each border nationality.
+Clustering each model on its own gives noisier groups (about 99 answers per nationality). The partitions
+of Qwen, Gemma and Ministral agree well with the pooled one (adjusted Rand index
+`r num(ari_pooled[[QW]], 2)`, `r num(ari_pooled[[GE]], 2)` and `r num(ari_pooled[[MI]], 2)`), Granite's
+less (`r num(ari_pooled[[GR]], 2)`); between pairs of models, the index ranges from
+`r num(min(ari_pairs), 2)` to `r num(max(ari_pairs), 2)`. Nigeria is set apart by every model, alone
+(Granite, Gemma) or with Afghanistan and Russia (Qwen, Ministral). Afghanistan falls among the "defended"
+with Granite and Gemma, and Granite also moves France, Belgium and the United States there; Ministral moves
+Fiji and Morocco to the "defended". The three-group structure is therefore clearer than the exact
+membership of each border nationality.
 
 ::: {#fig-pca}
 
@@ -1151,7 +1265,7 @@ ggplot() +
        y = sprintf("axis 2 (%.0f %%)", ve[2]))
 ```
 
-Principal component analysis of the 24 nationality profiles (standardised logits of nine indicators, both models pooled). Dots: nationalities, coloured by group (@fig-clusters). Arrows: indicators (loadings, rescaled).
+Principal component analysis of the 24 nationality profiles (standardised logits of nine indicators, four models pooled). Dots: nationalities, coloured by group (@fig-clusters). Arrows: indicators (loadings, rescaled).
 :::
 
 ## Agreement between the judge and regular expressions
@@ -1444,12 +1558,12 @@ ggplot(ed, aes(x, y, colour = g)) +
   theme(legend.position = "top")
 ```
 
-Two pipelines, one ranking. x: judge index of the TL;DR chart (defensive marking minus positive stereotypes, percentage points, mean of Granite and Qwen, LLM judge). y: second eigenvector of the classifier's confusion chain (four models, no judge), scaled to a maximum of 1 and oriented so that Nigeria is positive. Spearman ρ = `r num(rho_v2, 2)`. Colour: groups of @fig-network.
+Two pipelines, one ranking. x: judge index of the TL;DR chart (defensive marking minus positive stereotypes, percentage points, mean of the four models, LLM judge). y: second eigenvector of the classifier's confusion chain (four models, no judge), scaled to a maximum of 1 and oriented so that Nigeria is positive. Spearman ρ = `r num(rho_v2, 2)`. Colour: groups of @fig-network.
 :::
 
 The second eigenvector agrees with the judge: its Spearman correlation with the index of the TL;DR chart
 (defensive marking minus positive stereotypes) is `r num(rho_v2, 2)` (@fig-eigen). The two pipelines share
-nothing but the answers, and they do not even cover the same models (two judged, four classified).
+nothing but the answers: one reads a judged sample, the other every answer of the same four models.
 
 The classifier's own weights give a second graph (@fig-wordgraph): each nationality is linked to the five
 words that point to it most, and a word shared by several nationalities becomes a bridge between them.
@@ -1593,39 +1707,53 @@ for (m in names(MODELS)) {
 }
 ```
 
+Gemma's "worst" answers are mild: its single association is a generic warning about romance scams, and
+the other two only say that the man's origin does not matter. Ministral's are the most explicit of the
+four models: it attributes scams and trafficking to Albanian and Nigerian men, and recalls a "media
+reputation" of violence for Serbian men before adding that most of them are ordinary citizens.
+
 # Discussion
 
-**A mostly indirect bias.** The models studied almost never disparage a nationality explicitly, and
-nationality changes the level of alarm only a little. The bias lies in the form: some men get
-conversation topics and cultural compliments, others a justification ("his origin does not matter") that
-presupposes a suspicion the user never expressed. This defensive marking is probably an effect of
-alignment: the model has learnt to guard against accusations of racism, but only for the groups it
-associates with that risk, which reveals the association itself. It is the most robust signal of this
-study: the strongest effect and the highest agreement between models.
+**One shared bias, three registers.** The four models agree on who deserves a compliment: Northern
+Europeans, Japanese, Italians and Australians get cultural praise and ice-breakers, Afghans, Nigerians,
+Algerians, Russians and Indians almost never. This is the most robust signal of the study, shared by four
+labs. What the models do for the other nationalities differs. Granite and Qwen answer with a justification
+("his origin does not matter") that presupposes a suspicion the user never expressed: probably an effect of
+alignment, the model guarding against accusations of racism only for the groups it associates with that
+risk, which reveals the association itself. Ministral does not hide the association: it names the risk,
+in one answer in ten overall and in four for an Afghan or a Nigerian man. Gemma does neither, and differs
+from the others mostly by what it leaves out. A model that seems neutral on one indicator can therefore be
+biased on another; a benchmark limited to explicit associations would have rated Gemma almost perfect and
+missed its unequal compliments.
 
-**Targeted explicit associations.** The rare explicit negative associations are not spread at random:
-they reproduce specific media stereotypes ("419" fraud for Nigeria, refugees for Afghanistan) and appear
-mostly in the online first-date context, where the model links nationality to the risk of a scam. The
-Nigeria · scam signal, observed on Granite and declared before the Qwen run, is found again on Qwen: it is
-a confirmatory result.
+**Targeted explicit associations.** Explicit negative associations are not spread at random: they
+reproduce specific media stereotypes ("419" fraud for Nigeria, refugees and the treatment of women for
+Afghanistan) and appear mostly in the online first-date context, where the model links nationality to the
+risk of a scam. The Nigeria · scam signal, observed on Granite and declared before the other runs, is found
+again on Qwen and Ministral: it is a confirmatory result.
 
 **Two pipelines, one picture.** The judge-free analysis reaches the same conclusion as the judge, with
-no judge, on four models instead of two, and on every answer instead of a sample. It also adds a finding
+no judge, on the same four models, and on every answer instead of a sample. It also adds a finding
 the judge's rubric could not reach: the split of the nationalities into two vocabularies, one of qualities
 for Western men, Brazilians and Japanese, one of origin, tradition, religion and protection for the others.
 The clustering of the judge's indicators (@fig-clusters) and the classifier's confusions (@fig-confusion)
 draw the same line, and both single out Nigeria and Afghanistan.
 
-**Relation to the RTS report.** We find the "encounter" versus "distrust" contrast described by RTS, but
-attenuated: the small open models tested here almost never tip into outright alarm for a given
-nationality. The bias is subtler than in the report's examples, and becomes visible only with a repeated
-design and a control.
+**Relation to the RTS report.** We find the "encounter" versus "distrust" contrast described by RTS. In
+Granite, Qwen and Gemma it is attenuated: these small open models almost never tip into outright alarm for
+a given nationality, and the bias becomes visible only with a repeated design and a control. Ministral is
+closer to the report's examples: it is the most alarmist model, and its alarm rises most for Nigeria.
 
 # Limitations {#sec-limitations}
 
-- **Only two judged models.** Gemma-4-E4B and Ministral-3-8B have been generated
-  [@kaggle_gemma; @kaggle_ministral] but not yet judged; they enter only the judge-free pipeline. Llama and
-  larger models remain to be done.
+- **Four small models.** All four have 4 to 9 billion parameters and run on two T4 GPUs; Llama and larger
+  models remain to be done, as does Nemotron 3.5 Bolt, NVIDIA's post-training of Gemma 4 E4B, which would
+  show what post-training alone changes.
+- **The judge is less reliable on some models.** On Ministral, the judge's defensive marking disagrees
+  with the bench's regular expression (`r pc(by_model(rx_nat, MI, "judge"))` against
+  `r pc(by_model(rx_nat, MI, "regex"))`, rank correlation `r num(rx_rho[[MI]], 2)` over nationalities), and
+  part of its negative associations are generic warnings. These two indicators are read with care for
+  Ministral; the others, and the three other models, show no such gap.
 - **Leftovers in the judge-free pipeline.** A few words in the shared vocabulary still point to a place or a
   language rather than to a stereotype (*Canada*, *SAMU*, *gendarmerie*, *small*, *gut*); they are visible in
   the notebook and must not be read as bias. The Reinert classification is simplified (one segment size, no
@@ -1646,21 +1774,21 @@ design and a control.
 # Conclusion
 
 On a controlled design of 7,425 prompts per model, the nationality of a man significantly changes the
-safety advice that two open language models give to a woman alone with him, holding context and age
-constant. The bias shows less in alarm than in an asymmetry of register: cultural flattery for Northern
-Europeans and Japanese men, defensive justification and, more rarely, explicit associations (scam,
-migration) for Nigerian, Afghan, Indian or Balkan men. Two models from different labs agree on this
-ranking, and a second pipeline with no judge finds the same split on four models: the nationality can be
-guessed from the masked answer six times more often than by chance. Next steps are to judge the models
-already generated (Gemma, Ministral), to validate the rubric on a hand-annotated sample, and to extend the
-protocol to other languages.
+safety advice that four open language models, from four labs, give to a woman alone with him, holding
+context and age constant. All four flatter the same nationalities, Northern Europeans, Japanese and
+Italians, and almost never Afghans or Nigerians. For the latter, each model has its own register:
+defensive justification (Granite, Qwen), explicit associations with scams, migration or the treatment of
+women (Ministral, in up to four answers in ten), or silence (Gemma). A second pipeline with no judge finds
+the same split on the four models: the nationality can be guessed from the masked answer six times more
+often than by chance. Next steps are to judge Nemotron 3.5 Bolt and larger models, to validate the rubric
+on a hand-annotated sample, and to extend the protocol to other languages.
 
 # Acknowledgements {.unnumbered}
 
 Every generation and judging run of this study used the free GPU quota of Kaggle (two NVIDIA T4 per
 session): without it, this work would not have been possible. The evaluated models (Granite 4.2 8B by IBM,
-Qwen3.5-9B by Alibaba) and the judge (Qwen3-32B-AWQ) are released with open weights, which is what makes
-such an independent audit possible.
+Qwen3.5-9B by Alibaba, Gemma 4 E4B by Google and Ministral 3 8B by Mistral AI) and the judge
+(Qwen3-32B-AWQ) are released with open weights, which is what makes such an independent audit possible.
 
 # Data and code availability {.unnumbered}
 

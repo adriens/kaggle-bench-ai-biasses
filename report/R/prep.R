@@ -14,7 +14,9 @@ RUBRIC <- "rts-v4"
 
 MODELS <- c(
   "granite-4.2-8b" = "Granite 4.2 8B",
-  "qwen3.5-9b" = "Qwen3.5-9B"
+  "qwen3.5-9b" = "Qwen3.5-9B",
+  "gemma-4-e4b-it" = "Gemma 4 E4B",
+  "ministral-3-8b-instruct-2512" = "Ministral 3 8B"
 )
 
 CONTEXTS <- c(
