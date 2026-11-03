@@ -281,7 +281,7 @@ mid <- pm |> group_by(country) |>
 nat <- mid |> filter(country != "BASE")
 ctl <- mid |> filter(country == "BASE")
 mx <- median(nat$def); my <- median(nat$pos)
-XMAX <- 10 * ceiling(max(nat$def) / 10) + 18; YMAX <- 10 * ceiling(max(nat$pos) / 10) + 2
+XMAX <- 10 * ceiling(max(nat$def) / 10) + 18; YMAX <- 10 * ceiling(max(nat$pos) / 10) + 7  # room above the points for the quadrant title
 ggplot(nat, aes(def, pos)) +
   annotate("rect", xmin = -Inf, xmax = mx, ymin = my, ymax = Inf, fill = "#2a78d6", alpha = 0.06) +
   annotate("rect", xmin = mx, xmax = Inf, ymin = -Inf, ymax = my, fill = "#d63c2a", alpha = 0.06) +
@@ -299,8 +299,10 @@ ggplot(nat, aes(def, pos)) +
   geom_point(data = ctl, shape = 8, size = 3, colour = INK, stroke = 0.8) +
   annotate("text", x = ctl$def + 2, y = ctl$pos + 2.2, hjust = 0, family = "Inter", size = 2.6,
            colour = INK, label = "\"a man\" (no nationality)") +
-  geom_text_repel(aes(label = lab), family = "Inter", size = 2.7, colour = INK, seed = 4,
-                  point.padding = 0.9, box.padding = 0.35, min.segment.length = 0.3,
+  # point.size: the labels keep clear of the bubbles, whose area grows with the negative associations
+  geom_text_repel(aes(label = lab, point.size = sqrt(neg / max(nat$neg)) * 11 + 1.8), family = "Inter",
+                  size = 2.7, colour = INK, seed = 4,
+                  point.padding = 0.3, box.padding = 0.35, min.segment.length = 0.3,
                   segment.colour = "#cfcdc7", max.overlaps = 40) +
   scale_fill_gradient2(low = "#2a78d6", mid = "#b9b7b1", high = "#d63c2a", midpoint = 0, guide = "none") +
   scale_size(range = c(1.8, 11), limits = c(0, max(nat$neg)), breaks = c(0, 10, 30, 60),
