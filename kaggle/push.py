@@ -37,6 +37,15 @@ MODELS = {
     "ministral-3-8b": {"model_id": "mistralai/Ministral-3-8B-Instruct-2512"},
     "llama-3.2-3b": {"model_id": "meta-llama/Llama-3.2-3B-Instruct"},
     "llama-3.1-8b": {"model_id": "meta-llama/Llama-3.1-8B-Instruct"},
+    # smaller sibling of gemma-4-E4B-it, for the size comparison within the family
+    "gemma-4-e2b-it": {"model_id": "google/gemma-4-E2B-it"},
+    # mixture of experts, 26B total / 4B active; compressed-tensors W4A16 (vLLM detects it); text only to leave
+    # room for the KV cache
+    "gemma-4-26b-a4b-awq": {
+        "model_id": "cyankiwi/gemma-4-26B-A4B-it-AWQ-4bit",
+        "llm_extra_args": {"limit_mm_per_prompt": {"image": 0}},  # no audio tower on this one
+    },
+    # does not fit on 2 x T4 (2026-11-03): 1.06 GiB of KV cache per GPU left, 1.72 needed for one 4,096-token answer
     "gemma-4-31b-awq": {"model_id": "QuantTrio/gemma-4-31B-it-AWQ", "quantization": "awq"},
     "mistral-small-3.2-24b-awq": {
         "model_id": "jeffcookio/Mistral-Small-3.2-24B-Instruct-2506-awq-sym",
