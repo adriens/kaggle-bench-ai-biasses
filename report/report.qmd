@@ -321,24 +321,26 @@ Summary of the results, mean of the seven models per nationality (about 690 judg
 
 # Introduction
 
-Chat assistants are now asked for practical advice, including on personal safety. In 2026, a report by
-Swiss public broadcaster RTS [@rts2026] gave Gemini and GPT-5 a minimal sentence, *"I am alone with a
-[nationality]"* (in French). For an Italian, a Finn, a Belgian or a Swiss man, the answers suggested
-ice-breakers; for an Algerian, they advised keeping one's distance and listed emergency numbers. The test
-relied on a handful of prompts, with no repetition and no control condition. I learnt of this
-report through a France Inter radio debate, heard in my car, on the question "Is AI racist?" (*L'IA est-elle raciste ?*,
-3 September 2026) [@franceinter2026], which prompted the present study.
+Chat assistants are now asked for practical advice, including on personal safety, and a woman who asks one
+what to do when she is alone with a man deserves the same advice whoever he is. The RTS test [@rts2026] that
+started this study, on Gemini and GPT-5, was a striking demonstration rather than a measurement: a handful of
+prompts, no repetition, no control condition.
 
-I revisit the question in a controlled setting: **does a language model give a woman alone with a
-man different advice depending on the man's nationality, all else being equal?** I measure these gaps on
-open-weight models that can be run locally, in situations ranging from the mundane (a work meeting) to the
-ambiguous (his place at 11 pm), and for three ages including a minor. For a minor, the right answer is
-protective and independent of nationality: any variation by country is a sign of bias.
+I ask the question in a controlled setting: **does a language model give a woman alone with a man different
+advice depending on the man's nationality, all else being equal?** Three choices shape the study. The models
+are open-weight, so that anyone can rerun them on free GPUs. The situations vary, because a nationality may
+only matter where caution is expected. And one of the three ages is a minor, for whom the right answer is
+protective whoever the man is: any variation by country is a sign of bias.
 
-Existing bias benchmarks such as BBQ [@parrish2022bbq] ask closed questions with an expected answer. Here
-the answer is free and long (several hundred words); bias can lie in the tone, in the choice of advice or
-in a single sentence. I therefore use a judge model [@zheng2023judge] guided by a fixed rubric, applied to
-answers in which the nationality is masked.
+Existing bias benchmarks such as BBQ [@parrish2022bbq] ask closed questions with an expected answer. Here the
+answer is free and long, and bias can lie in the tone, in the choice of advice or in a single sentence. I
+therefore read the answers twice: with a judge model [@zheng2023judge] guided by a fixed rubric, applied to
+answers in which the nationality is masked, and with text analysis that needs no judge at all.
+
+The report makes four contributions: (1) a reproducible protocol and its 52,000 answers, published with
+every verdict; (2) evidence that seven models from five labs flatter the same nationalities; (3) three
+registers of bias that a judge alone would partly miss, including refusals to help; (4) a comparison within
+one model family showing how size and post-training change the form of the bias.
 
 # Method
 
@@ -351,24 +353,21 @@ a man, for the control). Professional roles take the adjective ("un collègue al
 algérien"). The prompt is sent as the only user message, with no system prompt, to measure default
 behaviour.
 
+No prompt is written by hand: all of them are generated from **prompt templates**. Each context has three
+paraphrased templates with a slot for the man, for instance *"Je suis seule dans un taxi avec {who}."* ("I am
+alone in a taxi with {who}."). The slot is filled with the context's role and, for a nationality, its French
+adjective (*un chauffeur algérien*), or with the role alone for the control (*un chauffeur*); an optional age
+sentence (*"J'ai 15 ans."*) comes first, and the same advice request (*"Que me conseilles-tu ?"*) last. Two
+prompts compared therefore differ by one adjective and by nothing else. The templates (version `fr-v2`), the
+24 nationalities and the 11 contexts live in a single parameterised source, shared by every generation
+notebook. A first version (`fr-v1`, pilot only) used the bare noun (*un Algérien*) and no advice request; it was
+replaced so that the control "un homme" differs from the other prompts by the nationality alone.
+
 @fig-pipeline summarises the experiment: how a prompt is built from the factors of the design (top), and
 the steps from prompts to statistics, each run in a Kaggle notebook (bottom). The answers are read in two
 independent ways: by an LLM judge (pipeline 1) and by a text analysis with no judge at all (pipeline 2).
 
 ::: {#fig-pipeline}
-
-```{=latex}
-\begin{howtoread}\textbf{How to read this chart}\par\smallskip
-```
-
-**Reading.** The top part shows one real question sent to the AI. Each coloured piece is something I vary on purpose; everything else stays word for word identical. The bottom part follows the experiment step by step: boxes 1 to 6 in blue are the path through the AI judge, box 7 in red is a second path that reads the answers with no judge.
-
-**What it shows.** Two questions I compare differ by a single word, the man's nationality, and the AI that grades the answers never sees that word. So any systematic difference between answers can be traced back to the nationality alone.
-
-```{=latex}
-\end{howtoread}
-```
-
 
 ```{=latex}
 \begin{tikzpicture}[
@@ -443,9 +442,15 @@ step 7). Steps 2, 5 and 7 run as Kaggle notebooks [@kaggle_granite; @kaggle_qwen
 reads the published dataset [@kaggle_data].
 :::
 
-The design crosses five factors (@tbl-design): 25 nationality cells (24 nationalities and the control),
-11 contexts, 3 paraphrases per context, 3 ages (unstated, "I am 15.", "I am 25.") and 3 stochastic samples
-with fixed seeds, i.e. $25 \times 11 \times 3 \times 3 \times 3 = 7{,}425$ answers per model.
+The design crosses five factors (@tbl-design): $N_{\text{nat}} = 25$ nationality cells (24 nationalities and
+the control), $N_{\text{ctx}} = 11$ contexts, $N_{\text{par}} = 3$ paraphrases per context, $N_{\text{age}} = 3$
+ages (unstated, "I am 15.", "I am 25.") and $N_{\text{smp}} = 3$ stochastic samples with fixed seeds. Each
+model therefore gives
+
+$$
+N_{\text{answers}} = N_{\text{nat}} \times N_{\text{ctx}} \times N_{\text{par}} \times N_{\text{age}} \times N_{\text{smp}}
+= 25 \times 11 \times 3 \times 3 \times 3 = 7{,}425 \text{ answers.}
+$$
 
 ```{r}
 #| label: tbl-design
@@ -495,7 +500,8 @@ ex |>
          Translation = TR[context_id]) |>
   arrange(ord) |>
   select(Context, `Prompt (French)`, Translation) |>
-  kable(booktabs = TRUE, escape = FALSE)
+  kable(booktabs = TRUE, escape = FALSE,
+        col.names = c("\\textbf{Context}", "\\textbf{Prompt (French)}", "\\textbf{Translation}"))
 ```
 
 The contexts range from harmless situations (C1 work meeting, C7 medical consultation), where any
@@ -505,13 +511,18 @@ distrust of a kind gesture; C10 (first date through an app) tests cultural stere
 
 ## Models and generation
 
-Seven models from five labs with different alignment policies were evaluated: **Granite 4.2 8B**
-(`ibm-granite/granite-4.2-8b`, IBM), **Qwen3.5-9B** (`Qwen/Qwen3.5-9B`, Alibaba, thinking mode disabled),
-three models of the **Gemma 4** family (Google): **E2B** (`google/gemma-4-E2B-it`), **E4B**
-(`google/gemma-4-E4B-it`) and **26B-A4B** (a mixture of experts with 26 billion parameters, 4 billion
-active per token, in the 4-bit AWQ quantisation `cyankiwi/gemma-4-26B-A4B-it-AWQ-4bit`, the only one that
-fits on the GPUs used), **Ministral 3 8B** (`mistralai/Ministral-3-8B-Instruct-2512`, Mistral AI) and
-**Nemotron 3.5 Bolt E4B** (`nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-BF16`, NVIDIA, thinking mode disabled).
+Seven models from five labs with different alignment policies were evaluated:
+
+- **Granite 4.2 8B** ([`ibm-granite/granite-4.2-8b`](https://huggingface.co/ibm-granite/granite-4.2-8b), IBM);
+- **Qwen3.5-9B** ([`Qwen/Qwen3.5-9B`](https://huggingface.co/Qwen/Qwen3.5-9B), Alibaba, thinking mode disabled);
+- **Gemma 4 E2B** ([`google/gemma-4-E2B-it`](https://huggingface.co/google/gemma-4-E2B-it), Google);
+- **Gemma 4 E4B** ([`google/gemma-4-E4B-it`](https://huggingface.co/google/gemma-4-E4B-it), Google);
+- **Gemma 4 26B-A4B** ([`google/gemma-4-26B-A4B-it`](https://huggingface.co/google/gemma-4-26B-A4B-it), Google), a mixture of experts with 26 billion parameters, 4 billion active per
+  token, in the 4-bit AWQ quantisation [`cyankiwi/gemma-4-26B-A4B-it-AWQ-4bit`](https://huggingface.co/cyankiwi/gemma-4-26B-A4B-it-AWQ-4bit), the only one that fits on
+  the GPUs used;
+- **Ministral 3 8B** ([`mistralai/Ministral-3-8B-Instruct-2512`](https://huggingface.co/mistralai/Ministral-3-8B-Instruct-2512), Mistral AI);
+- **Nemotron 3.5 Bolt E4B** ([`nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-BF16`](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-BF16), NVIDIA, thinking mode disabled).
+
 Two comparisons are built into this set. The three Gemma models share their training recipe and differ by
 size, which isolates what size changes. Nemotron is NVIDIA's post-training of Gemma 4 E4B: same
 architecture and size, and, with thinking disabled, exactly the same prompt; the pair isolates what
@@ -540,16 +551,29 @@ leaves Ministral 3 cells one answer short (2,571 answers).
 
 ## Masking and sampling for the judge
 
-Before rating, the country name and every form of the demonym (masculine, feminine, singular, plural), in
-French and English, are replaced by the token `[X]`, in the prompt as in the answer. The judge therefore
-does not know the nationality, and the rubric forbids guessing it. Masking does not cover indirect cues
-(greetings in the country's language, unlisted city names, demonyms misspelt by the model): this is a
+**The judge never sees the nationality.** Before rating, in the judge notebook [@kaggle_judge], the country name and every form of the demonym
+(masculine, feminine, singular, plural), in French and English, are replaced by `[X]`, in the prompt as in the
+answer:
+
+> *Je suis seule avec un homme algérien. Les Algériennes sont souvent très accueillantes.*\
+> → *Je suis seule avec un homme [X]. Les [X] sont souvent très accueillantes.*
+
+The rubric also forbids the judge to guess the nationality. A few indirect clues escape masking, such as a
+greeting in the country's language (*salam*), a city name, or a demonym misspelt by the model; this is a
 limitation (@sec-limitations).
 
-The judge rates a deterministic stratified sample: for each nationality, context and age, three
-non-truncated answers (one per paraphrase, first sample); for the control, six. This gives
-$24 \times 11 \times 3 \times 3 + 198 = 2{,}574$ answers per model, i.e. about 99 answers per nationality
-and 198 for the control.
+**The judge reads a third of the answers.** Rating all 7,425 answers of a model would take about 9 to 10
+hours of free GPU time. The judge therefore reads a sample fixed in advance, the same for every model, that
+keeps every combination of nationality, context and age: one answer per paraphrase (the first sample, never a
+truncated answer), and twice as many for the control, which every nationality is compared with:
+
+$$
+N_{\text{judged}} = \underbrace{24 \times N_{\text{ctx}} \times N_{\text{age}} \times N_{\text{par}}}_{\text{nationalities: } 2{,}376}
++ \underbrace{N_{\text{ctx}} \times N_{\text{age}} \times 6}_{\text{control: } 198} = 2{,}574 \text{ answers per model,}
+$$
+
+that is about 99 answers per nationality and 198 for the control. The choice is deterministic, so a resumed or
+repeated run of the judge notebook [@kaggle_judge] rates the same answers.
 
 ## Judge model and rubric
 

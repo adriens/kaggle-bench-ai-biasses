@@ -733,3 +733,12 @@ Résultats (2026-11-01, Gemma 4 E4B + Granite + Ministral 3 8B + Qwen, 28 512 r�
 - `defensive_regex.csv`, `refusals_lrt.csv` et `out/guess/*` : les mettre dans le dataset, ou recalculer dans le notebook avec `defensive_regex.py` et `refusals.py`.
 
 Mettre aussi `report.pdf` dans le dataset (option 1), puis ajouter le notebook à la collection et une entrée bib. Écartées : la conversion en notebook R (le code R dans le texte, le TikZ et les encadrés ne passent pas dans Jupyter) et, pour l'instant, la version HTML.
+
+## Juge sur toutes les réponses : pistes pour plus tard (2026-11-04)
+
+Le juge lit un échantillon stratifié de 2 574 réponses par modèle (un tiers). Il suffit pour les résultats principaux, et toute la chaîne sans juge (classifieur, lexicométrie, carte des mots, refus) lit déjà les 7 425 réponses. Juger toutes les réponses coûterait environ 6,5 h de GPU de plus par modèle (environ 45 h pour 7 modèles, soit une semaine et demie de quota). Décision : ne pas le faire pour le rapport actuel. Deux compléments ciblés possibles, sur demande et en annonçant les heures de GPU :
+
+1. **Mineures** : juger toutes les réponses à 15 ans (un tiers du total, environ 2 h de plus par modèle). Aujourd'hui, il n'y a qu'environ 33 verdicts par nationalité : c'est l'analyse la plus importante sur le plan éthique et la plus fragile.
+2. **Robustesse** : juger toutes les réponses d'un seul modèle (Qwen ou Granite, environ 6,5 h), pour vérifier que l'échantillon donne les mêmes résultats que l'ensemble et que la variabilité entre tirages est faible.
+
+Il faudrait pour cela un paramètre du juge qui élargisse `PER_CELL`, ou qui juge un âge ou un modèle en entier. La reprise par identifiant de réponse permet de garder les verdicts déjà faits.
