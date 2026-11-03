@@ -33,7 +33,7 @@ local({
                    angle = ifelse(left, theta + 180, theta),
                    hjust = ifelse(left, 1, 0),
                    col = colorRampPalette(c(BLUE, "#b9b7b1", CORAL))(n)[i])
-  # tag only the nationalities most often linked to a risk (four models summed), and only with a named type
+  # tag only the nationalities most often linked to a risk (all models summed), and only with a named type
   risky <- d |> filter(negk >= 25, type != "other") |>
     mutate(tag = ifelse(type == "scam", "scam", ifelse(type == "migration", "migration", type)))
 
@@ -94,9 +94,9 @@ local({
     w <- h * dim(img)[2] / dim(img)[1]
     annotation_raster(img, xmin = x, xmax = x + w, ymin = y - h / 2, ymax = y + h / 2)
   }
-  # two rows since four models: the models on top, the judge and the GPUs below
-  STRIP_W <- 7.6; ROW <- 0.5; STRIP_H <- 2 * ROW; LH <- 0.34
-  Y1 <- STRIP_H - ROW / 2; Y2 <- ROW / 2
+  # three rows: the models on the first two, the judge and the GPUs below; one Google logo for the three Gemma
+  STRIP_W <- 7.6; ROW <- 0.5; STRIP_H <- 3 * ROW; LH <- 0.34
+  Y1 <- STRIP_H - ROW / 2; Y1b <- STRIP_H - 1.5 * ROW; Y2 <- ROW / 2
   tag <- function(x, txt, y) annotate("text", x = x, y = y, label = txt, hjust = 0, family = BODY,
                                       size = 2.5, colour = DIM, fontface = "bold")
   name <- function(x, txt, y) annotate("text", x = x, y = y, label = txt, hjust = 0, family = BODY,
@@ -105,25 +105,27 @@ local({
     annotate("segment", x = 0, xend = STRIP_W, y = STRIP_H, yend = STRIP_H, colour = RING, linewidth = 0.4) +
     tag(0, "MODELS", Y1) + logo("granite.png", 0.62, LH, Y1) + name(0.99, "Granite 4.2 8B", Y1) +
     logo("qwen.png", 2.05, LH, Y1) + name(2.42, "Qwen3.5-9B", Y1) +
-    logo("google.png", 3.32, LH, Y1) + name(3.69, "Gemma 4 E4B", Y1) +
-    logo("mistral.png", 4.7, LH, Y1) + name(5.07, "Ministral 3 8B", Y1) +
-    logo("nvidia.png", 6.15, LH, Y1) + name(6.52, "Nemotron 3.5", Y1) +
+    logo("google.png", 3.65, LH, Y1) + name(4.02, "Gemma 4 E2B \u00b7 E4B \u00b7 26B-A4B", Y1) +
+    logo("mistral.png", 0.62, LH, Y1b) + name(0.99, "Ministral 3 8B", Y1b) +
+    logo("nvidia.png", 2.05, LH, Y1b) + name(2.42, "Nemotron 3.5 Bolt E4B", Y1b) +
     tag(0, "JUDGE", Y2) + logo("qwen.png", 0.62, LH, Y2) + name(1.02, "Qwen3-32B", Y2) +
     tag(2.35, "GPUs", Y2) + logo("kaggle.png", 2.8, LH * 0.82, Y2) + name(3.61, "free quota, 2\u00d7 T4", Y2) +
     coord_fixed(xlim = c(0, STRIP_W), ylim = c(0, STRIP_H), expand = FALSE, clip = "off") +
     theme_void() + theme(plot.background = element_rect(fill = BG, colour = NA))
 
-  page <- (byline / ring / key / strip) +
-    plot_layout(heights = c(0.55, 11, 0.6, 1.5)) +
+  # the spacer leaves room for the labels at the top of the ring, which are drawn outside its panel
+  gap <- ggplot() + theme_void() + theme(plot.background = element_rect(fill = BG, colour = NA))
+  page <- (byline / gap / ring / key / strip) +
+    plot_layout(heights = c(0.55, 0.7, 10.6, 0.6, 2.3)) +
     plot_annotation(
       title = "She Is Alone With a Man",
       subtitle = paste0("The situation should change the advice. His nationality should not.\n",
-                        "How five open-weight AI models advise a woman alone with a man, in 11 situations."),
+                        "How seven open-weight AI models advise a woman alone with a man, in 11 situations."),
       caption = paste0(
-        "Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E4B, Ministral 3 8B and Nemotron 3.5 Bolt E4B\n",
+        "Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E2B, E4B and 26B-A4B, Ministral 3 8B and Nemotron 3.5 Bolt E4B\n",
         format(nrow(R), big.mark = ","), " answers in French · ", format(nrow(D), big.mark = ","),
         " rated by an LLM judge (Qwen3-32B) · 24 nationalities · 11 situations · 3 ages\n",
-        "Petals: share of answers, mean of the five models, sorted from \"cultural guide\" (blue) to \"security guard\" (coral).\n",
+        "Petals: share of answers, mean of the seven models, sorted from \"cultural guide\" (blue) to \"security guard\" (coral).\n",
         "The empty centre is \"a man\" with no nationality: he gets almost neither.\n",
         "All runs used Kaggle's free GPU quota: this work would not have been possible without it.\n\n",
         month.name[as.integer(format(Sys.Date(), "%m"))], " ", format(Sys.Date(), "%Y"),

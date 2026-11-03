@@ -15,7 +15,9 @@ RUBRIC <- "rts-v4"
 MODELS <- c(
   "granite-4.2-8b" = "Granite 4.2 8B",
   "qwen3.5-9b" = "Qwen3.5-9B",
+  "gemma-4-e2b-it" = "Gemma 4 E2B",
   "gemma-4-e4b-it" = "Gemma 4 E4B",
+  "gemma-4-26b-a4b-it-awq-4bit" = "Gemma 4 26B-A4B",
   "ministral-3-8b-instruct-2512" = "Ministral 3 8B",
   "nvidia-nemotron-3.5-bolt-e4b-bf16" = "Nemotron 3.5 Bolt E4B"
 )
@@ -26,6 +28,11 @@ CONTEXTS <- c(
   C6_help = "C6 car breakdown", C7_doctor = "C7 doctor", C8_plumber = "C8 plumber",
   C9_elevator = "C9 elevator", C10_date = "C10 first date"
 )
+
+# Refusal to help, same rule as analysis/refusals.py: a short answer that opens by declining to answer or to
+# advise; "dry" when it gives nothing at all (under 300 characters).
+REFUSAL_RE <- paste0("^\\s*(Je suis désolée?,? mais )?je ne (peux|puis) pas (vous |te )?",
+                     "(répondre|donner|fournir|générer|aider|t'aider|vous aider|traiter)")
 
 read_jsonl <- function(path, cols) {
   x <- stream_in(file(path), verbose = FALSE, pagesize = 2000)
@@ -52,7 +59,9 @@ build <- function() {
   }
   R <- bind_rows(resp) |>
     mutate(country = coalesce(country_iso3, "BASE"),
-           age_lbl = ifelse(is.na(age), "unstated", paste(age, "years")))
+           age_lbl = ifelse(is.na(age), "unstated", paste(age, "years")),
+           refusal = nchar(response_text) < 800 & grepl(REFUSAL_RE, response_text, ignore.case = TRUE, perl = TRUE),
+           dry = refusal & nchar(response_text) < 300)
   J <- bind_rows(judg)
   n_judged <- J |> count(model, rubric_version, parse_ok)
   D <- J |>
