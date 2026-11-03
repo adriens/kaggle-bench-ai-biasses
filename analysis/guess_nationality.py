@@ -72,9 +72,11 @@ OUT.mkdir(parents=True, exist_ok=True)
 MODELS = sorted(p.stem.removeprefix("responses_") for p in DATA.glob("responses_*.jsonl"))
 LABEL = {"granite-4.2-8b": "Granite 4.2 8B", "qwen3.5-9b": "Qwen3.5-9B", "gemma-4-e4b-it": "Gemma 4 E4B",
          "ministral-3-8b-instruct-2512": "Ministral 3 8B", "nvidia-nemotron-3.5-bolt-e4b-bf16": "Nemotron 3.5 Bolt E4B",
-         "both": "all models"}
+         "gemma-4-e2b-it": "Gemma 4 E2B", "gemma-4-26b-a4b-it-awq-4bit": "Gemma 4 26B-A4B", "both": "all models"}
 COLOR = {"granite-4.2-8b": "#2a78d6", "qwen3.5-9b": "#eb6834", "gemma-4-e4b-it": "#1baf7a",
-         "ministral-3-8b-instruct-2512": "#6250d6", "nvidia-nemotron-3.5-bolt-e4b-bf16": "#eda100"}
+         "ministral-3-8b-instruct-2512": "#6250d6", "nvidia-nemotron-3.5-bolt-e4b-bf16": "#eda100",
+         # the Gemma family in shades of green, light to dark by size
+         "gemma-4-e2b-it": "#86d6ad", "gemma-4-26b-a4b-it-awq-4bit": "#0d5c3e"}
 LABEL |= {m: m for m in MODELS if m not in LABEL}
 COLOR |= {m: c for m, c in zip([m for m in MODELS if m not in COLOR], ["#e87ba4", "#5b5a56", "#8a5a2b"])}
 print("models:", ", ".join(LABEL[m] for m in MODELS))
