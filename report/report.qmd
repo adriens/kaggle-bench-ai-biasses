@@ -269,7 +269,7 @@ different companies, agree most on the vertical axis: who gets the compliments.
 ```
 
 ```{r}
-#| fig-height: 5.2
+#| fig-height: 4.5
 s_def <- rate_table("defensive_marking") |> select(model, country, def = pct)
 s_pos <- rate_table("stereo_pos") |> select(model, country, pos = pct)
 s_neg <- rate_table("negative_association") |> select(model, country, neg = k)
@@ -312,7 +312,7 @@ ggplot(nat, aes(def, pos)) +
   theme(legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 8))
 ```
 
-Summary of the results: "cultural guide" or "security guard". Mean of the seven models (Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E2B, E4B and 26B-A4B, Ministral 3 8B, Nemotron 3.5 Bolt E4B) for each nationality (about 690 judged answers per bubble). Bubble area: answers with a negative association (seven models). Dashed lines: medians of the 24 nationalities.
+Summary of the results, mean of the seven models per nationality (about 690 judged answers per bubble); dashed lines: medians of the 24 nationalities.
 :::
 
 \newpage
