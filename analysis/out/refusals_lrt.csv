@@ -1,0 +1,8 @@
+model,n,refusals,chi2,df,p
+gemma-4-26b-a4b-it-awq-4bit,7425,0,,,
+gemma-4-e2b-it,7425,627,201.6759755089961,24.0,4.9535364726855106e-30
+gemma-4-e4b-it,7425,188,40.540793778599436,24.0,0.0186953374061695
+granite-4.2-8b,7425,0,,,
+ministral-3-8b-instruct-2512,7425,0,,,
+nvidia-nemotron-3.5-bolt-e4b-bf16,7425,0,,,
+qwen3.5-9b,7425,2,,,
