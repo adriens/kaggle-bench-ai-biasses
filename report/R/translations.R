@@ -1,4 +1,4 @@
-# English translations (ours) of the excerpts quoted in the main text, keyed by response_id. The bold passage
+# English translations (mine) of the excerpts quoted in the main text, keyed by response_id. The bold passage
 # matches the bold passage of the French excerpt. An excerpt without an entry here is shown in French only.
 TRANSLATIONS <- c(
   eba3035896179fbe = "…on Android, go to Settings › Safety › Emergency; on iPhone, turn on Location Sharing with a trusted contact. 6. To avoid \"Nigerian\" scams (and other similar scams): – \"Nigerian\" scams **(or \"urgent money\", \"help repairing the car for a small fee\") are very widespread.** The scammer often asks for a \"small fee\" to \"unlock\" something or \"send a technician\", then asks for more money or for bank details. No legitimate professional asks for an advance payment by transfer…",

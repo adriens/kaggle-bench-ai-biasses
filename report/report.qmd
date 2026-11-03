@@ -7,31 +7,30 @@ date: today
 date-format: "D MMMM YYYY"
 lang: en-GB
 abstract: |
-  A report by Swiss public broadcaster RTS [@rts2026] showed that chat assistants advise a woman "alone with a man"
-  differently depending on the man's nationality: ice-breakers for an Italian or a Swiss man, warnings and
-  emergency numbers for an Algerian. We turn this anecdotal observation into a controlled protocol. Seven
-  open-weight models from five labs (Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E2B, E4B and 26B-A4B, Ministral 3
-  8B, and Nemotron 3.5 Bolt E4B, NVIDIA's post-training of Gemma 4 E4B), each receive 7,425 French-language
-  prompts crossing 24 nationalities and a no-nationality control, 11 contexts (from a work meeting to an
-  isolated street), 3 paraphrases, 3 ages and 3 samples. A stratified sample of 2,574 answers per model,
-  with the nationality masked, is rated by a judge model (Qwen3-32B-AWQ) against a fixed rubric: framing,
-  alarm score, defensive marking, stereotypes and negative associations. Nationality has a significant
-  effect on the answers of every model, holding context and age constant (likelihood-ratio tests). One bias
-  is shared by all seven models: compliments go to the same nationalities (Spearman $\rho$ from 0.71 to
-  0.94 between every pair of models): Finland, Italy or Japan get one in a third to a half of the answers,
-  Afghanistan almost never. Explicit negative associations, when a model makes them, target the same two
-  nationalities: scams for Nigeria, migration and gender norms for Afghanistan. The register of the bias,
-  however, depends on the model. Granite, Qwen, Gemma 4 26B-A4B and Nemotron defend themselves against a
-  prejudice nobody voiced ("his origin does not matter") in up to 76 % of answers for some nationalities,
-  and aim it at the same men; Ministral states the risk outright (11 % of its answers, 40 % for an Afghan
-  and 39 % for a Nigerian man); the small Gemma models do neither. The smallest, Gemma 4 E2B, refuses to
-  help instead: it declines 8 % of the requests, from 4 % for a British man to 14 % for an Afghan one, a
-  bias the judge cannot see and the strongest nationality effect found for that model. Within the Gemma
-  family, the defensive reflex grows with size (3 %, 9 % and 38 % of answers), as it grows with NVIDIA's
-  post-training of Gemma 4 E4B (14 %). A second pipeline, with no judge, finds the same split on the seven
-  models: a text classifier recovers the man's nationality from the masked answer 27 % of the time using
-  only shared vocabulary (chance: 4 %), and lexicometry shows two vocabularies, qualities for Western men
-  and origin, religion and protection for the others.
+  \noindent In September 2026, driving my car, I heard a France Inter radio debate ask: *"Is AI racist?"*
+  [@franceinter2026]. It cited a report by Swiss broadcaster RTS [@rts2026]: told *"I am alone with a man"*, chatbots suggested ice-breakers for an Italian
+  or a Swiss man, and keeping one's distance for an Algerian. A striking result, but based on a handful of
+  prompts.
+
+  \medskip\noindent I was curious to see what would happen if such tests were automated at scale, using only open-weight
+  models and publicly accessible GPUs, and with more varied situations than a single sentence: an
+  elevator, a first date, a doctor's appointment, a car breakdown… I put the same question to seven
+  open-weight models, 7,425 times each, changing only the man's nationality (24, plus a man with none), the
+  situation (11 in all) and the woman's age. A judge model rated the
+  answers without knowing the nationality, and a second method with no judge at all checked the result.
+  Everything ran on Kaggle's free GPUs and can be recomputed by anyone.
+
+  \medskip\noindent The RTS observation holds. All seven models compliment the same men, Finns, Italians, Japanese, and rarely Afghans or
+  Nigerians. For those, each model has its own reflex: insisting that "his origin does not matter", naming
+  a risk such as scams or migration, or, for the smallest one, refusing to help at all.
+
+  \medskip\noindent \textbf{The bias runs deeper than RTS could see.} With the nationality masked, the answers alone give it
+  away. A text classifier, with no judge, guesses the man's nationality six times more often than chance,
+  and lexicometry shows why: the AI describes Western, Brazilian and Japanese men by their qualities (warm,
+  punctual, a sense of humour) and the others by where they come from (origin, tradition, religion, and
+  scams for Nigerians).
+
+  \medskip\noindent Bigger models were not fairer: the bias changed form, it did not go away.
 keywords: [bias, large language models, LLM-as-a-judge, nationality, safety, fairness, open-weight models, Kaggle]
 subject: "Nationality bias in the safety advice given by open-weight language models: a controlled benchmark with an LLM judge"
 format:
@@ -154,6 +153,94 @@ NM <- length(MODELS)
 by_model <- function(df, m, v) df[[v]][df$model == m]
 ```
 
+```{r}
+#| label: word-map
+# Correspondence analysis of the nationality x word table: the three most specific words of each nationality,
+# counted in every answer with a nationality of the seven models (analysis/word_map.py; no judge).
+wm <- as.matrix(read.csv(file.path("..", "analysis", "out", "word_map_counts.csv"), row.names = 1,
+                         check.names = FALSE))
+P_ <- wm / sum(wm); rm_ <- rowSums(P_); cm_ <- colSums(P_)
+sv_ <- svd(diag(1 / sqrt(rm_)) %*% (P_ - rm_ %o% cm_) %*% diag(1 / sqrt(cm_)))
+ca_in <- 100 * sv_$d^2 / sum(sv_$d^2)
+ca_row <- diag(1 / sqrt(rm_)) %*% sv_$u[, 1:2] %*% diag(sv_$d[1:2])
+ca_col <- diag(1 / sqrt(cm_)) %*% sv_$v[, 1:2] %*% diag(sv_$d[1:2])
+# orientation: origin and risk to the right, warmth at the top
+s1_ <- sign(ca_row[rownames(wm) == "NGA", 1]); s2_ <- sign(ca_row[rownames(wm) == "ITA", 2])
+ca_row <- ca_row %*% diag(c(s1_, s2_)); ca_col <- ca_col %*% diag(c(s1_, s2_))
+w_idx <- inner_join(rate_table("defensive_marking") |> filter(country != "BASE") |>
+                      group_by(country) |> summarise(def = mean(pct), .groups = "drop"),
+                    rate_table("stereo_pos") |> filter(country != "BASE") |>
+                      group_by(country) |> summarise(pos = mean(pct), .groups = "drop"), by = "country") |>
+  mutate(idx = def - pos)
+ramp <- scales::gradient_n_pal(c("#2a78d6", "#8a8780", "#e8452c"))
+nat_pts <- tibble(country = rownames(wm), x = ca_row[, 1], y = ca_row[, 2]) |>
+  left_join(w_idx, by = "country") |>
+  mutate(lab = nm(country), col = ramp(scales::rescale(idx)), kind = "nat")
+# the three families: Ward clustering of the nationalities on the two axes shown; a nationality whose
+# silhouette is below 0.45 sits between two families and is left outside the outlines
+fam_h <- hclust(dist(ca_row), "ward.D2")
+fam_g <- cutree(fam_h, 3)
+fam_sil <- cluster::silhouette(fam_g, dist(ca_row))[, "sil_width"]
+fam_name <- setNames(c("warm", "reserved", "origin"),
+                     c(fam_g[rownames(wm) == "ITA"], fam_g[rownames(wm) == "FIN"], fam_g[rownames(wm) == "NGA"]))
+nat_pts <- nat_pts |> mutate(fam = unname(fam_name[as.character(fam_g)]), sil = fam_sil,
+                             inside = sil >= 0.45)
+between <- nat_pts$country[!nat_pts$inside]
+FAM_COL <- c(warm = "#eda100", reserved = "#2a78d6", origin = "#e8452c")
+# a word takes the colour of the nationality it is most over-used for (observed / expected count)
+over_ <- wm / (rowSums(wm) %o% colSums(wm) / sum(wm))
+word_pts <- tibble(lab = colnames(wm), x = ca_col[, 1], y = ca_col[, 2],
+                   country = rownames(wm)[apply(over_, 2, which.max)]) |>
+  mutate(col = nat_pts$col[match(country, nat_pts$country)], kind = "word")
+```
+
+::: {#fig-words fig-pos="H"}
+
+```{=latex}
+\begin{howtoread}\textbf{How to read this chart}\par\smallskip
+```
+
+**Reading.** A map of the words the AI uses for each man, in French as it wrote them (nationalities in bold, words in italics). A man sits close to the men it talks about in the same way, on the side of the words it uses most for him. Colour: blue for the men it compliments most, coral for those it most often "defends". Key words: *chaleureux* warm, *réservé* reserved, *ponctualité* punctuality, *origine* origin, *honneur* honour, *guerre* war, *arnaque* scam, *argent* money, *femme* women.
+
+**What it shows.** Without being told anything about the countries, the words sort the men into three worlds: the warm and passionate (Italy, Spain, Brazil), the reserved and punctual (Northern Europe, Japan), and, on the right, men described by their origin, honour, traditions, war or scams (Afghanistan, Nigeria, the Maghreb, the Balkans, India). The shaded outlines are these three families, found by a clustering of the map; `r paste(nm(between), collapse = " and ")` stay outside: they sit between two worlds. No judge is involved: this map comes straight from the answers.
+
+```{=latex}
+\end{howtoread}
+```
+
+```{r}
+#| fig-height: 5.6
+ggplot(mapping = aes(x, y)) +
+  geom_hline(yintercept = 0, colour = GRID, linewidth = 0.3) +
+  geom_vline(xintercept = 0, colour = GRID, linewidth = 0.3) +
+  ggforce::geom_mark_ellipse(data = nat_pts |> filter(inside), aes(group = fam, fill = fam, colour = FAM_COL[fam]),
+                             alpha = 0.07, linewidth = 0.35, expand = unit(4, "mm"), show.legend = FALSE) +
+  geom_point(data = nat_pts, aes(colour = col), size = 2.3) +
+  geom_text_repel(data = bind_rows(word_pts, nat_pts),
+                  aes(label = lab, colour = col, fontface = ifelse(kind == "nat", "bold", "italic"),
+                      size = ifelse(kind == "nat", 3.0, 2.75)),
+                  family = "Inter", seed = 5, max.overlaps = Inf, box.padding = 0.22, point.padding = 0.15, force = 2,
+                  min.segment.length = 0.4, segment.colour = "#d6d4ce", segment.size = 0.2) +
+  annotate("text", x = 0, y = max(word_pts$y, nat_pts$y) + 0.12, label = "\u2191 warm, passionate",
+           family = "Inter", fontface = "bold", size = 2.9, colour = FAM_COL[["warm"]]) +
+  annotate("text", x = min(word_pts$x, nat_pts$x), y = min(word_pts$y, nat_pts$y) - 0.12, hjust = 0,
+           label = "\u2190 reserved, punctual", family = "Inter", fontface = "bold", size = 2.9,
+           colour = FAM_COL[["reserved"]]) +
+  annotate("text", x = max(word_pts$x, nat_pts$x), y = min(word_pts$y, nat_pts$y) - 0.12, hjust = 1,
+           label = "origin, honour, war, scams \u2192", family = "Inter", fontface = "bold", size = 2.9,
+           colour = "#e8452c") +
+  scale_colour_identity() + scale_size_identity() +
+  scale_fill_manual(values = FAM_COL) +
+  coord_equal(clip = "off") +
+  labs(x = sprintf("axis 1 (%.0f %% of the differences in vocabulary)", ca_in[1]),
+       y = sprintf("axis 2 (%.0f %%)", ca_in[2])) +
+  theme(panel.grid = element_blank(), panel.grid.major = element_blank(), axis.text = element_blank(),
+        axis.title = element_text(size = 7.5))
+```
+
+How an AI describes the man you are alone with: correspondence analysis of the words of 49,896 answers, no judge (method in @sec-guess-method).
+:::
+
 # TL;DR {.unnumbered}
 
 Ask seven open AI models for advice about being alone with a man, and his nationality decides the tone: some
@@ -236,19 +323,19 @@ Chat assistants are now asked for practical advice, including on personal safety
 Swiss public broadcaster RTS [@rts2026] gave Gemini and GPT-5 a minimal sentence, *"I am alone with a
 [nationality]"* (in French). For an Italian, a Finn, a Belgian or a Swiss man, the answers suggested
 ice-breakers; for an Algerian, they advised keeping one's distance and listed emergency numbers. The test
-relied on a handful of prompts, with no repetition and no control condition. The author learnt of this
-report through a France Inter radio debate on the question "Is AI racist?" (*L'IA est-elle raciste ?*,
+relied on a handful of prompts, with no repetition and no control condition. I learnt of this
+report through a France Inter radio debate, heard in my car, on the question "Is AI racist?" (*L'IA est-elle raciste ?*,
 3 September 2026) [@franceinter2026], which prompted the present study.
 
-This work revisits the question in a controlled setting: **does a language model give a woman alone with a
-man different advice depending on the man's nationality, all else being equal?** We measure these gaps on
+I revisit the question in a controlled setting: **does a language model give a woman alone with a
+man different advice depending on the man's nationality, all else being equal?** I measure these gaps on
 open-weight models that can be run locally, in situations ranging from the mundane (a work meeting) to the
 ambiguous (his place at 11 pm), and for three ages including a minor. For a minor, the right answer is
 protective and independent of nationality: any variation by country is a sign of bias.
 
 Existing bias benchmarks such as BBQ [@parrish2022bbq] ask closed questions with an expected answer. Here
 the answer is free and long (several hundred words); bias can lie in the tone, in the choice of advice or
-in a single sentence. We therefore use a judge model [@zheng2023judge] guided by a fixed rubric, applied to
+in a single sentence. I therefore use a judge model [@zheng2023judge] guided by a fixed rubric, applied to
 answers in which the nationality is masked.
 
 # Method
@@ -272,9 +359,9 @@ independent ways: by an LLM judge (pipeline 1) and by a text analysis with no ju
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
-**Reading.** The top part shows one real question sent to the AI. Each coloured piece is something we vary on purpose; everything else stays word for word identical. The bottom part follows the experiment step by step: boxes 1 to 6 in blue are the path through the AI judge, box 7 in red is a second path that reads the answers with no judge.
+**Reading.** The top part shows one real question sent to the AI. Each coloured piece is something I vary on purpose; everything else stays word for word identical. The bottom part follows the experiment step by step: boxes 1 to 6 in blue are the path through the AI judge, box 7 in red is a second path that reads the answers with no judge.
 
-**What it shows.** Two questions we compare differ by a single word, the man's nationality, and the AI that grades the answers never sees that word. So any systematic difference between answers can be traced back to the nationality alone.
+**What it shows.** Two questions I compare differ by a single word, the man's nationality, and the AI that grades the answers never sees that word. So any systematic difference between answers can be traced back to the nationality alone.
 
 ```{=latex}
 \end{howtoread}
@@ -380,7 +467,7 @@ Australia, Fiji).
 
 ```{r}
 #| label: tbl-contexts
-#| tbl-cap: "The eleven contexts (first paraphrase, example for the Algerian nationality, age unstated), with our English translation. The control only removes the nationality adjective."
+#| tbl-cap: "The eleven contexts (first paraphrase, example for the Algerian nationality, age unstated), with my English translation. The control only removes the nationality adjective."
 #| tbl-colwidths: [17, 43, 40]
 TR <- c(
   C0_none = "I am alone with an Algerian man.",
@@ -507,7 +594,7 @@ nationality.
 
 ## Statistical analysis {#sec-stats}
 
-For each binary indicator, we compute the share of answers per model and nationality, with a 95 % Wilson
+For each binary indicator, I compute the share of answers per model and nationality, with a 95 % Wilson
 interval [@wilson1927]. The effect of nationality is tested, for each model and on answers with a
 nationality only, with a likelihood-ratio test between two logistic regressions,
 `indicator ~ context + age` and `indicator ~ context + age + nationality` (23 degrees of freedom). The alarm
@@ -552,7 +639,13 @@ each lemma, Lafon's specificity [@lafon1980] compares the number of uses with wh
 (hypergeometric law); the score is $-\log_{10} p$, positive for over-use and negative for under-use. The
 answers are also cut into segments of 15 content lemmas and grouped into themes by a simplified Reinert
 descending classification [@reinert1983]: recursive splits along the first axis of a correspondence
-analysis, into 8 classes, found without knowing the nationality.
+analysis, into 8 classes, found without knowing the nationality. The map that opens this report
+(@fig-words) is a correspondence analysis of the table of nationalities and words: the three most specific
+lemmas of each nationality, minus generic nouns, place names and English leftovers, counted in every answer
+with a nationality (symmetric map of the first two axes). Its three families come from a Ward clustering of the
+nationalities on these two axes; a nationality with a silhouette below 0.45 is left outside the outlines.
+Nationalities are coloured by the judge's index of the TL;DR chart, and each word like the nationality it is
+most over-used for.
 
 # Results
 
@@ -1033,12 +1126,12 @@ sig |>
   kable(booktabs = TRUE, align = "llrrr")
 ```
 
-@tbl-quotes gives representative quotes, in the original French with our translation. **These are model
+@tbl-quotes gives representative quotes, in the original French with my translation. **These are model
 outputs, not claims**; the nationality is masked (`[X]`) as the judge read it.
 
 ```{r}
 #| label: tbl-quotes
-#| tbl-cap: "Examples of negative associations quoted by the judge (masked text, excerpts; translations ours)."
+#| tbl-cap: "Examples of negative associations quoted by the judge (masked text, excerpts; translations mine)."
 #| tbl-colwidths: [13, 12, 11, 64]
 QUOTES <- tibble::tribble(
   ~pick, ~en,
@@ -1420,7 +1513,7 @@ alarm and protective advice to compliments and encounter framing: it is the "cul
 ranking differs from one model to the next, now loads mostly on the second axis. A nationality's position on this
 axis matches almost exactly the index used in the summary chart (defensive marking minus positive
 stereotypes, Spearman $\rho = `r num(abs(rho_idx), 2)`$). The second axis (`r num(ve[2], 0)` %) opposes defensive marking and
-negative stereotypes to requests for clarification: it is noisier and we do not interpret it.
+negative stereotypes to requests for clarification: it is noisier and I do not interpret it.
 
 Clustering each model on its own gives noisier groups (about 99 answers per nationality). The partitions
 of Qwen, Gemma E4B, Ministral and Nemotron agree well with the pooled one (adjusted Rand index
@@ -1902,7 +1995,7 @@ ranked by severity: an association between the man's origin and a risk (the judg
 then a negative stereotype, then a defensive marking ("his origin does not matter"); the alarm score breaks
 ties. An answer is kept only if the passage behind its flag is found in the text, and that passage is shown
 in **bold** at the centre of the excerpt. Answers flagged only for a high alarm are left out, since caution can
-be legitimate. Each excerpt is given in the original French, followed by our English translation. **These are model
+be legitimate. Each excerpt is given in the original French, followed by my English translation. **These are model
 outputs, not claims.** The same ranking applied context by context, with three answers per model in each
 of the eleven contexts, is given in the appendix.
 
@@ -1964,7 +2057,7 @@ The clustering of the judge's indicators (@fig-clusters) and the classifier's co
 draw the same line, and both single out Nigeria and Afghanistan. The refusals, counted without a judge
 too, are a third reading, and they fall on the same men.
 
-**Relation to the RTS report.** We find the "encounter" versus "distrust" contrast described by RTS. In
+**Relation to the RTS report.** I find the "encounter" versus "distrust" contrast described by RTS. In
 most of the models tested it is attenuated: these open models rarely tip into outright alarm for a given
 nationality, and the bias becomes visible only with a repeated design and a control. Ministral is closer
 to the report's examples: it is the most alarmist model, and its alarm rises most for Nigeria.
