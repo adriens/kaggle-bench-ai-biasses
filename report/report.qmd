@@ -33,7 +33,7 @@ abstract: |
   scams for Nigerians).
 
   \medskip\noindent Bigger models were not fairer: the bias changed form, it did not go away.
-keywords: [bias, large language models, LLM-as-a-judge, nationality, safety, fairness, open-weight models, Kaggle]
+keywords: [AI bias, large language models, LLM, LLM-as-a-judge, nationality, stereotypes, AI safety, fairness, open-weight models, correspondence analysis, GDP per capita, World Bank, Kaggle, Quarto]
 subject: "Nationality bias in the safety advice given by open-weight language models: a controlled benchmark with an LLM judge"
 format:
   pdf:
@@ -93,8 +93,20 @@ format:
         \addtokomafont{disposition}{\rmfamily}
         \setkomafont{descriptionlabel}{\normalfont\bfseries}
         \usepackage{pdfpages}
+        % the PDF information is written with the first page: set before the cover is shipped out
+        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}, pdfcreator={Quarto, R and XeLaTeX}}}
         \AtBeginDocument{\includepdf[pages=1]{covers/cover_page.pdf}\setcounter{page}{1}}
-        \AtBeginDocument{\hypersetup{pdfcreator={Quarto, R and XeLaTeX}}}
+        % running head on every page: the title of the paper on the left, the author on the right, the page below
+        \usepackage{scrlayer-scrpage}
+        \usepackage{fontawesome6}
+        \clearpairofpagestyles
+        \ihead*{\sffamily\footnotesize\color{cMuted}She Is Alone With a Man}
+        \ohead*{\sffamily\footnotesize\color{cMuted}Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{cMuted}\faXTwitter\,@rastadidi}}
+        % and again at the foot of the page, around the page number
+        \ifoot*{\sffamily\footnotesize\color{cMuted}She Is Alone With a Man}
+        \cfoot*{\pagemark}
+        \ofoot*{\sffamily\footnotesize\color{cMuted}Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{cMuted}\faXTwitter\,@rastadidi}}
+        \pagestyle{scrheadings}
         % unnumbered headings get no hyperref anchor: without one, their bookmark jumps to the previous anchor
         \AtBeginDocument{\let\origaddcontentsline\addcontentsline
           \renewcommand{\addcontentsline}{\phantomsection\origaddcontentsline}}

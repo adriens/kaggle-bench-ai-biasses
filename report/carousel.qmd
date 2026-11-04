@@ -50,6 +50,8 @@ format:
         \definecolor{panel}{HTML}{1B1F27}
         \definecolor{linkblue}{HTML}{8EC1FF}
         \pagestyle{empty}
+        % the PDF author: the name, then the X handle
+        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}}}
         \pagecolor{night}
         \setlength{\parindent}{0pt}\setlength{\parskip}{0.6em}\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000
         \renewcommand{\maketitle}{}
