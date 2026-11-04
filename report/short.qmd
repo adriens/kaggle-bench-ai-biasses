@@ -108,8 +108,8 @@ suppressPackageStartupMessages({
 source("R/prep.R")
 source("R/clusters.R")
 COVER_FILE <- "covers/cover_short"
-COVER_SUBTITLE <- paste0("Same question, same situation: only the man's nationality changes.\n",
-                         "What seven AI models answer a woman alone with him.")
+# the same hook as the carousel, large enough to read on a LinkedIn thumbnail
+COVER_SUBTITLE <- "Only his nationality changes.\nThe AI's advice changes too."; COVER_SUB_SIZE <- 25
 source("R/cover_page.R")  # draws covers/cover_short.pdf, inserted before page 1
 
 # the Gemma family in shades of green, light to dark by size

@@ -149,6 +149,8 @@ suppressPackageStartupMessages({
 })
 source("R/prep.R")
 source("R/clusters.R")
+# the same hook as the carousel, large enough to read on a LinkedIn thumbnail
+COVER_SUBTITLE <- "Only his nationality changes.\nThe AI's advice changes too."; COVER_SUB_SIZE <- 25
 source("R/cover_page.R")  # regenerates covers/cover_page.pdf, inserted as page 1
 
 # the Gemma family in shades of green, light to dark by size
