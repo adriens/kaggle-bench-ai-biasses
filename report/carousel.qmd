@@ -727,15 +727,17 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \takeaway{keyblue}{\faMagnifyingGlass}{Test who the people are.}{Safety tests must vary it, prompt after prompt.}
 \vfill
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, before upper=\raggedright]
-{\fontsize{12.5}{16}\selectfont\color{fg}\faGithub\enspace\textbf{Full report, data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\color{linkblue}\underline{the full report}} (89 pages)\enspace·\enspace\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/short.pdf}{\color{linkblue}\underline{the 5-page version}}\par}
 \vspace{0.15em}
-{\fontsize{12.5}{16}\selectfont\color{fg}\faKaggle\enspace\textbf{Notebooks and datasets on Kaggle:} \href{https://www.kaggle.com/work/collections/19371544}{\color{linkblue}\underline{the Alone With a Stranger collection}}\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faGithub\enspace\textbf{Data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
+\vspace{0.15em}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faKaggle\enspace\textbf{Notebooks and datasets:} \href{https://www.kaggle.com/work/collections/19371544}{\color{linkblue}\underline{the Alone With a Stranger collection}}\par}
 \vspace{0.4em}
 {\fontsize{12}{15}\selectfont\color{dim}Adrien Sales\quad
 \href{https://www.linkedin.com/in/adrien-sales}{\color{linkblue}\faLinkedin}\enspace
 \href{https://x.com/rastadidi}{\color{linkblue}\faXTwitter}\enspace
 \href{https://dev.to/adriens}{\color{linkblue}\faDev}\enspace
 \href{https://www.kaggle.com/adriensales}{\color{linkblue}\faKaggle}\enspace
-\href{https://github.com/adriens}{\color{linkblue}\faGithub}\hfill{\fontsize{9}{11}\selectfont Built with \href{https://www.r-project.org}{\color{dim}R} and \href{https://quarto.org}{\color{dim}Quarto}}\par}
+\href{https://github.com/adriens}{\color{linkblue}\faGithub}\hfill{\fontsize{9}{11}\selectfont Built with \href{https://www.r-project.org}{\color{dim}R}, \href{https://quarto.org}{\color{dim}Quarto} and \href{https://www.latex-project.org}{\color{dim}\LaTeX}}\par}
 \end{tcolorbox}
 ```
