@@ -710,7 +710,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \headline{Six things to remember.}
 % a take-away: an icon in a coloured disc, a bold line, then one line of detail
 \newcommand{\takeaway}[4]{\begin{tile}{#1}\begin{minipage}[c]{0.16\linewidth}\centering
-  \tikz{\fill[#1!22!panel] (0,0) circle (0.3in); \node[#1, font=\fontsize{20}{20}\selectfont] at (0,0) {#2};}\end{minipage}%
+  \tikz{\fill[#1!22!panel] (0,0) circle (0.26in); \node[#1, font=\fontsize{20}{20}\selectfont] at (0,0) {#2};}\end{minipage}%
   \begin{minipage}[c]{0.83\linewidth}\raggedright{\fontsize{17}{21}\selectfont\bfseries\color{fg}#3\par}\vspace{0.15em}
   {\fontsize{13.5}{17}\selectfont\color{dim}#4\par}\end{minipage}\end{tile}}
 \vfill
@@ -727,13 +727,15 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \takeaway{keyblue}{\faMagnifyingGlass}{Test who the people are.}{Safety tests must vary it, prompt after prompt.}
 \vfill
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, before upper=\raggedright]
-{\fontsize{14}{18}\selectfont\color{fg}\faGithub\enspace\textbf{Full report, data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faGithub\enspace\textbf{Full report, data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
+\vspace{0.15em}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faKaggle\enspace\textbf{Notebooks and datasets on Kaggle:} \href{https://www.kaggle.com/work/collections/19371544}{\color{linkblue}\underline{the Alone With a Stranger collection}}\par}
 \vspace{0.4em}
 {\fontsize{12}{15}\selectfont\color{dim}Adrien Sales\quad
 \href{https://www.linkedin.com/in/adrien-sales}{\color{linkblue}\faLinkedin}\enspace
 \href{https://x.com/rastadidi}{\color{linkblue}\faXTwitter}\enspace
 \href{https://dev.to/adriens}{\color{linkblue}\faDev}\enspace
 \href{https://www.kaggle.com/adriensales}{\color{linkblue}\faKaggle}\enspace
-\href{https://github.com/adriens}{\color{linkblue}\faGithub}\quad open models, Kaggle's free GPUs, R and Quarto.\par}
+\href{https://github.com/adriens}{\color{linkblue}\faGithub}\hfill{\fontsize{9}{11}\selectfont Built with \href{https://www.r-project.org}{\color{dim}R} and \href{https://quarto.org}{\color{dim}Quarto}}\par}
 \end{tcolorbox}
 ```
