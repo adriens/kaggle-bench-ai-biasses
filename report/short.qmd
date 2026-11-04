@@ -44,6 +44,7 @@ format:
         \definecolor{dim}{HTML}{A9A7A0}
         \definecolor{amber}{HTML}{EDA100}
         \definecolor{violet}{HTML}{8B7CF0}
+        \definecolor{green}{HTML}{1BAF7A}
         \input{flags/flags.tex}
         % a quote of an AI: the flag of the man, the sentence, then the model and the question it was asked
         \newcommand{\quotetile}[5]{\begin{tcolorbox}[enhanced, colback=#1!7, frame hidden, borderline west={3pt}{0pt}{#1},
@@ -193,8 +194,8 @@ wr <- function(k) num(w_rho$rho[w_rho$measure == k], 2)
 ```
 `\textcolor{keyblue}{\textbf{ABSTRACT}}`{=latex}\enspace A test by Swiss broadcaster RTS [@rts2026], discussed on France
 Inter [@franceinter2026], found that chatbots told *"I am alone with a man"* suggested ice-breakers with an Italian or
-Swiss man and keeping one's distance with an Algerian one, on a handful of prompts. Does it hold at scale? Seven
-open-weight models (2 to 26 billion parameters, five developers) answered `r num(nrow(R), 0)` prompts in French in
+Swiss man and keeping one's distance with an Algerian one, on a handful of prompts. Seven
+open-weight models (2 to 26 billion parameters) from five companies (IBM, Alibaba, Google, Mistral AI, NVIDIA) answered `r num(nrow(R), 0)` prompts in French in
 which a woman is alone with a man; only his nationality changed (24 countries, or none), across 11 situations and 3
 ages. An LLM judge blind to the nationality rated `r num(nrow(D), 0)` answers; a judge-free classifier read them all.
 In a taxi, an elevator or an isolated street, naming any nationality raised prejudiced answers from `r pc(p_none)` to
@@ -213,33 +214,40 @@ prompt are.**
 In September 2026, driving my car, I heard a radio debate on [France Inter: *"Is AI racist?"*](https://www.radiofrance.fr/franceinter/podcasts/le-debat/le-debat-de-la-grand-matinale-du-jeudi-03-septembre-2026-5351193) [@franceinter2026].
 It cited [a test by Swiss broadcaster RTS](https://www.rts.ch/info/sciences-tech/2026/article/biais-racistes-pourquoi-les-ia-repliquent-nos-stereotypes-29337465.html) [@rts2026]. Told *"I am alone with a man"*, chatbots suggested
 **ice-breakers** when the man was Italian or Swiss, and **keeping one's distance** when he was Algerian.
-A striking result, but based on a handful of prompts.
+A striking result, but on a handful of prompts. Then came the question:
 
-So I built a controlled experiment that anyone can replay on their own. Same question, same situation, same woman. **Only one word changes: the
-man's nationality.** Seven freely available AI models, `r num(nrow(R), 0)` answers, no other difference.
+```{=latex}
+% the question that started the work, set apart as a pull quote
+\par\vspace{0.2em}{\centering\sffamily\bfseries\itshape\large{\color{amber}\faLightbulb}\enspace``And what if I tested this at scale, with open-weight models,\\ and shared the results as open data?''\par}\vspace{0.4em}
+```
+
+Curiosity drives how I learn, and it kept me going through this work. So I built a controlled experiment
+anyone can replay: same question, same situation, same woman. **Only one word changes: the man's
+nationality.**
 
 ```{=latex}
 % the two shares side by side, each over a bar on the same scale (the width of a column is 100 %)
 \begin{bignum}[heat]\sffamily
-\begin{minipage}[b]{0.41\linewidth}\raggedright
-\bignumber{muted}{`r num(p_none, 0)` \%}\par
-{\small with \textit{``a man''}, no nationality}\par\smallskip
+\begin{minipage}[b]{0.43\linewidth}\raggedright
+% the number and its label on one line, to keep the box short
+\begin{minipage}[c]{0.33\linewidth}{\sffamily\bfseries\fontsize{26}{28}\selectfont\color{muted}`r num(p_none, 0)`\,\%}\end{minipage}%
+\begin{minipage}[c]{0.67\linewidth}\raggedright{\small with \textit{``a man''},\\ no nationality}\end{minipage}\par\smallskip
 \pbar{muted}{`r num(p_none / 100, 3)`}
 \end{minipage}\hfill
-\begin{minipage}[b]{0.1\linewidth}\centering{\fontsize{30}{30}\selectfont\color{heat}$\rightarrow$}\par\vspace{0.9em}\end{minipage}\hfill
-\begin{minipage}[b]{0.41\linewidth}\raggedright
-\bignumber{heat}{`r num(p_nat, 0)` \%}\par
-{\small as soon as he has one, \textbf{any} nationality}\par\smallskip
+\begin{minipage}[b]{0.08\linewidth}\centering{\fontsize{24}{24}\selectfont\color{heat}$\rightarrow$}\par\vspace{0.3em}\end{minipage}\hfill
+\begin{minipage}[b]{0.43\linewidth}\raggedright
+\begin{minipage}[c]{0.38\linewidth}{\sffamily\bfseries\fontsize{26}{28}\selectfont\color{heat}`r num(p_nat, 0)`\,\%}\end{minipage}%
+\begin{minipage}[c]{0.62\linewidth}\raggedright{\small as soon as he has one,\\ \textbf{any} nationality}\end{minipage}\par\smallskip
 \pbar{heat}{`r num(p_nat / 100, 3)`}
-\end{minipage}\par\medskip
-{\small\color{muted}Prejudiced answers of the larger AI models, in a taxi, an elevator or an isolated street.}
+\end{minipage}\par\smallskip
+{\footnotesize\color{muted}Prejudiced answers of the larger AI models, in a taxi, an elevator or an isolated street.}
 \end{bignum}
 ```
 
-The nationality decides who gets compliments, a warning, a defence, or no help at all. **The bias is not random. It follows the same men, from model to model.**
+**The bias is not random: it follows the same men, from model to model.**
 
 ```{r}
-#| fig-height: 2.7
+#| fig-height: 2.6
 #| out-width: "94%"
 s_def <- rate_table("defensive_marking") |> select(model, country, def = pct)
 s_pos <- rate_table("stereo_pos") |> select(model, country, pos = pct)
@@ -290,7 +298,7 @@ ggplot(nat, aes(def, pos)) +
 ```
 
 ```{=latex}
-\vspace{-1.2em}{\small\color{muted} One bubble per nationality, mean of the seven AIs; its size: answers linking him to a risk. Star: "a man", no nationality.}
+\vspace{-1.2em}{\footnotesize\color{muted} One bubble per nationality, mean of the seven AIs; size: answers linking him to a risk; star: "a man", no nationality.}
 ```
 
 \newpage
@@ -586,72 +594,68 @@ alone with him. Granite tells her so:
 
 # What to take away
 
-- **The man's nationality changes the advice**, in all seven models, holding the situation and the age constant.
-- **Two layers of bias.** Who gets compliments is shared by every model, probably learnt from the same data.
-  What a model does with the other men (defend them, name a risk, refuse to help) depends on how it was aligned.
+```{=latex}
+% a take-away: an icon in a coloured disc, a bold line, then one line of detail (as on the carousel)
+\newcommand{\takeaway}[4]{\begin{tcolorbox}[enhanced, colback=#1!6, frame hidden, borderline west={3pt}{0pt}{#1},
+  arc=2pt, height=0.98in, valign=center, left=6pt, right=6pt, top=4pt, bottom=4pt, fontupper=\sffamily]
+  \begin{minipage}[c]{0.2\linewidth}\centering
+  \tikz{\fill[#1!18] (0,0) circle (0.22in); \node[#1, font=\fontsize{15}{15}\selectfont] at (0,0) {#2};}\end{minipage}%
+  \begin{minipage}[c]{0.8\linewidth}\raggedright{\normalsize\bfseries #3\par}\vspace{0.15em}
+  {\small\color{muted}#4\par}\end{minipage}\end{tcolorbox}}
+\begin{tcbraster}[raster columns=2, raster column skip=8pt, raster row skip=6pt]
+\takeaway{heat}{\faPassport}{His nationality changes the advice.}{In all seven AIs, from five companies, same situation, same age.}
+\takeaway{green}{\faHeart}{Who gets compliments is shared.}{Probably learnt from the same data.}
+\takeaway{amber}{\faTriangleExclamation}{The others get suspicion.}{Its form depends on how each AI was aligned.}
+\takeaway{green}{\faSackDollar}{The richer his country, the warmer the AI.}{Even within a continent. A link, not a proof of cause.}
+\takeaway{violet}{\faChartColumn}{Bigger is not fairer.}{In Google's Gemma family, the bias changes form, it does not go away.}
+\takeaway{keyblue}{\faMagnifyingGlass}{Test who the people are.}{Safety tests must vary it, prompt after prompt.}
+\end{tcbraster}
+```
+
 ```{r}
-#| fig-height: 3.2
+#| fig-height: 2.9
 NJ <- D |> filter(!is_base)
 p_neg <- 100 * mean(NJ$negative_association); p_def <- 100 * mean(NJ$defensive_marking)
-tip <- tibble(x = c(-1.3, -0.6, 0, 0.7, 1.4), y = c(0, 0.8, 1.35, 0.75, 0))
-body <- tibble(x = c(-1.3, -3.7, -4.5, -3.3, 0, 3.5, 4.6, 3.6, 1.4), y = c(0, -1.0, -3.0, -5.0, -5.6, -4.9, -2.9, -0.9, 0))
-under <- tibble(y = c(-0.95, -1.85, -2.75, -3.65, -4.55), lab = c(
-  sprintf("\"his origin does not matter\": %s of the answers", pc(p_def)),
-  sprintf("unequal compliments: Finland %s, Afghanistan %s", pc(sp_$p[sp_$country == "FIN"]), pc(sp_$p[sp_$country == "AFG"])),
-  sprintf("refusals to help: up to %s for an Afghan man", pc(refu$p[refu$country == "AFG"])),
-  "a religion for some men, and a dress code for her",
-  sprintf("nationality guessed from the words alone: %s (chance: 4 %%)", pc(g_acc))),
+# a flat iceberg: a small tip above the water, a wide body below holding what this study adds, in two columns
+tip <- tibble(x = c(-1.1, -0.5, 0, 0.6, 1.2), y = c(0, 0.65, 1.05, 0.6, 0))
+body <- tibble(x = c(-1.1, -4.3, -4.85, -4.2, 0, 4.2, 4.85, 4.3, 1.2), y = c(0, -0.6, -1.9, -3.25, -3.65, -3.25, -1.9, -0.6, 0))
+chip <- function(n, txt) paste0(n, "  ", txt)
+under <- tibble(
+  x = c(-2.35, 2.35, -2.35, 2.35, 0), y = c(-0.95, -0.95, -1.85, -1.85, -2.75),
+  lab = c(chip(pc(p_def), "say \"his origin does not matter\""),
+          chip(paste(pc(sp_$p[sp_$country == "FIN"]), "vs", pc(sp_$p[sp_$country == "AFG"])), "compliments: Finn vs Afghan"),
+          chip(pc(refu$p[refu$country == "AFG"]), "refusals for an Afghan man"),
+          chip(paste(rel_n[["AFG"]], "vs", rel_n[["FRA"]]), "a religion: Afghan vs French man"),
+          chip(pc(g_acc), "nationality guessed from the words alone (chance: 4 %)")),
   fill = c("#eb6834", "#1baf7a", "#6250d6", "#eda100", "#2a78d6"))
 # the bands overlap a little, so that no thin line shows between them
-water <- tibble(y0 = seq(0, -5.6, length.out = 40)) |> mutate(y1 = y0 - 5.75 / 40 - 0.03,
+water <- tibble(y0 = seq(0, -3.8, length.out = 40)) |> mutate(y1 = y0 - 3.9 / 40 - 0.03,
                                                               col = colorRampPalette(c("#d5eaf8", "#2c6fae"))(40))
 ggplot() +
   annotate("rect", xmin = -Inf, xmax = Inf, ymin = 0, ymax = Inf, fill = "#f7fbfe") +
   geom_rect(data = water, aes(xmin = -Inf, xmax = Inf, ymin = y1, ymax = y0, fill = col), colour = NA) +
   geom_polygon(data = body, aes(x, y), fill = "#f2f9ff", colour = "#9cc9ee", linewidth = 0.7, alpha = 0.93) +
   geom_polygon(data = tip, aes(x, y), fill = "#ffffff", colour = "#7fb2dd", linewidth = 0.7) +
-  geom_polygon(data = tibble(x = c(-0.6, 0, 0.7, 0.2), y = c(0.8, 1.35, 0.75, 0.55)), aes(x, y),
-               fill = "#e1effa", colour = NA) +
   geom_hline(yintercept = 0, colour = "#2a78d6", linewidth = 0.9) +
-  geom_label(aes(x = -4.85, y = 0.72, label = sprintf("What a quick test sees:\nexplicit risks (scams, migration),\n%s of the answers", pc(p_neg, 1))),
+  geom_label(aes(x = -4.9, y = 0.55, label = sprintf("What a quick test sees: %s\nexplicit risks (scams, migration)", pc(p_neg, 1))),
              hjust = 0, family = "Inter", fontface = "bold", size = 2.8, lineheight = 0.95, colour = "white",
              fill = "#d63c2a", label.size = 0, label.r = unit(4, "pt"), label.padding = unit(4, "pt")) +
-  annotate("text", x = 4.9, y = -0.33, hjust = 1, family = "Inter", fontface = "bold", size = 2.8,
-           colour = "#1f5f99", label = "what this study adds ↓") +
-  geom_label(data = under, aes(0, y, label = lab, fill = fill), family = "Inter", fontface = "bold", size = 2.75,
+  annotate("text", x = 4.9, y = 0.55, hjust = 1, family = "Inter", fontface = "bold", size = 2.9,
+           colour = "#1f5f99", label = "what this study adds, below ↓") +
+  geom_label(data = under, aes(x, y, label = lab, fill = fill), family = "Inter", fontface = "bold", size = 2.75,
              colour = "white", label.size = 0, label.r = unit(5, "pt"), label.padding = unit(4.5, "pt")) +
   scale_fill_identity() +
-  coord_cartesian(xlim = c(-5, 5), ylim = c(-5.75, 1.5), expand = FALSE) +
+  coord_cartesian(xlim = c(-5, 5), ylim = c(-3.9, 1.2), expand = FALSE) +
   theme_void()
 ```
 
 ```{=latex}
-{\small\color{muted} The bias as an iceberg (shapes not to scale): a quick test like the one RTS ran sees the tip; the rest only shows when the same question is asked thousands of times, one nationality at a time.}
-```
+{\small\color{muted} The bias as an iceberg: a quick test, or a judge looking only for danger, sees the tip; the rest only shows when the question is asked thousands of times.}
 
-
-- **The richer his country, the warmer the AI.** Compliments rise and suspicion falls with GDP per capita
-  (Spearman ρ about 0.75, World Bank data), even within a continent. A link, not a proof of cause.
-- **Bigger is not fairer.** In one family of models (Google's Gemma), the larger model gives far more prejudiced
-  answers than the smaller ones. The bias changes form; it does not go away.
-- **A judge looking for danger misses part of it.** Refusals and religious assumptions are not "risks", yet they
-  change what the woman is told.
-- **Safety tests must vary who the people are.** One prompt is not enough: these patterns only show when the
-  nationality changes, prompt after prompt.
-
+\medskip
+\begin{tcolorbox}[enhanced, colback=black!3, frame hidden, arc=2pt, left=10pt, right=10pt, top=7pt, bottom=7pt]
 These are not the big commercial chatbots RTS tested, but open models anyone can download and run, and the
 same pattern shows up in all of them.
-
-```{=latex}
-\begin{tcolorbox}[enhanced, colback=black!3, frame hidden, arc=2pt, left=10pt, right=10pt, top=8pt, bottom=8pt]
-\sffamily\small
-\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\textbf{The full report}} (89 pages: method, statistics, every chart, the worst answers in French and English),
-the data and the code are published under the name \textit{Alone With a Stranger}, on GitHub:
-\href{https://github.com/adriens/kaggle-bench-ai-biasses}{github.com/adriens/kaggle-bench-ai-biasses}.
-The results also come as a \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/carousel.pdf}{16-slide carousel}.\par\medskip
-{\color{muted}Made with open-weight models (IBM, Alibaba, Google, Mistral AI, NVIDIA) on Kaggle's free GPUs.
-Built with \href{https://www.r-project.org}{\color{muted}R}, \href{https://quarto.org}{\color{muted}Quarto} and \href{https://www.latex-project.org}{\color{muted}\LaTeX}.
-These are model outputs, not claims.}
 \end{tcolorbox}
 ```
 
@@ -665,7 +669,7 @@ Fiji are described through *origin, honour, war and scams*. Romania and Russia s
 
 ```{r}
 #| label: map
-#| fig-height: 4.2
+#| fig-height: 3.2
 # the families of the word map, on a world map, with Europe enlarged (as in the carousel, on a light page)
 MAP_NAME <- c("United Kingdom" = "UK", "United States" = "USA")
 fam_lab <- c(warm = "warm, passionate", reserved = "reserved, punctual", origin = "his origin, honour, war, scams",
@@ -711,8 +715,21 @@ p_world / (p_eu | key) + plot_layout(heights = c(1.3, 1))
 ```
 
 ```{=latex}
+\begin{tcolorbox}[enhanced, colback=black!3, frame hidden, arc=2pt, left=10pt, right=10pt, top=8pt, bottom=8pt]
+\sffamily\small
+\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\textbf{The full report}} (89 pages: method, statistics, every chart, the worst answers in French and English),
+the data and the code are published under the name \textit{Alone With a Stranger}, on GitHub:
+\href{https://github.com/adriens/kaggle-bench-ai-biasses}{github.com/adriens/kaggle-bench-ai-biasses}.
+The results also come as a \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/carousel.pdf}{16-slide carousel}.\par\medskip
+{\color{muted}Made with open-weight models (IBM, Alibaba, Google, Mistral AI, NVIDIA) on Kaggle's free GPUs.
+Built with \href{https://www.r-project.org}{\color{muted}R}, \href{https://quarto.org}{\color{muted}Quarto} and \href{https://www.latex-project.org}{\color{muted}\LaTeX}.
+These are model outputs, not claims.}
+\end{tcolorbox}
+```
+
+```{=latex}
 \vspace{0.4em}{\sffamily\bfseries\small References}\par\vspace{-0.4em}
-\footnotesize
+\scriptsize
 ```
 ::: {#refs}
 :::
