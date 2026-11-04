@@ -3281,7 +3281,7 @@ audit.
 All notebooks and datasets of the project, published under the name *Alone With a Stranger*, are gathered in a
 Kaggle collection [@kaggle_collection]; the source of every notebook, of the analysis scripts and of this report
 is on GitHub, at [github.com/adriens/kaggle-bench-ai-biasses](https://github.com/adriens/kaggle-bench-ai-biasses). A
-[5-page version](https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/short.pdf) and a [16-slide carousel](https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/carousel.pdf) of the results sit next to this report. The
+[7-page version](https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/short.pdf) and a [16-slide carousel](https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/carousel.pdf) of the results sit next to this report. The
 generation notebooks, one per model [@kaggle_granite; @kaggle_qwen; @kaggle_gemma_e2b; @kaggle_gemma; @kaggle_gemma_26b;
 @kaggle_ministral; @kaggle_nemotron],
 record the model revision, vLLM version, seeds and every answer; the judge notebook [@kaggle_judge] records

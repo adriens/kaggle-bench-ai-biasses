@@ -758,7 +758,7 @@ Préparer une **version présentation au format paysage**, toujours avec Quarto 
 
 ## Version courte pour LinkedIn (2026-11-04)
 
-`report/short.qmd` produit `report/short.pdf` : une couverture (même visuel que le rapport, sous-titre propre, `covers/cover_short.pdf`, grâce aux variables `COVER_FILE` et `COVER_SUBTITLE` de `R/cover_page.R`), puis 5 pages A4 en anglais, sur un ton factuel et percutant. Les chiffres sont recalculés à partir des mêmes données que le rapport (`data.rds`, `analysis/out/`).
+`report/short.qmd` produit `report/short.pdf` : une couverture (même visuel que le rapport, sous-titre propre, `covers/cover_short.pdf`, grâce aux variables `COVER_FILE` et `COVER_SUBTITLE` de `R/cover_page.R`), puis 7 pages A4 en anglais (résumé, références IEEE, page de citations, carte), sur un ton factuel et percutant. Les chiffres sont recalculés à partir des mêmes données que le rapport (`data.rds`, `analysis/out/`).
 1. L'accroche : la voiture, France Inter, la RTS, le chiffre choc (3 % → 62 % de réponses avec préjugé quand on nomme une nationalité, grands modèles, taxi / rue / ascenseur), le graphique « cultural guide / security guard ».
 2. La méthode en 6 chiffres, les deux lectures (juge, analyse sans juge), le graphique du classifieur (27 % et 35 % contre 4 % de hasard).
 3. Les mêmes hommes flattés : la carte des mots.
