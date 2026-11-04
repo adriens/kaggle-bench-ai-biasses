@@ -1,5 +1,5 @@
 # /// script
-# dependencies = ["pandas", "scipy", "requests"]
+# dependencies = ["pandas", "scipy", "requests", "statsmodels"]
 # ///
 """Does the man's treatment follow the wealth of his country? A test across the 24 nationalities.
 
@@ -13,14 +13,18 @@ same number of times): the share of answers that say, unasked, that his origin d
 marking), that compliment his culture (positive stereotype), and that tie him to a risk (negative association).
 Each share is set against GDP per capita with a Spearman rank correlation, over 24 points.
 
-Outputs (analysis/out/): wealth_by_country.csv, wealth_spearman.csv.
+Outputs (analysis/out/): wealth_by_country.csv, wealth_spearman.csv, wealth_region.csv (wealth once the continent
+is known, see below).
 Run from the repository root: uv run analysis/wealth.py
 """
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import requests
+import statsmodels.formula.api as smf
 from scipy.stats import spearmanr
+from statsmodels.stats.anova import anova_lm
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA, OUT = ROOT / "analysis" / "data", ROOT / "analysis" / "out"
@@ -63,5 +67,28 @@ for k in ["defensive", "compliment", "risk"]:
     tests.append({"measure": k, "rho": rho, "p": p, "n": len(by)})
 pd.DataFrame(tests).to_csv(OUT / "wealth_spearman.csv", index=False)
 
+# Is it wealth, or only geography? Each share is regressed on the continent of the man's country (UN M49), then on
+# the continent and the logarithm of GDP per capita: the F test of the second model against the first says whether
+# wealth still orders the men once the continent is known. Inside Europe (13 countries, Russia included), the Spearman correlation
+# is also measured alone.
+CONTINENT = {"Europe": "Europe", "Africa": "Africa", "Asia": "Asia", "America": "Americas",
+             "Australia": "Oceania", "Melanesia": "Oceania"}
+reg = pd.read_csv(DATA / "countries.csv")[["country_iso3", "region_m49"]].rename(columns={"country_iso3": "country"})
+reg["continent"] = reg.region_m49.map(lambda r: next(v for k, v in CONTINENT.items() if k in r))
+by = by.merge(reg[["country", "continent"]], on="country")
+by["log_gdp"] = np.log10(by.gdp_pc)
+eu = by.continent == "Europe"
+adj = []
+for k in ["defensive", "compliment", "risk"]:
+    f0 = smf.ols(f"{k} ~ C(continent)", by).fit()
+    f1 = smf.ols(f"{k} ~ C(continent) + log_gdp", by).fit()
+    ft = anova_lm(f0, f1)
+    rho_eu, p_eu = spearmanr(by.gdp_pc[eu], by[k][eu])
+    adj.append({"measure": k, "r2_continent": f0.rsquared, "r2_continent_gdp": f1.rsquared,
+                "slope_per_x10_gdp": f1.params["log_gdp"], "F": ft.F[1], "p": ft["Pr(>F)"][1],
+                "rho_europe": rho_eu, "p_europe": p_eu, "n_europe": int(eu.sum())})
+pd.DataFrame(adj).to_csv(OUT / "wealth_region.csv", index=False)
+
 print(by.sort_values("gdp_pc", ascending=False).round(1).to_string(index=False))
 print(pd.DataFrame(tests).round(4).to_string(index=False))
+print(pd.DataFrame(adj).round(4).to_string(index=False))

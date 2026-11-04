@@ -24,7 +24,7 @@ format:
         \usepackage{eso-pic}
         \usepackage{pdfpages}
         \usepackage{fontawesome6}
-        \usepackage{tikz}\usetikzlibrary{shapes.geometric}
+        \usepackage{tikz}\usetikzlibrary{shapes.geometric, calc}
         \input{flags/flags.tex}
         % icons of the four forms of suspicion, 0.5in high
         \newcommand{\talkicon}{\tikz{\fill[heat, rounded corners=5pt] (0,0.1in) rectangle (0.6in,0.5in); \fill[heat] (0.1in,0.12in) -- (0.08in,0) -- (0.24in,0.12in) -- cycle;
@@ -544,7 +544,7 @@ key <- tibble(fam = names(fam_lab), x = c(0, 0, 1, 1), y = c(0, -1, 0, -1)) |>
 ```
 
 ```{=latex}
-\kicker{amber}{On the map}
+{\fontsize{11}{13}\selectfont\bfseries\color{amber}{\fontsize{14}{14}\selectfont\faGlobe}\enspace ON THE MAP\par}\vspace{0.25em}
 \headline{Three ways to see a man, by where he comes from.}
 ```
 
@@ -563,7 +563,7 @@ p_world / key + plot_layout(heights = c(3.2, 0.7))
 
 <!-- 9: close-up on Europe -->
 ```{=latex}
-\kicker{amber}{Close-up on Europe}
+{\fontsize{11}{13}\selectfont\bfseries\color{amber}\raisebox{-0.04in}{\flag{0.2}{\euflag}}\enspace CLOSE-UP ON EUROPE\par}\vspace{0.25em}
 \headline{One continent, three families.}
 ```
 
@@ -614,7 +614,7 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
 \rhochip{heat}{`r sub("-", "−", rho("defensive"))`}{"his origin\\ does not matter"}
 \rhochip{amber}{`r sub("-", "−", rho("risk"))`}{a risk tied\\ to his origin}
 \end{tcbraster}
-{\fontsize{11}{14}\selectfont\color{dim}Correlation with his country's wealth, from −1 to +1 (Spearman, 24 nationalities, all p < 0.001). Strong, but it does not prove a cause: wealth also goes with region, religion and how the news talk about these countries.\par}
+{\fontsize{11}{14}\selectfont\color{dim}Correlation with his country's wealth, from −1 to +1 (Spearman, 24 nationalities, all p < 0.001). Strong, and it holds within a continent; but it does not prove a cause: wealth also goes with religion and how the news talk about these countries.\par}
 {\fontsize{10}{13}\selectfont\color{dim}\faDatabase\enspace\textbf{Source:} World Bank, GDP per capita in current US\$, 2023 (indicator NY.GDP.PCAP.CD), \href{https://data.worldbank.org/indicator/NY.GDP.PCAP.CD}{\color{linkblue}\underline{data.worldbank.org}}, CC BY 4.0.\par}
 \newpage
 ```
@@ -765,7 +765,7 @@ ggplot() +
 <!-- 17: take-aways -->
 ```{=latex}
 \kicker{heat}{What to take away}
-\headline{Five things to remember.}
+\headline{Six things to remember.}
 % a take-away: an icon in a coloured disc, a bold line, then one line of detail
 \newcommand{\takeaway}[4]{\begin{tile}{#1}\begin{minipage}[c]{0.16\linewidth}\centering
   \tikz{\fill[#1!22!panel] (0,0) circle (0.3in); \node[#1, font=\fontsize{20}{20}\selectfont] at (0,0) {#2};}\end{minipage}%
@@ -777,6 +777,8 @@ ggplot() +
 \takeaway{green}{\faHeart}{Who gets compliments is shared.}{Probably learnt from the same data.}
 \vfill
 \takeaway{amber}{\faTriangleExclamation}{The others get suspicion.}{Its form depends on how each AI was aligned.}
+\vfill
+\takeaway{green}{\faSackDollar}{The richer his country, the warmer the AI.}{Even within a continent. A link, not a proof of cause.}
 \vfill
 \takeaway{violet}{\faChartColumn}{Bigger is not fairer.}{The bias changes form, it does not go away.}
 \vfill

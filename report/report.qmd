@@ -290,7 +290,8 @@ Ask seven open AI models for advice about being alone with a man, and his nation
 men get compliments and ice-breakers, others a "his origin does not matter" that nobody asked for, a
 warning about scams or migration, or, from the smallest model, no advice at all. The seven models agree on
 who gets the compliments, probably learnt from the same data; they differ on how they treat the others,
-which looks like a choice made when each was aligned. One chart sums it up.
+which looks like a choice made when each was aligned. And the treatment follows money: the richer his
+country, the more compliments and the less suspicion, even within a continent (@sec-wealth). One chart sums it up.
 
 ::: {#fig-summary fig-pos="H"}
 
@@ -308,7 +309,7 @@ the average of the seven AIs tested; the star is the man with no nationality.
 ```
 
 ```{r}
-#| fig-height: 4.5
+#| fig-height: 4.0
 s_def <- rate_table("defensive_marking") |> select(model, country, def = pct)
 s_pos <- rate_table("stereo_pos") |> select(model, country, pos = pct)
 s_neg <- rate_table("negative_association") |> select(model, country, neg = k)
@@ -2264,6 +2265,8 @@ w_r2 <- 100 * summary(w_lm)$r.squared
 hi_ <- wealth$income_group == "High income"
 wsub <- function(k, rows) num(cor(wealth$gdp_pc[rows], wealth[[k]][rows], method = "spearman"), 2)
 fam_inc <- function(f) table(wealth$income_group[wealth$fam == f])
+w_reg <- read.csv(file.path("..", "analysis", "out", "wealth_region.csv"))
+wg <- function(k, col) w_reg[[col]][w_reg$measure == k]
 ```
 
 The link is strong on the three measures: the richer his country, the more the AI compliments his culture
@@ -2328,13 +2331,25 @@ wealth barely orders the men (ρ = `r wsub("compliment", hi_)` for compliments, 
 "his origin does not matter"); among the `r sum(!hi_)` others, it orders them closely
 (`r wsub("compliment", !hi_)` and `r wsub("defensive", !hi_)`).
 
+Nor is it only geography. Once the continent of his country is known (Europe, Africa, Asia, the Americas,
+Oceania), wealth still orders the men: adding it to the continent raises the share of differences explained
+from `r pc(100 * wg("compliment", "r2_continent"))` to `r pc(100 * wg("compliment", "r2_continent_gdp"))` for
+compliments, from `r pc(100 * wg("defensive", "r2_continent"))` to `r pc(100 * wg("defensive", "r2_continent_gdp"))`
+for "his origin does not matter" and from `r pc(100 * wg("risk", "r2_continent"))` to
+`r pc(100 * wg("risk", "r2_continent_gdp"))` for risks (F tests, $p$ between
+`r num(min(w_reg$p), 3)` and `r num(max(w_reg$p), 3)`). At the same continent, a country ten times richer gets
+`r num(wg("compliment", "slope_per_x10_gdp"), 0)` points more compliments. Inside Europe alone
+(`r w_reg$n_europe[1]` countries, Russia included), the richer the country, the more compliments
+(ρ = `r num(wg("compliment", "rho_europe"), 2)`) and the fewer risks (ρ = `r num(wg("risk", "rho_europe"), 2)`);
+"his origin does not matter" follows it less clearly (ρ = `r num(wg("defensive", "rho_europe"), 2)`, not significant).
+
 ```{=latex}
 \begin{whyitmatters}\textbf{\large Why it matters}\par\smallskip
 ```
 
-- **A link, not a proof of cause.** Wealth goes with region, majority religion and the way French media talk
-  about these countries, often through migration; 24 countries cannot tell them apart. The AI may follow any
-  of them, or all.
+- **A link, not a proof of cause.** The continent does not explain it away, but wealth also goes with majority
+  religion and the way French media talk about these countries, often through migration; 24 countries cannot
+  tell them apart. The AI may follow any of them, or all.
 - **Still, the pattern is the one of a social prejudice.** The men of rich countries are described by
   their qualities, those of poorer countries by where they come from. Nobody asked the AI to rank countries.
 
@@ -3204,7 +3219,8 @@ to the report's examples: it is the most alarmist model, and its alarm rises mos
 - **Imperfect masking.** Greetings in the country's language, some city names, or demonyms misspelt by
   the models escape masking and may steer the judge.
 - **Wealth is one variable among several.** The link with GDP per capita (@sec-wealth) is measured over
-  24 countries, which also differ by region, religion and media coverage; it describes the pattern, not its cause.
+  24 countries; it survives the continent, but the countries also differ by religion and media coverage, so it
+  describes the pattern, not its cause.
 - **Protocol.** French prompts only, a single gender configuration (a woman alone with a man), and uniform
   generation parameters rather than each vendor's recommended settings.
 

@@ -450,7 +450,7 @@ ggplot(mn, aes(y = mod)) +
 - **Two layers of bias.** Who gets compliments is shared by every model, probably learnt from the same data.
   What a model does with the other men (defend them, name a risk, refuse to help) depends on how it was aligned.
 ```{r}
-#| fig-height: 3.6
+#| fig-height: 3.2
 NJ <- D |> filter(!is_base)
 p_neg <- 100 * mean(NJ$negative_association); p_def <- 100 * mean(NJ$defensive_marking)
 tip <- tibble(x = c(-1.3, -0.6, 0, 0.7, 1.4), y = c(0, 0.8, 1.35, 0.75, 0))
@@ -490,6 +490,8 @@ ggplot() +
 ```
 
 
+- **The richer his country, the warmer the AI.** Compliments rise and suspicion falls with GDP per capita
+  (Spearman ρ about 0.75, World Bank data), even within a continent. A link, not a proof of cause.
 - **Bigger is not fairer.** In one family of models (Google's Gemma), the larger model gives far more prejudiced
   answers than the smaller ones. The bias changes form; it does not go away.
 - **A judge looking for danger misses part of it.** Refusals and religious assumptions are not "risks", yet they
