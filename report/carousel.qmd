@@ -161,8 +161,8 @@ COVER_FILE <- "covers/cover_carousel"; # drawn at the width of the A4 cover, in 
 COVER_W <- 8.27; COVER_H <- 8.27 * 1.25; COVER_GAP <- 1.7; COVER_CENTRE <- 0.78; COVER_DATE_TOP <- TRUE
 # the social handles are not drawn here: the slide writes them over the cover, as links (\\coverlinks)
 COVER_CAPTION <- paste0("7 open-weight models · 24 nationalities · 11 situations · 52k answers · 89 GPU hours (2 × NVIDIA T4), 6 CPU hours\n\n ")
-COVER_SUBTITLE <- paste0("Same question, same situation: only the man's nationality changes.\n",
-                         "What seven open-weight AI models answer a woman alone with him.")
+# the subtitle is a hook, large enough to read on the thumbnail of a phone feed
+COVER_SUBTITLE <- "Only his nationality changes.\nThe AI's advice changes too."; COVER_SUB_SIZE <- 25
 source("R/cover_page.R")
 
 # the carousel is dark: light ink on a near-black page, charts on a transparent background

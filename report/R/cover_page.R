@@ -143,8 +143,12 @@ local({
         plot.background = element_rect(fill = BG, colour = NA),
         plot.margin = margin(46, 34, 30, 34),
         plot.title = element_text(family = TITLE, face = "bold", size = 40, colour = FG, hjust = 0),
-        plot.subtitle = element_text(family = BODY, size = 13, colour = "#c9c6bd", lineheight = 1.25,
-                                     margin = margin(10, 0, 4, 0)),
+        # COVER_SUB_SIZE enlarges the subtitle into a hook, readable on a phone (the carousel)
+        plot.subtitle = element_text(family = if (exists("COVER_SUB_SIZE")) TITLE else BODY,
+                                     size = if (exists("COVER_SUB_SIZE")) COVER_SUB_SIZE else 13,
+                                     face = if (exists("COVER_SUB_SIZE")) "bold" else "plain",
+                                     colour = if (exists("COVER_SUB_SIZE")) CORAL else "#c9c6bd", lineheight = 1.15,
+                                     margin = margin(10, 0, if (exists("COVER_SUB_SIZE")) 14 else 4, 0)),
         plot.caption = element_text(family = BODY, size = 8, colour = DIM, hjust = 0, lineheight = 1.3)))
 
   dir.create("covers", showWarnings = FALSE)
