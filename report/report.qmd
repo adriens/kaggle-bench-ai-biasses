@@ -2596,7 +2596,7 @@ edges_ <- do.call(rbind, lapply(which(fr$id > 1), function(i) {
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
-**Reading.** Start on the left, with all the judged answers. At each box, the answers are split in two by one question (which AI, which situation, which man, which age); the box says which answers went that way. The percentage is the share of prejudiced answers in the box; the colour goes from blue (few) to red (many). The boxes on the right are the end of the paths.
+**Reading.** Start on the left, with all the judged answers. At each step the answers are split in two by one question (which AI, which situation, which man, which age); each box says which answers went that way, and the share of them that are prejudiced, from blue (few) to red (many).
 
 **What it shows.** The first question is the *size of the AI*: the small ones (Gemma E2B, Gemma E4B and Nemotron) give few prejudiced answers, whatever the man; among them, Nemotron, NVIDIA's post-training of Gemma E4B, gives more than Google's own models. With the larger ones (Granite, Qwen, Ministral, Gemma 26B), the situation comes next, then the man: in an isolated street, `r pc(100 * max(leaves_$yval))` of the answers are prejudiced as soon as the man has a nationality, against `r pc(100 * min(leaves_$yval[leaves_$n < 400]))` when he has none. The religion the AI gives him never appears in the tree.
 
@@ -2605,10 +2605,11 @@ edges_ <- do.call(rbind, lapply(which(fr$id > 1), function(i) {
 ```
 
 ```{r}
-#| fig-height: 6.4
+#| fig-height: 4.6
 ramp_t <- scales::gradient_n_pal(c("#2a78d6", "#d9d6cf", "#d63c2a"))
 fr$fill <- ramp_t(pmin(fr$yval / 0.8, 1))
-fr$txt <- paste0(vapply(fr$cond, \(z) paste(strwrap(z, 21), collapse = "\n"), ""), "\n", pc(100 * fr$yval),
+fr$txt <- paste0(vapply(seq_len(nrow(fr)), \(i) paste(strwrap(fr$cond[i], if (fr$leaf[i]) 27 else 21),
+                                                       collapse = "\n"), ""), "\n", pc(100 * fr$yval),
                  " · n = ", num(fr$n, 0))
 ggplot() +
   geom_segment(data = edges_, aes(x = x, y = y, xend = (x + xend) / 2, yend = y), colour = "#b9b7b1", linewidth = 0.5) +
@@ -2616,17 +2617,44 @@ ggplot() +
                linewidth = 0.5) +
   geom_segment(data = edges_, aes(x = (x + xend) / 2, y = yend, xend = xend, yend = yend), colour = "#b9b7b1",
                linewidth = 0.5) +
-  geom_label(data = fr, aes(x, y, label = txt, fill = fill, fontface = ifelse(leaf, "bold", "plain")),
-             family = "Inter", size = 2.25, lineheight = 0.95, label.size = 0, label.r = unit(3, "pt"),
+  geom_label(data = fr, aes(x, y, label = txt, fill = pmin(yval, 0.8), fontface = ifelse(leaf, "bold", "plain")),
+             family = "Inter", size = 2.1, lineheight = 0.95, label.size = 0, label.r = unit(3, "pt"),
              label.padding = unit(4, "pt"), colour = ifelse(fr$yval > 0.45 | fr$yval < 0.06, "white", INK)) +
-  scale_fill_identity() +
+  scale_fill_gradientn(colours = c("#2a78d6", "#d9d6cf", "#d63c2a"), limits = c(0, 0.8),
+                       breaks = c(0, 0.2, 0.4, 0.6, 0.8), labels = c("0 %", "20 %", "40 %", "60 %", "80 %"),
+                       name = "share of prejudiced answers in the box") +
   scale_x_continuous(expand = expansion(add = 0.5)) +
   scale_y_continuous(expand = expansion(add = 0.6)) +
-  theme_void()
+  theme_void(base_family = "Inter") +
+  theme(legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 7.5),
+        legend.text = element_text(colour = MUTED, size = 7), legend.key.height = unit(6, "pt"),
+        legend.key.width = unit(34, "pt"))
 ```
 
-Decision tree (regression tree, rpart) predicting a prejudiced answer from the publisher and the size of the model, the family of the man's nationality, the situation, the woman's age and the religion given to him (`r num(nrow(TD), 0)` judged answers; boxes of at least 200 answers).
+Decision tree (rpart regression tree; `r num(nrow(TD), 0)` judged answers; boxes of at least 200 answers).
 :::
+
+```{=latex}
+\begin{keyfinding}\textbf{\large What the tree tells us}\par\smallskip
+```
+
+- **Which AI you ask matters most.** The first split is the size of the model: `r pc(100 * fr$yval[fr$id == 2])`
+  of prejudiced answers for the small ones, `r pc(100 * fr$yval[fr$id == 3])` for the larger ones.
+- **For the small models, the man's nationality does not even come up**; only who post-trained them does
+  (NVIDIA's Nemotron more than Google's own Gemma).
+- **For the larger models, naming a nationality is what tips the answer.** In a taxi, an isolated street or an
+  elevator, `r pc(100 * fr$yval[fr$id == 14])` of the answers about "a man" are prejudiced, against
+  `r pc(100 * fr$yval[fr$id == 15])` as soon as he has a nationality, any nationality.
+- **In ordinary situations, the family of the man decides**: men the AI describes by their origin get far more
+  prejudiced answers than the warm or reserved ones.
+- **The religion the AI gives the man never appears**: it goes with the prejudice, it does not decide it.
+
+The tree shows where prejudice concentrates, not why; and what it counts as prejudice is mostly the "his origin
+does not matter" reflex, by far the most frequent indicator.
+
+```{=latex}
+\end{keyfinding}
+```
 
 A single tree is only one way to split the answers. A **random forest**, 400 trees fitted on random parts of
 the data with the 24 nationalities themselves instead of their families, measures how much each factor matters
@@ -2669,6 +2697,32 @@ fi |> mutate(lab = factor(FLAB[factor], levels = rev(FLAB[fi$factor]))) |>
 
 What decides a prejudiced answer: permutation importance of each factor in a random forest (scikit-learn, 400 trees; held-out quarter of the `r num(fm$n, 0)` judged answers; bars: ± 2 standard deviations over 20 shuffles).
 :::
+
+**Where are the hot spots?** The tree groups the answers into large boxes. @tbl-hot goes down to finer cells:
+the combinations of a model and a nationality, and of a nationality and a situation, with the most prejudiced
+answers. The cells are ranked by the lower bound of their 95 % interval, so that a high but uncertain share does
+not come first; a model, a nationality and a situation together give only 9 judged answers, too few to rank.
+
+```{r}
+#| label: tbl-hot
+#| tbl-cap: "The hot spots of prejudice: the ten cells with the highest share of prejudiced answers, ranked by the lower bound of the 95 % Wilson interval. Left: model × nationality (about 99 judged answers per cell). Right: nationality × situation, the seven models pooled (about 63 per cell)."
+hot_rank <- function(df, ...) df |> group_by(...) |>
+  summarise(k = sum(prej), n = n(), .groups = "drop") |>
+  mutate(p = k / n, lo = wilson(k, n)[, "lo"], hi = wilson(k, n)[, "hi"]) |> arrange(desc(lo)) |> head(10)
+h1 <- hot_rank(TD |> filter(country != "BASE"), model, country) |>
+  transmute(`Model × nationality` = paste(SHORT[model], nm(country), sep = " · "),
+            `Prejudiced (95 % interval)` = paste0(pc(100 * p), " (", num(100 * lo, 0), "–", num(100 * hi, 0), ")"))
+h2 <- hot_rank(TD |> filter(country != "BASE"), country, context_id) |>
+  transmute(`Nationality × situation` = paste(nm(country), sub("^C[0-9]+ ", "", CONTEXTS[context_id]), sep = " · "),
+            `Prejudiced (95 % interval) ` = paste0(pc(100 * p), " (", num(100 * lo, 0), "–", num(100 * hi, 0), ")"))
+bind_cols(h1, h2) |> kable(booktabs = TRUE, align = "lrlr")
+```
+
+The two rankings tell different stories. Between models and nationalities, the hot spots are the men singled out
+everywhere in this report: Indian, Afghan, Nigerian and Algerian men, with Granite, Qwen and Gemma 26B. Between
+nationalities and situations, almost every cell is the isolated street, whatever the man, Swiss, Finnish or
+Japanese included: there, the situation outweighs the nationality, and the AI says that his origin does not
+matter for nearly everyone.
 
 ## The worst answers
 
