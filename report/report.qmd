@@ -2965,25 +2965,70 @@ The results fit in two layers (@fig-layers): one shared by every model, one spec
 ::: {#fig-layers}
 
 ```{=latex}
-\begin{tikzpicture}[font=\sffamily\footnotesize,
-  layer/.style={draw=#1, line width=0.8pt, fill=#1!6, rounded corners=3pt, minimum width=14.6cm, align=left,
-                text width=14.1cm, inner sep=7pt},
-  tag/.style={font=\sffamily\bfseries\scriptsize, text=#1}]
-\node[layer=keyblue, minimum height=2.2cm] (l1) at (0,0) {%
-  {\bfseries\small LAYER 1 \quad What they learnt} \hfill {\bfseries\color{keyblue} all seven agree}\\[4pt]
-  Who gets the compliments: Finns, Italians, Japanese, Australians\ldots, and almost never Afghans,
-  Nigerians, Algerians or Indians. Probably learnt from shared training data.};
-\node[layer=heat, minimum height=2.9cm, below=6pt of l1] (l2) {%
-  {\bfseries\small LAYER 2 \quad How each was aligned} \hfill {\bfseries\color{heat} each its own}\\[4pt]
-  What it does with the men it does not flatter:\\[2pt]
-  \textbf{defends them}, ``his origin does not matter'' \textcolor{cMuted}{(Granite, Qwen, Gemma 26B, Nemotron)}\\
-  \textbf{names a risk}, scams, migration \textcolor{cMuted}{(Ministral)}\\
-  \textbf{says little} \textcolor{cMuted}{(Gemma E4B)} \quad\textperiodcentered\quad
-  \textbf{refuses to help} \textcolor{cMuted}{(Gemma E2B)}};
-\end{tikzpicture}
+\begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
-The two layers of bias: the same men are flattered by every model; what each model does with the others depends on how it was aligned.
+**Reading.** Two layers, one above the other. Top: each nationality's share of answers with a cultural compliment, one thin line per AI, nationalities sorted from the most to the least complimented. Bottom: for the men the AIs describe by their origin (Afghanistan, Nigeria, the Maghreb, the Balkans, India…), what each AI does with them: says that his origin does not matter, links him to a risk, or refuses to help.
+
+```{=latex}
+\end{howtoread}
+```
+
+```{r}
+#| fig-height: 5.6
+# layer 1: compliments, one line per model
+l1 <- sp |> filter(country != "BASE") |>
+  mutate(lab = factor(nm(country), levels = nm(sp |> filter(country != "BASE") |> group_by(country) |>
+                                                 summarise(m = mean(pct), .groups = "drop") |> arrange(-m) |> pull(country))))
+rho_pos <- range(cor(spw_[names(MODELS)], method = "spearman")[upper.tri(diag(NM))])
+p1 <- ggplot(l1, aes(lab, pct, group = model, colour = model)) +
+  geom_line(linewidth = 0.55, alpha = 0.75) +
+  scale_colour_manual(values = COL, guide = "none") +
+  scale_y_continuous(labels = \(x) paste0(x, " %")) +
+  labs(x = NULL, y = "compliments",
+       title = "LAYER 1   What they learnt: who gets the compliments",
+       subtitle = sprintf("the seven lines move together: the AIs agree (Spearman ρ from %.2f to %.2f between every pair)",
+                          rho_pos[1], rho_pos[2])) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 7),
+        plot.title = element_text(face = "bold", size = 9.5, colour = "#2a78d6"),
+        plot.subtitle = element_text(size = 7.5, colour = MUTED), panel.grid.major.x = element_blank())
+# layer 2: what each model does with the men of the "origin and risk" family
+orig_ <- names(fam_of)[fam_of == "origin"]
+l2 <- bind_rows(
+  D |> filter(country %in% orig_) |> group_by(model) |>
+    summarise(`says his origin does not matter` = 100 * mean(defensive_marking),
+              `links him to a risk` = 100 * mean(negative_association), .groups = "drop"),
+  R |> filter(country %in% orig_) |> group_by(model) |>
+    summarise(`refuses to help` = 100 * mean(refusal), .groups = "drop")) |>
+  group_by(model) |> summarise(across(everything(), \(x) sum(x, na.rm = TRUE)), .groups = "drop") |>
+  pivot_longer(-model, names_to = "what", values_to = "pct") |>
+  mutate(mod = factor(SHORT[model], levels = rev(SHORT)),
+         what = factor(what, levels = c("says his origin does not matter", "links him to a risk", "refuses to help")))
+p2 <- ggplot(l2, aes(pct, mod, fill = what)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
+  scale_fill_manual(values = c("says his origin does not matter" = "#eb6834", "links him to a risk" = "#b4232a",
+                               "refuses to help" = "#6250d6"), name = NULL) +
+  scale_x_continuous(labels = \(x) paste0(x, " %"), expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "share of answers about Afghan, Nigerian, Maghrebi, Balkan, Indian… men", y = NULL,
+       title = "LAYER 2   How each was aligned: what it does with the men it does not flatter",
+       subtitle = "each AI its own reflex: defend him, name a risk, refuse to help, or say little") +
+  theme(plot.title = element_text(face = "bold", size = 9.5, colour = "#d63c2a"),
+        plot.subtitle = element_text(size = 7.5, colour = MUTED), panel.grid.major.y = element_blank(),
+        legend.position = "bottom", axis.title.x = element_text(size = 7.5))
+p1 / p2 + plot_layout(heights = c(1, 1.15))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The top layer is shared: whatever the AI, the same men are complimented and the same men are not. The bottom layer is not: for the same men, Granite, Qwen, Gemma 26B and Nemotron mostly say that his origin does not matter, Ministral names a risk, Gemma E2B refuses to help, and Gemma E4B does little of any of it. The first layer looks learnt from shared data; the second, a choice made when each model was aligned.
+
+```{=latex}
+\end{whatitshows}
+```
+
+The two layers of bias, measured: compliments by nationality for each model (top, judged answers), and what each model does with the men of the "origin and risk" family of @fig-words (bottom; refusals counted on all answers, no judge).
 :::
 
 **Two layers of bias.** The seven models agree on who deserves a compliment: Northern
@@ -3093,7 +3138,7 @@ repeat the study in other languages.
 # Acknowledgements {.unnumbered}
 
 Every generation and judging run of this study used the free GPU quota of Kaggle (two NVIDIA T4 per
-session): without it, this work would not have been possible. The evaluated models (Granite 4.2 8B by IBM,
+session), about 90 GPU hours on two NVIDIA T4 and 6 CPU hours in all (@tbl-compute): without it, this work would not have been possible. The evaluated models (Granite 4.2 8B by IBM,
 Qwen3.5-9B by Alibaba, Gemma 4 E2B, E4B and 26B-A4B by Google, Ministral 3 8B by Mistral AI and Nemotron
 3.5 Bolt E4B by NVIDIA) and the judge (Qwen3-32B-AWQ) are released with open weights, which is what makes
 such an independent audit possible; the 4-bit quantisation of Gemma 4 26B-A4B used here was published by
@@ -3107,7 +3152,8 @@ audit.
 # Data and code availability {.unnumbered}
 
 All notebooks and datasets of the project, published under the name *Alone With a Stranger*, are gathered in a
-Kaggle collection [@kaggle_collection]. The
+Kaggle collection [@kaggle_collection]; the source of every notebook, of the analysis scripts and of this report
+is on GitHub, at [github.com/adriens/kaggle-bench-ai-biasses](https://github.com/adriens/kaggle-bench-ai-biasses). The
 generation notebooks, one per model [@kaggle_granite; @kaggle_qwen; @kaggle_gemma_e2b; @kaggle_gemma; @kaggle_gemma_26b;
 @kaggle_ministral; @kaggle_nemotron],
 record the model revision, vLLM version, seeds and every answer; the judge notebook [@kaggle_judge] records
@@ -3145,6 +3191,41 @@ tibble::tribble(
   "XeLaTeX, KOMA-Script, TikZ, tcolorbox", "PDF layout, diagrams and boxes", "—",
   "Libertinus, Inter, IBM Plex Mono, Space Grotesk", "fonts", "—"
 ) |> kable(booktabs = TRUE, escape = FALSE)
+```
+
+**Compute.** Every run used Kaggle's free quota (two NVIDIA T4 GPUs per session, 30 GPU hours a week).
+@tbl-compute adds up the runs of the project, from the first test on 18 October to the last judge on 3 November
+2026, from the durations recorded by the notebooks; a few sessions only recorded their generation time, and
+about an hour of loading and post-processing was added to them, so the total is accurate to a few hours. Judging
+cost more than generating: the judge was rerun on Granite each time its rubric changed.
+
+```{r}
+#| label: tbl-compute
+#| tbl-cap: "Kaggle compute used by the project (hours, reconstructed from the recorded durations; about ±5 h in all)."
+#| tbl-colwidths: [58, 22, 20]
+comp <- tibble::tribble(
+  ~Run, ~GPU, ~CPU,
+  "Generation: Granite pilots (English test, pilot 1, pilot 2)", 9.0, 0,
+  "Generation: Granite 4.2 8B", 9.2, 0,
+  "Generation: Qwen3.5-9B", 4.0, 0,
+  "Generation: Gemma 4 E4B (one failed start, then the run)", 3.6, 0,
+  "Generation: Ministral 3 8B", 6.4, 0,
+  "Generation: Nemotron 3.5 Bolt E4B", 2.0, 0,
+  "Generation: Gemma 4 E2B", 2.0, 0,
+  "Generation: Gemma 4 26B-A4B", 5.6, 0,
+  "Generation: Gemma 4 31B (abandoned: does not fit in memory)", 0.2, 0,
+  "Judge: pilot and speed test", 5.5, 0,
+  "Judge: Granite, rubric versions 2 to 4", 14.9, 0,
+  "Judge: Qwen3.5-9B, two rubric versions", 6.7, 0,
+  "Judge: Gemma E4B, Ministral, Nemotron, Gemma E2B, Gemma 26B", 19.8, 0,
+  "Judge: one run started by mistake", 0.2, 0,
+  "Synthesis notebook (13 versions)", 0, 1.0,
+  "Guess-the-nationality notebook (3 versions)", 0, 5.0
+)
+bind_rows(comp, tibble(Run = "\\textbf{Total}", GPU = sum(comp$GPU), CPU = sum(comp$CPU))) |>
+  mutate(GPU = ifelse(GPU > 0, num(GPU, 1), "—"), CPU = ifelse(CPU > 0, num(CPU, 1), "—")) |>
+  rename(`GPU hours (2 × NVIDIA T4)` = GPU, `CPU hours` = CPU) |>
+  kable(booktabs = TRUE, escape = FALSE, align = "lrr")
 ```
 
 # References {.unnumbered}

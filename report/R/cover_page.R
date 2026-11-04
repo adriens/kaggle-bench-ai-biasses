@@ -119,8 +119,9 @@ local({
     plot_layout(heights = c(0.55, 0.7, 10.6, 0.6, 2.3)) +
     plot_annotation(
       title = "She Is Alone With a Man",
-      subtitle = paste0("The situation should change the advice. His nationality should not.\n",
-                        "How seven open-weight AI models advise a woman alone with a man, in 11 situations."),
+      subtitle = if (exists("COVER_SUBTITLE")) COVER_SUBTITLE else
+        paste0("The situation should change the advice. His nationality should not.\n",
+               "How seven open-weight AI models advise a woman alone with a man, in 11 situations."),
       caption = paste0(
         "Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E2B, E4B and 26B-A4B, Ministral 3 8B and Nemotron 3.5 Bolt E4B\n",
         format(nrow(R), big.mark = ","), " answers in French · ", format(nrow(D), big.mark = ","),
@@ -129,7 +130,7 @@ local({
         "The empty centre is \"a man\" with no nationality: he gets almost neither.\n",
         "All runs used Kaggle's free GPU quota: this work would not have been possible without it.\n\n",
         month.name[as.integer(format(Sys.Date(), "%m"))], " ", format(Sys.Date(), "%Y"),
-        "   ·   x.com/rastadidi   ·   dev.to/adriens   ·   linkedin.com/in/adrien-sales   ·   kaggle.com/adriensales"),
+        "   ·   x.com/rastadidi  ·  dev.to/adriens  ·  github.com/adriens  ·  linkedin.com/in/adrien-sales  ·  kaggle.com/adriensales"),
       theme = theme(
         plot.background = element_rect(fill = BG, colour = NA),
         plot.margin = margin(46, 34, 30, 34),
@@ -139,7 +140,9 @@ local({
         plot.caption = element_text(family = BODY, size = 8, colour = DIM, hjust = 0, lineheight = 1.3)))
 
   dir.create("covers", showWarnings = FALSE)
-  ggsave("covers/cover_page.pdf", page, width = 8.27, height = 11.69, device = cairo_pdf, bg = BG)
-  ggsave("covers/cover_page.png", page, width = 8.27, height = 11.69, dpi = 150, device = png,
+  # COVER_FILE lets another document (the short version) draw its own cover with the same design
+  out <- if (exists("COVER_FILE")) COVER_FILE else "covers/cover_page"
+  ggsave(paste0(out, ".pdf"), page, width = 8.27, height = 11.69, device = cairo_pdf, bg = BG)
+  ggsave(paste0(out, ".png"), page, width = 8.27, height = 11.69, dpi = 150, device = png,
          type = "cairo", bg = BG)
 })
