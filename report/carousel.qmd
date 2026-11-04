@@ -65,10 +65,12 @@ format:
         % on every slide but the cover: the name of the report and the author on top, the slide number on the right
         \AddToShipoutPictureFG{\ifnum\value{page}>1
           \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.45in}){\makebox[0pt][l]{\fontsize{9}{11}\selectfont
-            \color{dim}\textbf{She Is Alone With a Man}\quad Adrien Sales}}}
+            \color{dim}\textbf{She Is Alone With a Man}\quad Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{dim}\faXTwitter\,@rastadidi}}}}
           \AtPageUpperLeft{\put(\LenToUnit{\paperwidth-0.55in},\LenToUnit{-0.45in}){\makebox[0pt][r]{\fontsize{9}{11}\selectfont
             \color{dim}\thepage\,/\,16}}}
-          \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.56in}){\color{panel}\rule{\dimexpr\paperwidth-1.1in\relax}{0.6pt}}}\fi}
+          % under it, a progress bar: filled to the share of the deck already read
+          \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.57in}){\color{panel}\rule{\dimexpr\paperwidth-1.1in\relax}{2.2pt}}}%
+          \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.57in}){\color{heat}\rule{\dimexpr(\paperwidth-1.1in)*\value{page}/16\relax}{2.2pt}}}\fi}
         \newcommand{\kicker}[2]{{\fontsize{11}{13}\selectfont\bfseries\color{#1}\MakeUppercase{#2}\par}\vspace{0.25em}}
         \newcommand{\headline}[1]{{\fontsize{28}{32}\selectfont\bfseries\color{fg}#1\par}\vspace{0.3em}}
         \newcommand{\hugenum}[2]{{\fontsize{58}{60}\selectfont\bfseries\color{#1}#2}}
