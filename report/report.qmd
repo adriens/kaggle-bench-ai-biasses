@@ -1402,30 +1402,60 @@ nationalities are more informative than gaps to the control.
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
-**Reading.** Each row is a situation, from a work meeting to a first date. A dot's position gives the share of answers that advise caution or warn of danger. The filled dot is the average over all nationalities, the hollow circle is the man with no nationality; the grey bar joins them.
+**Reading.** Each row is a situation. A position gives the share of answers that advise caution or warn of danger, from 0 % (none) to 100 % (all). The filled dot is the average over all nationalities, the hollow circle the man with no nationality, both averaged over the seven AIs; the bar joins them. The background turns red towards the right: the further right, the more the AI speaks of danger. The small coloured dots are each AI's own value for the nationalities (legend below the chart).
 
-**What it shows.** The situation matters most: almost no warnings at the doctor's or in a meeting, nearly always in an isolated street. Surprisingly, the man with no nationality is often warned about more than the named nationalities, so the fair comparison is between nationalities, not with that reference.
+**What it shows.** The situation matters most: the dashed boxes group the situations into three families, found where the gaps between them are largest: low risk (a work meeting, the doctor), it depends (a first date, a café, no context) and high risk (the elevator, his place at night, a taxi, a plumber, an isolated street, a breakdown). And where the two differ, the hollow circle is often to the right: the man with no nationality is warned about more than the named ones, in the elevator above all, then in the taxi, at the café and on a first date. The fair comparison is therefore between nationalities, not with that reference.
 
 ```{=latex}
 \end{howtoread}
 ```
 
 ```{r}
-#| fig-height: 4.6
-ctx |>
-  mutate(lab = factor(CONTEXTS[context_id], levels = rev(CONTEXTS)), model = factor(model, levels = names(MODELS))) |>
-  ggplot(aes(ca, lab)) +
-  geom_line(aes(group = lab), colour = GRID, linewidth = 1.2) +
-  geom_point(aes(shape = grp, colour = model), size = 2.2, stroke = 0.9) +
-  facet_wrap(~ model, labeller = as_labeller(SHORT), nrow = 1) +
-  scale_colour_manual(values = COL, guide = "none") +
-  scale_shape_manual(values = c("nationalities" = 16, "control" = 1)) +
-  scale_x_continuous(labels = \(x) paste0(x, " %"), limits = c(0, 100), breaks = c(0, 100)) +
-  labs(x = "caution or alarm framing", y = NULL) +
-  theme(panel.spacing.x = unit(0.8, "lines"), strip.text = element_text(size = 7.5))
+#| fig-height: 4.0
+#| out-width: "88%"
+cmean <- ctx |> group_by(context_id, grp) |> summarise(ca = mean(ca), .groups = "drop") |>
+  pivot_wider(names_from = grp, values_from = ca)
+cord <- cmean |> arrange(nationalities) |> pull(context_id)
+lev_ <- unname(CONTEXTS[cord])
+# three families of situations: cut at the two largest gaps between neighbouring contexts
+cvals <- sort(cmean$nationalities)
+cuts <- sort(order(diff(cvals), decreasing = TRUE)[1:2])
+bands <- tibble(lo = c(1, cuts + 1), hi = c(cuts, length(cvals)),
+                name = c("low risk", "it depends", "high risk"),
+                fill = c("#eef6f1", "#f7f5ef", "#fbeee9"))
+danger_bg <- tibble(x = seq(0.5, 99.5, by = 1))
+ggplot(mapping = aes(y = factor(CONTEXTS[context_id], levels = lev_))) +
+  # background: the further right, the more the answers speak of danger
+  scale_y_discrete(limits = lev_) +
+  annotate("rect", xmin = danger_bg$x - 0.5, xmax = danger_bg$x + 0.5, ymin = -Inf, ymax = Inf,
+           fill = colorRampPalette(c("#ffffff", "#f6c9bd"))(nrow(danger_bg)), colour = NA) +
+  annotate("text", x = 1, y = length(lev_) + 0.9, label = "\u2190 no warning", hjust = 0, family = "Inter",
+           fontface = "bold", size = 2.8, colour = MUTED) +
+  annotate("text", x = 99, y = length(lev_) + 0.9, label = "caution, danger \u2192", hjust = 1, family = "Inter",
+           fontface = "bold", size = 2.8, colour = "#c0392b") +
+  # one band per family of situations, named on the right
+  annotate("rect", xmin = -Inf, xmax = Inf, ymin = bands$lo - 0.45, ymax = bands$hi + 0.45,
+           fill = NA, colour = "#9a9893", linewidth = 0.3, linetype = "dashed") +
+  annotate("text", x = 101.5, y = (bands$lo + bands$hi) / 2, label = bands$name, hjust = 0, angle = 0,
+           family = "Inter", fontface = "bold", size = 2.8, colour = c("#2f7d55", "#8a8780", "#c0392b")) +
+  geom_point(data = ctx |> filter(grp == "nationalities"), aes(x = ca, colour = model), size = 1.5,
+             alpha = 0.6) +
+  geom_segment(data = cmean, aes(x = nationalities, xend = control, yend = factor(CONTEXTS[context_id], levels = lev_)),
+               colour = "#b9b7b1", linewidth = 1.1) +
+  geom_point(data = cmean, aes(x = nationalities), size = 3, colour = INK) +
+  geom_point(data = cmean, aes(x = control), size = 3, shape = 21, stroke = 1.1, fill = "white", colour = INK) +
+  scale_colour_manual(values = COL, labels = SHORT, breaks = names(MODELS), name = NULL) +
+  scale_x_continuous(labels = \(x) paste0(x, " %"), breaks = seq(0, 100, 25), expand = c(0, 0)) +
+  coord_cartesian(xlim = c(0, 100), clip = "off") +
+  labs(x = "answers framed as caution or alarm (filled: nationalities; hollow: no nationality)", y = NULL) +
+  guides(colour = guide_legend(nrow = 2, override.aes = list(size = 2.4, alpha = 1))) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        axis.title.x = element_text(size = 7.5), legend.position = "bottom",
+        legend.title = element_text(colour = MUTED, size = 7.5), legend.text = element_text(size = 7),
+        plot.margin = margin(14, 62, 5, 5))
 ```
 
-Share of answers framed as caution or alarm, per context: mean of the 24 nationalities (filled dot) and no-nationality control (circle). About 216 verdicts per point for nationalities, 18 for the control.
+Share of answers framed as caution or alarm, per context, averaged over the seven models: mean of the 24 nationalities (filled dot, about 1,500 verdicts) and "a man" control (hollow circle, about 126); pale dots: each model's mean over the nationalities. Contexts sorted by the nationalities' share.
 :::
 
 ::: {#fig-map}
