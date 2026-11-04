@@ -73,6 +73,9 @@ format:
           leftrule=3pt, arc=0pt, outer arc=0pt, left=9pt, right=9pt, top=6pt, bottom=6pt, before skip=8pt,
           after skip=12pt}
         \definecolor{keyblue}{HTML}{2A78D6}
+        \newtcolorbox{whatitshows}{enhanced, breakable=false, colback=white, colframe=readbox!50, boxrule=0.4pt,
+          leftrule=2.5pt, arc=0pt, outer arc=0pt, left=7pt, right=7pt, top=5pt, bottom=5pt, fontupper=\small,
+          before skip=4pt, after skip=10pt}
         \newtcolorbox{keyfinding}{enhanced, breakable=false, colback=keyblue!6, colframe=keyblue, boxrule=0pt,
           leftrule=3pt, arc=0pt, outer arc=0pt, left=9pt, right=9pt, top=6pt, bottom=6pt, before skip=8pt,
           after skip=12pt}
@@ -234,8 +237,6 @@ word_pts <- tibble(lab = colnames(wm), x = ca_col[, 1], y = ca_col[, 2],
 
 **Reading.** A map of the words the AI uses for each man, in French as it wrote them (nationalities in bold, words in italics). A man sits close to the men it talks about in the same way, on the side of the words it uses most for him. Colour: blue for the men it compliments most, coral for those it most often "defends". Key words: *chaleureux* warm, *réservé* reserved, *ponctualité* punctuality, *origine* origin, *honneur* honour, *guerre* war, *arnaque* scam, *argent* money, *femme* women.
 
-**What it shows.** Without being told anything about the countries, the words sort the men into three worlds: the warm and passionate (Italy, Spain, Brazil), the reserved and punctual (Northern Europe, Japan), and, on the right, men described by their origin, honour, traditions, war or scams (Afghanistan, Nigeria, the Maghreb, the Balkans, India). The shaded outlines are these three families, found by a clustering of the map; `r paste(nm(between), collapse = " and ")` stay outside: they sit between two worlds. No judge is involved: this map comes straight from the answers.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -270,6 +271,16 @@ ggplot(mapping = aes(x, y)) +
         axis.title = element_text(size = 7.5))
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** Without being told anything about the countries, the words sort the men into three worlds: the warm and passionate (Italy, Spain, Brazil), the reserved and punctual (Northern Europe, Japan), and, on the right, men described by their origin, honour, traditions, war or scams (Afghanistan, Nigeria, the Maghreb, the Balkans, India). The shaded outlines are these three families, found by a clustering of the map; `r paste(nm(between), collapse = " and ")` stay outside: they sit between two worlds. No judge is involved: this map comes straight from the answers.
+
+```{=latex}
+\end{whatitshows}
+```
+
 How an AI describes the man you are alone with: correspondence analysis of the words of 49,896 answers, no judge (method in @sec-guess-method).
 :::
 
@@ -291,11 +302,6 @@ which looks like a choice made when each was aligned. One chart sums it up.
 says, without being asked, that the man's origin does not matter. The higher up, the more often it compliments his
 culture. The bigger the bubble, the more often it links him to a specific risk (scam, migration…). Each bubble is
 the average of the seven AIs tested; the star is the man with no nationality.
-
-**What it shows.** The AI treats nationalities in two ways. Top left, a *cultural guide*: compliments and
-ice-breakers (Finland, Japan, Sweden). Bottom right, a *security guard*: it reassures that origin does not matter,
-which presupposes a suspicion, or names a risk outright (Nigeria, Afghanistan). The seven AIs, made by five
-different companies, agree most on the vertical axis: who gets the compliments.
 
 ```{=latex}
 \end{howtoread}
@@ -345,6 +351,19 @@ ggplot(nat, aes(def, pos)) +
   scale_y_continuous(labels = \(x) paste0(x, " %"), limits = c(-2, YMAX), expand = c(0, 0)) +
   labs(x = "\"his origin does not matter\" (defensive marking)", y = "compliments on his culture (positive stereotypes)") +
   theme(legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 8))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The AI treats nationalities in two ways. Top left, a *cultural guide*: compliments and
+ice-breakers (Finland, Japan, Sweden). Bottom right, a *security guard*: it reassures that origin does not matter,
+which presupposes a suspicion, or names a risk outright (Nigeria, Afghanistan). The seven AIs, made by five
+different companies, agree most on the vertical axis: who gets the compliments.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Summary of the results, mean of the seven models per nationality (about 690 judged answers per bubble); dashed lines: medians of the 24 nationalities.
@@ -831,8 +850,6 @@ sentence ("your safety comes first") for a defensive one.
 
 **Reading.** One row per AI. The star is "a man" with no nationality; the two dots are the nationality the AI "defends" least and the one it "defends" most ("his origin does not matter"), with its name. The longer the line, the more differently the AI treats the men.
 
-**What it shows.** Four AIs draw long lines with the same names at the ends: French or American men on the left, Afghan, Indian or Algerian men on the right. The two small Gemma models stay close to zero for everyone. Ministral is greyed: the judge is less reliable for it (see the text).
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -858,6 +875,16 @@ ggplot(gap, aes(y = mod)) +
   theme(panel.grid.major.y = element_blank(), axis.title.x = element_text(size = 7.5))
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** Four AIs draw long lines with the same names at the ends: French or American men on the left, Afghan, Indian or Algerian men on the right. The two small Gemma models stay close to zero for everyone. Ministral is greyed: the judge is less reliable for it (see the text).
+
+```{=latex}
+\end{whatitshows}
+```
+
 The gap between the least and the most "defended" nationality, per model (about 99 judged answers per nationality).
 :::
 
@@ -868,8 +895,6 @@ The gap between the least and the most "defended" nationality, per model (about 
 ```
 
 **Reading.** Each row is a nationality, each column one of the seven AIs. The number in a cell is the share of answers in which the AI says, without being asked, that the man's origin does not matter ("whether he is [X] or not"); the darker the cell, the more often. The last row is "a man" with no nationality.
-
-**What it shows.** Four columns get darker towards the top: Granite, Qwen, Gemma 26B and Nemotron defend Afghan, Nigerian or Algerian men far more often than French or Spanish ones, and the control almost never. The two small Gemma columns stay pale everywhere. Ministral's column is less reliable (see the text).
 
 ```{=latex}
 \end{howtoread}
@@ -894,6 +919,16 @@ bind_rows(dnat, dbase) |>
   theme(panel.grid = element_blank(), panel.grid.major = element_blank(), legend.position = "bottom",
         legend.title = element_text(colour = MUTED, size = 8), legend.key.height = unit(6, "pt"),
         legend.key.width = unit(28, "pt"))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** Four columns get darker towards the top: Granite, Qwen, Gemma 26B and Nemotron defend Afghan, Nigerian or Algerian men far more often than French or Spanish ones, and the control almost never. The two small Gemma columns stay pale everywhere. Ministral's column is less reliable (see the text).
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Share of answers with defensive marking, per nationality and model (about 99 judged answers per cell; 198 for the control, below the line). Nationalities sorted by the mean of the seven models.
@@ -959,8 +994,6 @@ reflex rises (@sec-family).
 
 **Reading.** Each row is a nationality. Each dot is the share of all the answers (about 300 per nationality) in which the AI refuses to help the woman, with its margin of uncertainty; light green is Gemma E2B, medium green Gemma E4B. The other five AIs do not appear: they never refuse. The dotted vertical lines are the same measure when no nationality is given.
 
-**What it shows.** Gemma E2B refuses more than twice as often for an Afghan or Nigerian man as for a British or French one; most bars of the top half lie entirely to the right of its dotted line. A refusal is not caution: the woman leaves with no safety advice at all, and the judge, which sees no prejudice in an empty answer, misses it.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -980,6 +1013,16 @@ rtab |>
   scale_colour_manual(values = COL, labels = LAB[refusers], breaks = refusers) +
   scale_x_continuous(labels = \(x) paste0(x, " %"), limits = c(0, NA), expand = expansion(mult = c(0, 0.04))) +
   labs(x = "answers in which the AI refuses to help", y = NULL)
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** Gemma E2B refuses more than twice as often for an Afghan or Nigerian man as for a British or French one; most bars of the top half lie entirely to the right of its dotted line. A refusal is not caution: the woman leaves with no safety advice at all, and the judge, which sees no prejudice in an empty answer, misses it.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Share of refusals to help, per nationality, for the two models that refuse (all 7,425 answers of each model, about 297 per nationality; 95 % Wilson intervals). Dotted lines: "a man" control with no nationality. A refusal is an answer under 800 characters that opens by declining to answer or to advise; no judge is involved. Nationalities sorted by Gemma E2B's rate.
@@ -1013,15 +1056,13 @@ an Afghan man `r pc(min(sapply(names(MODELS), \(m) rt("stereo_pos", m, "AFG"))))
 complimented nationality for six models out of seven; for Gemma 26B, the most generous with compliments,
 India, Russia and Algeria come last and Afghanistan fifth from the bottom.
 
-::: {#fig-bump fig-pos="H"}
+::: {#fig-bump}
 
 ```{=latex}
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
 **Reading.** Each column is one of the seven AIs; each line follows one nationality from AI to AI. Its height is its place in that AI's ranking of compliments: 1st at the top, the man it compliments most, 24th at the bottom. Blue lines: the three most complimented nationalities on average; coral: the three least; grey: the others.
-
-**What it shows.** The coloured lines stay in their band: whatever the company that made the AI, the same men are near the top (Japan, Australia, Italy) and the same ones near the bottom (India, Nigeria, Afghanistan). The grey lines in the middle cross a lot: the AIs agree on the extremes, much less on the rest.
 
 ```{=latex}
 \end{howtoread}
@@ -1053,6 +1094,16 @@ ggplot(bump, aes(mod, rank, group = country, colour = col)) +
         axis.title.y = element_text(size = 7.5))
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The coloured lines stay in their band: whatever the company that made the AI, the same men are near the top (Japan, Australia, Italy) and the same ones near the bottom (India, Nigeria, Afghanistan). The grey lines in the middle cross a lot: the AIs agree on the extremes, much less on the rest.
+
+```{=latex}
+\end{whatitshows}
+```
+
 Ranking of the 24 nationalities by share of answers with a positive stereotype, per model (about 99 judged answers per nationality).
 :::
 
@@ -1063,8 +1114,6 @@ Ranking of the 24 nationalities by share of answers with a positive stereotype, 
 ```
 
 **Reading.** Each row is a nationality, each column one of the seven AIs. The number in a cell is the share of answers in which the AI pays the man a compliment about his culture ("Finns are punctual", "Italian warmth"); the darker the cell, the more often.
-
-**What it shows.** The seven columns look alike: whatever the company that made the AI, Northern Europeans, Japanese, Italians and Australians are complimented, while Afghans, Nigerians, Algerians, Russians and Indians rarely are.
 
 ```{=latex}
 \end{howtoread}
@@ -1089,6 +1138,16 @@ spw |>
         legend.key.width = unit(28, "pt"))
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The seven columns look alike: whatever the company that made the AI, Northern Europeans, Japanese, Italians and Australians are complimented, while Afghans, Nigerians, Algerians, Russians and Indians rarely are.
+
+```{=latex}
+\end{whatitshows}
+```
+
 Share of answers with a positive stereotype, per nationality and model (about 99 judged answers per cell). Nationalities sorted by the mean of the seven models. No control answer receives one.
 :::
 
@@ -1111,8 +1170,6 @@ says less about them, and Gemma E2B refuses to answer (previous section).
 ```
 
 **Reading.** Each dot is a nationality. The further right, the more often the AI says "his origin does not matter". The higher up, the more often it pays the nationality a compliment ("Finns are punctual"). The grey line shows the overall trend.
-
-**What it shows.** The dots slope down from top left to bottom right. Nationalities that are flattered (Finland, Japan, Sweden) are rarely "defended", and those that are defended (Afghanistan, Nigeria, India) are rarely flattered: two different treatments for the same question. This chart uses Granite and Qwen only, the first two models whose defensive marking was found frequent and reliable; Gemma 26B and Nemotron give the same slope.
 
 ```{=latex}
 \end{howtoread}
@@ -1142,6 +1199,16 @@ ggplot(both, aes(def, pos)) +
   labs(x = "defensive marking (\"his origin does not matter\")",
        y = "positive stereotypes") +
   guides(colour = guide_legend(nrow = 2))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The dots slope down from top left to bottom right. Nationalities that are flattered (Finland, Japan, Sweden) are rarely "defended", and those that are defended (Afghanistan, Nigeria, India) are rarely flattered: two different treatments for the same question. This chart uses Granite and Qwen only, the first two models whose defensive marking was found frequent and reliable; Gemma 26B and Nemotron give the same slope.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Defensive marking (x) and positive stereotypes (y) per nationality, mean of Granite and Qwen. Colour: grouped UN M49 region.
@@ -1259,8 +1326,6 @@ models.
 
 **Reading.** Each bar counts the answers (out of about 99 per nationality) in which the AI links the man to a specific risk because of where he comes from. The colour gives the kind of risk: scam, migration, crime, religion, treatment of women. One panel per AI; a grey band with a 0 means that this AI never links that nationality to a risk. The three Gemma models and Nemotron, with one to four such answers each, are left out.
 
-**What it shows.** These remarks are not spread at random: Nigeria with scams and Afghanistan with migration or gender norms stand out in every AI that makes them. Ministral makes many more, and extends scams to Russia, Romania and Albania. A man with no nationality never receives one.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -1293,6 +1358,16 @@ na_bars |>
                                "#9a9893")) +
   labs(x = "answers with a negative association", y = NULL) +
   guides(fill = guide_legend(nrow = 2))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** These remarks are not spread at random: Nigeria with scams and Afghanistan with migration or gender norms stand out in every AI that makes them. Ministral makes many more, and extends scams to Russia, Romania and Albania. A man with no nationality never receives one.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Negative associations per nationality, by type as labelled by the judge (number of answers out of about 99 per nationality and model; free horizontal scales). Nationalities with no association in any of the three models are omitted; a grey band with a 0: none for that model. The three Gemma models and Nemotron (one to four associations each) are not shown.
@@ -1433,15 +1508,13 @@ mentions a religion is then sorted by what it does with it [@kaggle_synthesis]:
   negative associations as "religion": its rubric counts a religion only when it is tied to a risk, whereas
   giving a man a faith because of his passport is already a stereotype.
 
-::: {#fig-religion fig-pos="H"}
+::: {#fig-religion}
 
 ```{=latex}
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
 **Reading.** Each row is a nationality, each column a religion. The number is the share of answers (all seven AIs, about 2,000 per nationality) in which the AI mentions that religion; the darker, the more often. Rows with no religion at all are grouped at the bottom.
-
-**What it shows.** The AI gives a religion only to some men: Islam to Afghans, Moroccans, Algerians and Turks, Christianity to Fijians and Serbs, Hinduism to Indians. A French, Swedish, American or British man, like "a man" with no nationality, never gets one.
 
 ```{=latex}
 \end{howtoread}
@@ -1470,18 +1543,26 @@ rel_c |>
         legend.key.width = unit(28, "pt"))
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The AI gives a religion only to some men: Islam to Afghans, Moroccans, Algerians and Turks, Christianity to Fijians and Serbs, Hinduism to Indians. A French, Swedish, American or British man, like "a man" with no nationality, never gets one.
+
+```{=latex}
+\end{whatitshows}
+```
+
 Which men get a religion: share of all answers of the seven models (about 2,079 per nationality) that mention each religion, no judge.
 :::
 
-::: {#fig-religion-kinds fig-pos="H"}
+::: {#fig-religion-kinds}
 
 ```{=latex}
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
 **Reading.** One bar per AI: the number of its answers that mention a religion, split by what the answer does with it. Grey: it only informs. Amber: it assumes the man's faith from his origin. Red: it tells the woman how to dress or behave because of his faith.
-
-**What it shows.** Ministral talks about religion far more than the others and is the one that most often gives the woman instructions; Gemma 26B is the one that most often assumes his faith. Four AIs hardly mention religion at all.
 
 ```{=latex}
 \end{howtoread}
@@ -1500,6 +1581,16 @@ rel_m |>
                                prescription = "tells her how to dress or behave")) +
   labs(x = "answers mentioning a religion (out of 7,425 per AI)", y = NULL) +
   theme(panel.grid.major.y = element_blank(), legend.position = "top")
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** Ministral talks about religion far more than the others and is the one that most often gives the woman instructions; Gemma 26B is the one that most often assumes his faith. Four AIs hardly mention religion at all.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 What the AIs do with the religion they give the man, by model (no judge; rule in the text).
@@ -1630,8 +1721,6 @@ nationalities are more informative than gaps to the control.
 
 **Reading.** Each row is a situation. A position gives the share of answers that advise caution or warn of danger, from 0 % (none) to 100 % (all). The filled dot is the average over all nationalities, the hollow circle the man with no nationality, both averaged over the seven AIs; the bar joins them. The background turns red towards the right: the further right, the more the AI speaks of danger. The small coloured dots are each AI's own value for the nationalities (legend below the chart).
 
-**What it shows.** The situation matters most: the dashed boxes group the situations into three families, found where the gaps between them are largest: low risk (a work meeting, the doctor), it depends (a first date, a café, no context) and high risk (the elevator, his place at night, a taxi, a plumber, an isolated street, a breakdown). And where the two differ, the hollow circle is often to the right: the man with no nationality is warned about more than the named ones, in the elevator above all, then in the taxi, at the café and on a first date. The fair comparison is therefore between nationalities, not with that reference.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -1681,6 +1770,16 @@ ggplot(mapping = aes(y = factor(CONTEXTS[context_id], levels = lev_))) +
         plot.margin = margin(14, 62, 5, 5))
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The situation matters most: the dashed boxes group the situations into three families, found where the gaps between them are largest: low risk (a work meeting, the doctor), it depends (a first date, a café, no context) and high risk (the elevator, his place at night, a taxi, a plumber, an isolated street, a breakdown). And where the two differ, the hollow circle is often to the right: the man with no nationality is warned about more than the named ones, in the elevator above all, then in the taxi, at the café and on a first date. The fair comparison is therefore between nationalities, not with that reference.
+
+```{=latex}
+\end{whatitshows}
+```
+
 Share of answers framed as caution or alarm, per context, averaged over the seven models: mean of the 24 nationalities (filled dot, about 1,500 verdicts) and "a man" control (hollow circle, about 126); pale dots: each model's mean over the nationalities. Contexts sorted by the nationalities' share.
 :::
 
@@ -1691,8 +1790,6 @@ Share of answers framed as caution or alarm, per context, averaged over the seve
 ```
 
 **Reading.** Rows are nationalities, columns are situations. Each square compares a nationality with the others in the same situation: red means the AI is more alarming than usual, blue less alarming, white about average.
-
-**What it shows.** The rows for Nigeria, Afghanistan, Russia and Romania are mostly red, especially in the first-date column, while Finland, Japan, the United Kingdom and Italy lean blue. Each square rests on few answers: read the overall pattern, not single squares.
 
 ```{=latex}
 \end{howtoread}
@@ -1714,6 +1811,16 @@ heat |>
   labs(x = NULL, y = NULL) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1), legend.position = "right",
         legend.title = element_text(colour = MUTED, size = 8), panel.grid = element_blank())
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The rows for Nigeria, Afghanistan, Russia and Romania are mostly red, especially in the first-date column, while Finland, Japan, the United Kingdom and Italy lean blue. Each square rests on few answers: read the overall pattern, not single squares.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Mean alarm score per nationality and context, as a gap to the mean of the nationalities in the same context (mean over the seven models and three ages). Red: more alarm than other nationalities in the same context. Exploratory: about 63 verdicts per cell.
@@ -1750,15 +1857,13 @@ Granite and from `r pc(p15m(QW,"lo"))` (`r nm(p15m(QW,"cmin"))`) to `r pc(p15m(Q
 with care. A minor thus gets protective advice that varies with the man's origin, although her need does
 not change.
 
-::: {#fig-minors fig-pos="H"}
+::: {#fig-minors}
 
 ```{=latex}
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
 **Reading.** The girl is 15. One row per AI. The coloured line runs from the nationality for which the AI is least protective (left) to the one for which it is most protective (right), with their names; the black dot is the average over all nationalities, the star the man with no nationality. The dashed line at 100 % is what she should get: protective advice (a trusted adult, a helpline, not staying alone with him) every time.
-
-**What it shows.** A 15-year-old girl should always be told to protect herself. She is not. Granite, for example, gives her protective advice 27 times out of 100 when the man is Japanese, but 64 times out of 100 when he is Nigerian. Every AI does the same: she is protected least with a Japanese or British man, most with an Albanian, Afghan, Indian, Nigerian or Russian one. And even in the best case, no AI protects her every time: the right end of every line stays left of the dashed line (97 % at best, 64 % for Granite).
 
 ```{=latex}
 \end{howtoread}
@@ -1785,6 +1890,16 @@ ggplot(mn, aes(y = mod)) +
   coord_cartesian(xlim = c(0, 118), clip = "off") +
   labs(x = "protective answers, girl of 15 (dot: mean of the nationalities; star: no nationality)", y = NULL) +
   theme(panel.grid.major.y = element_blank(), axis.title.x = element_text(size = 7))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** A 15-year-old girl should always be told to protect herself. She is not. Granite, for example, gives her protective advice 27 times out of 100 when the man is Japanese, but 64 times out of 100 when he is Nigerian. Every AI does the same: she is protected least with a Japanese or British man, most with an Albanian, Afghan, Indian, Nigerian or Russian one. And even in the best case, no AI protects her every time: the right end of every line stays left of the dashed line (97 % at best, 64 % for Granite).
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Protection of a minor depends on the man's nationality (about 33 judged answers per nationality and model, so the extremes are noisy; the full figures are in @tbl-minors).
@@ -1888,8 +2003,6 @@ alignment, although four of them share the Gemma 4 base. Do they single out the 
 
 **Reading.** Each row is a pair of AIs, each column a kind of answer. The number is their agreement on the ranking of the 24 nationalities, from 0 (none) to 1 (same order); the darker, the stronger.
 
-**What it shows.** The "positive stereotype" column is dark everywhere: the seven AIs compliment the same nationalities. The "defensive marking" column is dark only for the pairs among Granite, Qwen, Gemma 26B and Nemotron: the two small Gemma models and Ministral do not single out the same nationalities in that way.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -1909,6 +2022,16 @@ agree |>
   theme(panel.grid = element_blank(), panel.grid.major = element_blank(), legend.position = "right",
         axis.text.x.top = element_text(angle = 30, hjust = 0, vjust = 0, size = 7.5),
         legend.title = element_text(colour = MUTED, size = 8))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The "positive stereotype" column is dark everywhere: the seven AIs compliment the same nationalities. The "defensive marking" column is dark only for the pairs among Granite, Qwen, Gemma 26B and Nemotron: the two small Gemma models and Ministral do not single out the same nationalities in that way.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Agreement between each pair of models on the ranking of the 24 nationalities, per indicator (Spearman $\rho$, values of @tbl-agreement; negative values are drawn as 0).
@@ -1979,8 +2102,6 @@ replicates: `r paste(nm(unstable), collapse = ", ")` stay in their group in less
 
 **Reading.** Each row is a nationality, each column a kind of answer. The number in a cell is the share of answers of that kind (in %). The colour compares it with the other nationalities: red means more than average, blue less. The black line splits the columns in two: on the left, "cultural guide" answers (red there means the AI is friendlier than usual); on the right, "security guard" answers (red there means more suspicion). The tree on the left joins the nationalities whose rows look alike, and the coloured square shows the group each one falls into; a paler square means the nationality sometimes switches group when the data are resampled.
 
-**What it shows.** Without being told anything about the countries, the method separates three groups: two nationalities the AI links to a risk (Nigeria, Afghanistan), a group it "defends" ("his origin does not matter") without flattering it, and a group it flatters with compliments on its culture.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -2039,6 +2160,16 @@ p_heat <- ggplot(cells, aes(f, y, fill = pmax(pmin(z, 2.5), -2.5))) +
 p_tree + p_grp + p_heat + plot_layout(widths = c(0.9, 2.1, 6))
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** Without being told anything about the countries, the method separates three groups: two nationalities the AI links to a risk (Nigeria, Afghanistan), a group it "defends" ("his origin does not matter") without flattering it, and a group it flatters with compliments on its culture.
+
+```{=latex}
+\end{whatitshows}
+```
+
 Profiles of the 24 nationalities (share of answers in %, seven models pooled, about 690 judged answers per row) and their hierarchical clustering (Ward). Cell colour: gap to the mean of the nationalities, in standard deviations of the logit. Vertical line: indicators on the "cultural guide" side (left) and the "security guard" side (right) of the first axis of @fig-pca. Square: group; transparency: share of bootstrap replicates in which the nationality stays in its group.
 :::
 
@@ -2073,8 +2204,6 @@ The three-group structure is therefore clearer than the exact membership of each
 
 **Reading.** Each dot is a nationality; two nationalities close to each other were treated alike by the AI. The grey arrows show the kinds of answers: a nationality lies towards the arrows of the answers it gets most. The colours are the three groups of the previous chart.
 
-**What it shows.** The nationalities spread along one main horizontal line, from "cultural guide" on the left (compliments, ice-breakers) to "security guard" on the right ("his origin does not matter", caution, risks). Nigeria and Afghanistan stand far to the right, apart from all the others.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -2101,6 +2230,16 @@ ggplot() +
   coord_equal() +
   labs(x = sprintf("axis 1 (%.0f %%): cultural guide  →  security guard", ve[1]),
        y = sprintf("axis 2 (%.0f %%)", ve[2]))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The nationalities spread along one main horizontal line, from "cultural guide" on the left (compliments, ice-breakers) to "security guard" on the right ("his origin does not matter", caution, risks). Nigeria and Afghanistan stand far to the right, apart from all the others.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Principal component analysis of the 24 nationality profiles (standardised logits of nine indicators, seven models pooled). Dots: nationalities, coloured by group (@fig-clusters). Arrows: indicators (loadings, rescaled).
@@ -2187,8 +2326,6 @@ chance level.
 
 **Reading.** A computer program reads each answer, with the nationality hidden, and tries to guess which nationality it was about. Each row is the true nationality, each column the program's guess. The dark diagonal is the right guesses; a number off the diagonal says how often (in %) the row's nationality was taken for the column's.
 
-**What it shows.** The mistakes are not random. They draw two blocks that almost never mix: Western Europe, North America, Australia, Brazil and Japan on one side; Russia, the Balkans, Turkey, the Maghreb, India, Fiji, Nigeria and Afghanistan on the other. Inside the second block, Nigeria and Afghanistan act as magnets: the other answers of the block are often mistaken for them. The first block is less uniform: smaller families appear inside it, such as Brazil, Spain and Italy (the network of the next chart separates them as a group of their own).
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -2218,6 +2355,16 @@ ggplot(cd, aes(guess, true, fill = pct)) +
         axis.text.x.top = element_text(angle = 50, hjust = 0, vjust = 0),
         legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 8),
         legend.key.height = unit(6, "pt"), legend.key.width = unit(28, "pt"))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The mistakes are not random. They draw two blocks that almost never mix: Western Europe, North America, Australia, Brazil and Japan on one side; Russia, the Balkans, Turkey, the Maghreb, India, Fiji, Nigeria and Afghanistan on the other. Inside the second block, Nigeria and Afghanistan act as magnets: the other answers of the block are often mistaken for them. The first block is less uniform: smaller families appear inside it, such as Brazil, Spain and Italy (the network of the next chart separates them as a group of their own).
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Confusion matrix of the nationality classifier (shared vocabulary, logistic regression, out-of-fold predictions on the `r num(n_guess, 0)` answers with a nationality of the seven models). Cell: share of the row nationality's answers guessed as the column nationality (%); values of 5 % or more are printed. Rows and columns are ordered by average-linkage clustering of the confusions.
@@ -2322,8 +2469,6 @@ order the nationalities along a scale (@fig-eigen).
 
 **Reading.** Each dot is a nationality. An arrow from A to B means that at least 5 % of the answers about A were mistaken for answers about B; the thicker the arrow, the more often. The bigger the dot and the name, the more the classifier's mistakes end up on this nationality (its PageRank). The closer two dots, the more often they are confused. The colours are the groups the computer found by itself, from the arrows alone and their thickness.
 
-**What it shows.** Four groups, joined by only a few thin arrows, but they are not alike. The red group is one dense knot: every nationality in it is mistaken for every other, and arrows converge on Nigeria and Afghanistan, so the AI talks about all of them in nearly the same way. In the other three groups, the arrows follow clichés or a language instead: Spain, Italy and Brazil (warmth) in amber; the United Kingdom, the United States and Australia (English-speaking) in green; in blue, Belgium and Switzerland around France (French-speaking), Finland and Sweden (reserve), Germany and Japan. France is the big blue dot: answers about Western men that carry no cliché of their own end up there, as a default "Western" answer.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -2362,6 +2507,16 @@ ggraph::ggraph(gnet, layout = "manual", x = xy[, 1], y = xy[, 2]) +
   theme(legend.position = "top")
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** Four groups, joined by only a few thin arrows, but they are not alike. The red group is one dense knot: every nationality in it is mistaken for every other, and arrows converge on Nigeria and Afghanistan, so the AI talks about all of them in nearly the same way. In the other three groups, the arrows follow clichés or a language instead: Spain, Italy and Brazil (warmth) in amber; the United Kingdom, the United States and Australia (English-speaking) in green; in blue, Belgium and Switzerland around France (French-speaking), Finland and Sweden (reserve), Germany and Japan. France is the big blue dot: answers about Western men that carry no cliché of their own end up there, as a default "Western" answer.
+
+```{=latex}
+\end{whatitshows}
+```
+
 The classifier's confusions as a network (shared vocabulary, seven models). Arrow A → B: at least 5 % of A's answers guessed as B; width: that share. Dot and label size: PageRank of the nationality in the full matrix of mistakes (where the classifier's errors end up). Colour: Louvain communities computed from the arrows, weighted by their share; an arrow takes the colour of the nationality it leaves. Stress-majorisation layout weighted by the rates (distance = 1 / rate, both directions summed): the more often two nationalities are confused, the closer they are drawn.
 :::
 
@@ -2372,8 +2527,6 @@ The classifier's confusions as a network (shared vocabulary, seven models). Arro
 ```
 
 **Reading.** Each dot is a nationality. Horizontally, the AI judge's verdict (pipeline 1): how much more often the AI says "his origin does not matter" than it pays him a cultural compliment. Vertically, the position of the nationality on the main axis of the classifier's mistakes (pipeline 2), which uses no judge at all. The colours are the groups of the previous chart.
-
-**What it shows.** The two pipelines rank the nationalities in nearly the same order: the dots climb from bottom left (Finland, Japan, Sweden: compliments, and answers easy to tell apart) to top right (Nigeria, Afghanistan: justification, and answers that look alike). Two methods that share nothing but the AI's answers see the same thing.
 
 ```{=latex}
 \end{howtoread}
@@ -2396,6 +2549,16 @@ ggplot(ed, aes(x, y, colour = g)) +
   theme(legend.position = "top")
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The two pipelines rank the nationalities in nearly the same order: the dots climb from bottom left (Finland, Japan, Sweden: compliments, and answers easy to tell apart) to top right (Nigeria, Afghanistan: justification, and answers that look alike). Two methods that share nothing but the AI's answers see the same thing.
+
+```{=latex}
+\end{whatitshows}
+```
+
 Two pipelines, one ranking. x: judge index of the TL;DR chart (defensive marking minus positive stereotypes, percentage points, mean of the seven models, LLM judge). y: second eigenvector of the classifier's confusion chain (seven models, no judge), scaled to a maximum of 1 and oriented so that Nigeria is positive. Spearman ρ = `r num(rho_v2, 2)`. Colour: groups of @fig-network.
 :::
 
@@ -2413,8 +2576,6 @@ words that point to it most, and a word shared by several nationalities becomes 
 ```
 
 **Reading.** Large dots are nationalities; words in italics are the clues the computer uses to recognise them (in French, as the AI wrote them). A line joins a nationality to one of its five strongest clues; the thicker the line, the stronger the clue. A word with several lines is a clue shared by several nationalities; it is grey when it links nationalities of different groups.
-
-**What it shows.** The biggest hub is *origine* (origin), also the word with the highest PageRank in this graph: it links Albania, Algeria, India, Nigeria and Afghanistan, the men the AI talks about through where they come from. Nigeria is also tied to *argent* (money) and *arnaques* (scams), Afghanistan to *femmes* (women). On the other side, the hubs are compliments: *chaleureux* (warm) for Spain, Italy and Brazil, *ponctualité* for Germany and Switzerland, *humour* for the United Kingdom, Australia and Belgium, and *réservés* (reserved), *discrets* and *silence* for Finland.
 
 ```{=latex}
 \end{howtoread}
@@ -2459,6 +2620,16 @@ ggraph::ggraph(gw, layout = "stress", weights = 1 / igraph::E(gw)$coef) +
   theme(legend.position = "top")
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The biggest hub is *origine* (origin), also the word with the highest PageRank in this graph: it links Albania, Algeria, India, Nigeria and Afghanistan, the men the AI talks about through where they come from. Nigeria is also tied to *argent* (money) and *arnaques* (scams), Afghanistan to *femmes* (women). On the other side, the hubs are compliments: *chaleureux* (warm) for Spain, Italy and Brazil, *ponctualité* for Germany and Switzerland, *humour* for the United Kingdom, Australia and Belgium, and *réservés* (reserved), *discrets* and *silence* for Finland.
+
+```{=latex}
+\end{whatitshows}
+```
+
 Nationality–clue graph from the classifier's weights (logistic regression on the shared vocabulary of seven models): each nationality is joined to its five single words with the largest positive coefficients; edge width: coefficient. Colours: the communities of @fig-network (not recomputed on this graph); a word takes the colour of the nationalities it points to, grey when it bridges two groups. Stress-majorisation layout weighted by the coefficients (distance = 1 / coefficient). Five leftover words are left out: four English or German words (small, hope, need, gut) and *usa*, which escaped masking.
 :::
 
@@ -2471,8 +2642,6 @@ Lexicometry confirms these words with a statistical test, nationality by nationa
 ```
 
 **Reading.** Each row is a word, in French as the AI wrote it; each column a nationality. Red means the AI uses this word for this nationality more than chance would explain; blue means it avoids it. The darker the cell, the less likely it is to be chance. Words and nationalities that go together are placed next to each other.
-
-**What it shows.** Two halves. For Western men, Brazilians and Japanese, the over-used words are qualities: *chaleureux* (warm), *ponctualité* (punctuality), *silence*, *humour*. For the others, they are about where the man comes from: *origine*, *ethnique*, *tradition*, *famille*, *religion*, *femme*, and *arnaque* (scam) and *argent* (money) for Nigeria. The blue cells are as telling: *humour*, *silence* and *réservé* (reserved) are almost never used for Turkey, the Maghreb, India, Fiji, Nigeria and Afghanistan. A third family, Brazil, Spain and Italy next to Russia, Romania and Serbia, shares words of language and warmth (*langue*, *traduction*, *chaleureux*).
 
 ```{=latex}
 \end{howtoread}
@@ -2500,6 +2669,16 @@ ggplot(sd_, aes(country, lemma, fill = spec)) +
         legend.key.height = unit(6, "pt"), legend.key.width = unit(28, "pt"))
 ```
 
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** Two halves. For Western men, Brazilians and Japanese, the over-used words are qualities: *chaleureux* (warm), *ponctualité* (punctuality), *silence*, *humour*. For the others, they are about where the man comes from: *origine*, *ethnique*, *tradition*, *famille*, *religion*, *femme*, and *arnaque* (scam) and *argent* (money) for Nigeria. The blue cells are as telling: *humour*, *silence* and *réservé* (reserved) are almost never used for Turkey, the Maghreb, India, Fiji, Nigeria and Afghanistan. A third family, Brazil, Spain and Italy next to Russia, Romania and Serbia, shares words of language and warmth (*langue*, *traduction*, *chaleureux*).
+
+```{=latex}
+\end{whatitshows}
+```
+
 Lafon specificities of the three most over-used lemmas of each nationality (shared vocabulary, all answers of seven models). Cell: signed $-\log_{10} p$ of the hypergeometric test, red for over-use and blue for under-use, clipped at ±10. Rows and columns are ordered by average-linkage clustering.
 :::
 
@@ -2516,6 +2695,10 @@ in the notebook [@kaggle_guess].
 
 ```{=latex}
 \FloatBarrier
+```
+
+```{=latex}
+\clearpage
 ```
 
 ## What makes an answer prejudiced? A decision tree {#sec-tree}
@@ -2598,14 +2781,12 @@ edges_ <- do.call(rbind, lapply(which(fr$id > 1), function(i) {
 
 **Reading.** Start on the left, with all the judged answers. At each step the answers are split in two by one question (which AI, which situation, which man, which age); each box says which answers went that way, and the share of them that are prejudiced, from blue (few) to red (many).
 
-**What it shows.** The first question is the *size of the AI*: the small ones (Gemma E2B, Gemma E4B and Nemotron) give few prejudiced answers, whatever the man; among them, Nemotron, NVIDIA's post-training of Gemma E4B, gives more than Google's own models. With the larger ones (Granite, Qwen, Ministral, Gemma 26B), the situation comes next, then the man: in an isolated street, `r pc(100 * max(leaves_$yval))` of the answers are prejudiced as soon as the man has a nationality, against `r pc(100 * min(leaves_$yval[leaves_$n < 400]))` when he has none. The religion the AI gives him never appears in the tree.
-
 ```{=latex}
 \end{howtoread}
 ```
 
 ```{r}
-#| fig-height: 4.6
+#| fig-height: 4.3
 ramp_t <- scales::gradient_n_pal(c("#2a78d6", "#d9d6cf", "#d63c2a"))
 fr$fill <- ramp_t(pmin(fr$yval / 0.8, 1))
 fr$txt <- paste0(vapply(seq_len(nrow(fr)), \(i) paste(strwrap(fr$cond[i], if (fr$leaf[i]) 27 else 21),
@@ -2629,6 +2810,16 @@ ggplot() +
   theme(legend.position = "bottom", legend.title = element_text(colour = MUTED, size = 7.5),
         legend.text = element_text(colour = MUTED, size = 7), legend.key.height = unit(6, "pt"),
         legend.key.width = unit(34, "pt"))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The first question is the size of the AI, then, for the larger ones, the situation and the man: naming a nationality, any nationality, is what tips the answer (details in the box below).
+
+```{=latex}
+\end{whatitshows}
 ```
 
 Decision tree (rpart regression tree; `r num(nrow(TD), 0)` judged answers; boxes of at least 200 answers).
@@ -2674,8 +2865,6 @@ and explains less, which is why the report keeps the tree and the forest.
 
 **Reading.** One bar per factor. Its length is how much worse the random forest predicts prejudiced answers when that factor is scrambled: the longer the bar, the more the factor decides whether an answer is prejudiced.
 
-**What it shows.** The size of the AI matters most: larger models give far more prejudiced answers. Then the situation, then the man's nationality, then the woman's age, and only then who made the AI. The religion the AI gives the man adds nothing once the rest is known.
-
 ```{=latex}
 \end{howtoread}
 ```
@@ -2693,6 +2882,16 @@ fi |> mutate(lab = factor(FLAB[factor], levels = rev(FLAB[fi$factor]))) |>
   scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
   labs(x = "loss of predictive power when the factor is scrambled (ROC AUC)", y = NULL) +
   theme(panel.grid.major.y = element_blank(), axis.title.x = element_text(size = 7.5))
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The size of the AI matters most: larger models give far more prejudiced answers. Then the situation, then the man's nationality, then the woman's age, and only then who made the AI. The religion the AI gives the man adds nothing once the rest is known.
+
+```{=latex}
+\end{whatitshows}
 ```
 
 What decides a prejudiced answer: permutation importance of each factor in a random forest (scikit-learn, 400 trees; held-out quarter of the `r num(fm$n, 0)` judged answers; bars: ± 2 standard deviations over 20 shuffles).
