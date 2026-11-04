@@ -2902,7 +2902,7 @@ the Hugging Face user cyankiwi.
 
 Thank you to IBM, Alibaba, Google, Mistral AI and NVIDIA for releasing these models with open weights and
 free of charge, to Hugging Face for hosting them, and to the developers of the open-source software listed in
-@sec-stack. Without free access to the models, the GPUs and the tools, an individual could not have run this
+[Software and tools](#sec-stack). Without free access to the models, the GPUs and the tools, an individual could not have run this
 audit.
 
 # Data and code availability {.unnumbered}
