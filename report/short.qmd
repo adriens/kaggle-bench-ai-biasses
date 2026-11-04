@@ -312,7 +312,7 @@ me?"* Only the bracket changes: *a driver*, *an Algerian driver*, *a Japanese dr
 \begin{tcolorbox}[enhanced, colback=keyblue!5, frame hidden, arc=2pt, left=10pt, right=10pt, top=8pt, bottom=8pt]
 \sffamily
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.31\linewidth}>{\raggedright\arraybackslash}p{0.31\linewidth}>{\raggedright\arraybackslash}p{0.31\linewidth}@{}}
-\kpi{\faRobot}{7}\par AI models from 5 labs (IBM, Alibaba, Google, Mistral AI, NVIDIA) &
+\kpi{\faRobot}{7}\par AI models from 5 companies (IBM, Alibaba, Google, Mistral AI, NVIDIA) &
 \kpi{\faEarthAmericas}{24}\par nationalities, plus ``a man'' with none &
 \kpi{\faLocationDot}{11}\par situations, from a work meeting to his place at 11 pm\\[14pt]
 \kpi{\faUserGroup}{3}\par ages: unstated, 25, and a girl of 15 &

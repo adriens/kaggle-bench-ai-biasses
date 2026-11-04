@@ -300,11 +300,25 @@ How an AI describes the man you are alone with: correspondence analysis of the w
 
 # TL;DR {.unnumbered}
 
+```{r}
+#| label: tipping
+# the headline of the short version and the carousel: prejudiced answers (a risk tied to his origin, a negative
+# stereotype, or "his origin does not matter"), larger models (8B and more), taxi, street and elevator
+TP_SIZE <- c("granite-4.2-8b" = 8, "qwen3.5-9b" = 9, "gemma-4-e2b-it" = 2, "gemma-4-e4b-it" = 4,
+             "gemma-4-26b-a4b-it-awq-4bit" = 26, "ministral-3-8b-instruct-2512" = 8,
+             "nvidia-nemotron-3.5-bolt-e4b-bf16" = 4)
+tp_ <- D |> mutate(prej = negative_association | defensive_marking | coalesce(stereo_neg, FALSE)) |>
+  filter(TP_SIZE[model] >= 6, context_id %in% c("C3_taxi", "C4_street", "C9_elevator"))
+tp_none <- 100 * mean(tp_$prej[tp_$is_base]); tp_nat <- 100 * mean(tp_$prej[!tp_$is_base])
+```
+
 Ask seven open AI models for advice about being alone with a man, and his nationality decides the tone: some
 men get compliments and ice-breakers, others a "his origin does not matter" that nobody asked for, a
 warning about scams or migration, or, from the smallest model, no advice at all. The seven models agree on
 who gets the compliments, probably learnt from the same data; they differ on how they treat the others,
-which looks like a choice made when each was aligned. And the treatment follows money: the richer his
+which looks like a choice made when each was aligned. In a taxi, an elevator or an isolated street, the larger
+models give a prejudiced answer `r num(tp_none, 0)` % of the time when the woman is alone with "a man", and
+`r num(tp_nat, 0)` % of the time as soon as she names his nationality, any nationality. And the treatment follows money: the richer his
 country, the more compliments and the less suspicion, even within a continent (@sec-wealth). One chart sums it up.
 
 ::: {#fig-summary fig-pos="H"}
@@ -3267,7 +3281,7 @@ repeat the study in other languages.
 # Acknowledgements {.unnumbered}
 
 Every generation and judging run of this study used the free GPU quota of Kaggle (two NVIDIA T4 per
-session), about 90 GPU hours on two NVIDIA T4 and 6 CPU hours in all (@tbl-compute): without it, this work would not have been possible. The evaluated models (Granite 4.2 8B by IBM,
+session), 89 GPU hours on two NVIDIA T4 and 6 CPU hours in all (@tbl-compute): without it, this work would not have been possible. The evaluated models (Granite 4.2 8B by IBM,
 Qwen3.5-9B by Alibaba, Gemma 4 E2B, E4B and 26B-A4B by Google, Ministral 3 8B by Mistral AI and Nemotron
 3.5 Bolt E4B by NVIDIA) and the judge (Qwen3-32B-AWQ) are released with open weights, which is what makes
 such an independent audit possible; the 4-bit quantisation of Gemma 4 26B-A4B used here was published by
@@ -3291,7 +3305,8 @@ the rubric, the judge revision and every verdict; the judge-free notebook [@kagg
 classifier and the lexicometry from every answer of every model; the synthesis notebook [@kaggle_synthesis]
 also counts the refusals. The answers and `rts-v4` verdicts analysed here are
 released under CC0-1.0 [@kaggle_data]. The GDP per capita and income groups of @sec-wealth come from the World Bank's open data, under CC BY 4.0 [@worldbank_gdp; @worldbank_class], and are kept in the repository (`analysis/data/worldbank.csv`). This report is a Quarto document that recomputes every figure,
-table and number from that dataset.
+table and number from that dataset. Built with [R](https://www.r-project.org), [Quarto](https://quarto.org) and
+[`\LaTeX`{=latex}](https://www.latex-project.org).
 
 # Software and tools {#sec-stack .unnumbered}
 
