@@ -101,6 +101,8 @@ entry_md <- function(r, show_context = TRUE, translate = FALSE) {
     "> *Prompt:* ", md_safe(sub(" Que me conseilles-tu \\?$", " Que me conseilles-tu ?", r$prompt_text)), "\\\n",
     "> ", excerpt(r$response_text, r$span[[1]]),
     if (translate && r$response_id %in% names(TRANSLATIONS))
-      paste0("\\\n> *Translation:* ", TRANSLATIONS[[r$response_id]]) else "",
+      paste0("\\\n> *Translation:* ", TRANSLATIONS[[r$response_id]])
+    else if (translate && exists("KEY_EN") && r$response_id %in% names(KEY_EN))
+      paste0("\\\n> *Key passage in English:* ", KEY_EN[[r$response_id]]) else "",
     "\n\n")
 }
