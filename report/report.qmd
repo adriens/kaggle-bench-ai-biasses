@@ -2245,6 +2245,103 @@ ggplot() +
 Principal component analysis of the 24 nationality profiles (standardised logits of nine indicators, seven models pooled). Dots: nationalities, coloured by group (@fig-clusters). Arrows: indicators (loadings, rescaled).
 :::
 
+## The wealth of his country {#sec-wealth}
+
+The three families of the opening word map (@fig-words) look like a map of income. To test it, each
+nationality's treatment is set against the GDP per capita of his country in 2023, from the World Bank
+[@worldbank_gdp], with a Spearman rank correlation over the 24 nationalities (`analysis/wealth.py`; the
+figures are kept in the repository, so the test replays offline). The shares pool the seven models.
+
+```{r}
+#| label: wealth-stats
+wealth <- read.csv(file.path("..", "analysis", "out", "wealth_by_country.csv")) |>
+  left_join(nat_pts |> transmute(country, fam = ifelse(inside, fam, "between")), by = "country") |>
+  mutate(lab = nm(country))
+w_rho <- read.csv(file.path("..", "analysis", "out", "wealth_spearman.csv"))
+wr <- function(k) num(w_rho$rho[w_rho$measure == k], 2)
+w_lm <- lm(compliment ~ log10(gdp_pc), wealth)
+w_r2 <- 100 * summary(w_lm)$r.squared
+hi_ <- wealth$income_group == "High income"
+wsub <- function(k, rows) num(cor(wealth$gdp_pc[rows], wealth[[k]][rows], method = "spearman"), 2)
+fam_inc <- function(f) table(wealth$income_group[wealth$fam == f])
+```
+
+The link is strong on the three measures: the richer his country, the more the AI compliments his culture
+(ρ = `r wr("compliment")`), the less it says, unasked, that his origin does not matter
+(ρ = `r wr("defensive")`), and the less it ties him to a risk (ρ = `r wr("risk")`); all three have
+$p < 0.001$. On a logarithmic scale, wealth alone accounts for `r pc(w_r2)` of the differences in
+compliments. The World Bank's income groups [@worldbank_class] draw the same line as the word map: the
+`r sum(wealth$fam == "reserved")` men of the "reserved, punctual" family all come from high-income countries,
+none of the `r sum(wealth$fam == "origin")` men of the "origin" family does, and the two men in between,
+Romanian and Russian, come from the only high-income countries treated like the poorer ones.
+
+::: {#fig-wealth}
+
+```{=latex}
+\begin{howtoread}\textbf{How to read this chart}\par\smallskip
+```
+
+**Reading.** Each dot is a nationality, coloured by its family on the word map (@fig-words). Left to right,
+the GDP per person of his country, on a logarithmic scale; bottom to top, the share of answers of the seven
+models that compliment his culture. The grey line is the trend, with its 95 % band.
+
+```{=latex}
+\end{howtoread}
+```
+
+```{r}
+#| fig-height: 4.2
+ggplot(wealth, aes(gdp_pc, compliment)) +
+  geom_smooth(method = "lm", formula = y ~ x, colour = MUTED, fill = GRID, linewidth = 0.5) +
+  geom_point(aes(colour = fam), size = 2.4) +
+  geom_text_repel(aes(label = lab, colour = fam), family = "Inter", size = 2.7, seed = 2, box.padding = 0.25,
+                  min.segment.length = 0.3, segment.colour = "#cfcdc7", show.legend = FALSE) +
+  scale_colour_manual(values = c(FAM_COL, between = "#8a4a3f"),
+                      labels = c(warm = "warm", reserved = "reserved, punctual", origin = "origin",
+                                 between = "in between"),
+                      breaks = c("warm", "reserved", "origin", "between")) +
+  scale_x_log10(breaks = c(500, 1000, 3000, 10000, 30000, 100000),
+                labels = c("$500", "$1k", "$3k", "$10k", "$30k", "$100k")) +
+  scale_y_continuous(labels = function(x) paste0(x, " %")) +
+  coord_cartesian(ylim = c(0, 41)) +
+  labs(x = "GDP per person, 2023 (current US$, log scale)", y = "answers complimenting his culture")
+```
+
+```{=latex}
+\begin{whatitshows}
+```
+
+**What it shows.** The dots climb from Afghanistan, the poorest country and the least complimented man, to
+Finland, Japan, Australia and Switzerland. Brazil, Fiji and Japan sit well above the line: they are
+complimented more than their wealth predicts. Russia, the United States, France and Romania sit well below it.
+
+```{=latex}
+\end{whatitshows}
+```
+
+Compliments on his culture against GDP per capita, 2023 [@worldbank_gdp]; seven models pooled. Line: linear fit
+on the logarithm of GDP per capita.
+:::
+
+The slope is mostly a gap between rich and less rich countries. Among the `r sum(hi_)` high-income countries,
+wealth barely orders the men (ρ = `r wsub("compliment", hi_)` for compliments, `r wsub("defensive", hi_)` for
+"his origin does not matter"); among the `r sum(!hi_)` others, it orders them closely
+(`r wsub("compliment", !hi_)` and `r wsub("defensive", !hi_)`).
+
+```{=latex}
+\begin{whyitmatters}\textbf{\large Why it matters}\par\smallskip
+```
+
+- **A link, not a proof of cause.** Wealth goes with region, majority religion and the way French media talk
+  about these countries, often through migration; 24 countries cannot tell them apart. The AI may follow any
+  of them, or all.
+- **Still, the pattern is the one of a social prejudice.** The men of rich countries are described by
+  their qualities, those of poorer countries by where they come from. Nobody asked the AI to rank countries.
+
+```{=latex}
+\end{whyitmatters}
+```
+
 ## Agreement between the judge and regular expressions
 
 ```{r}
@@ -3106,6 +3203,8 @@ to the report's examples: it is the most alarmist model, and its alarm rises mos
   and analyses by context (about 9 verdicts per cell and model) are exploratory.
 - **Imperfect masking.** Greetings in the country's language, some city names, or demonyms misspelt by
   the models escape masking and may steer the judge.
+- **Wealth is one variable among several.** The link with GDP per capita (@sec-wealth) is measured over
+  24 countries, which also differ by region, religion and media coverage; it describes the pattern, not its cause.
 - **Protocol.** French prompts only, a single gender configuration (a woman alone with a man), and uniform
   generation parameters rather than each vendor's recommended settings.
 
@@ -3160,7 +3259,7 @@ record the model revision, vLLM version, seeds and every answer; the judge noteb
 the rubric, the judge revision and every verdict; the judge-free notebook [@kaggle_guess] recomputes the
 classifier and the lexicometry from every answer of every model; the synthesis notebook [@kaggle_synthesis]
 also counts the refusals. The answers and `rts-v4` verdicts analysed here are
-released under CC0-1.0 [@kaggle_data]. This report is a Quarto document that recomputes every figure,
+released under CC0-1.0 [@kaggle_data]. The GDP per capita and income groups of @sec-wealth come from the World Bank's open data, under CC BY 4.0 [@worldbank_gdp; @worldbank_class], and are kept in the repository (`analysis/data/worldbank.csv`). This report is a Quarto document that recomputes every figure,
 table and number from that dataset.
 
 # Software and tools {#sec-stack .unnumbered}
@@ -3187,6 +3286,7 @@ tibble::tribble(
   "igraph, ggraph, graphlayouts", "networks of the classifier's confusions", rv("igraph"),
   "cluster", "silhouettes of the families of the opening map", rv("cluster"),
   "knitr, jsonlite", "tables; reading the answer and verdict files", rv("knitr"),
+  "World Bank open data API, requests", "GDP per capita and income groups (analysis/wealth.py)", "—",
   "Quarto", "this document: R code and text in one source", system("quarto --version", intern = TRUE),
   "XeLaTeX, KOMA-Script, TikZ, tcolorbox", "PDF layout, diagrams and boxes", "—",
   "Libertinus, Inter, IBM Plex Mono, Space Grotesk", "fonts", "—"

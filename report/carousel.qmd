@@ -1,6 +1,10 @@
 ---
 title: "She Is Alone With a Man"
 author: "Adrien Sales"
+subtitle: "What seven open-weight AI models answer a woman alone with a man, when only his nationality changes"
+subject: "Nationality bias in the safety advice of seven open-weight LLMs: 52k answers, 24 nationalities, 11 situations"
+keywords: [AI bias, LLM, nationality, stereotypes, AI safety, open-weight models, Kaggle, Quarto]
+date: "2026-11-04"
 lang: en-GB
 format:
   pdf:
@@ -49,11 +53,19 @@ format:
         \pagecolor{night}
         \setlength{\parindent}{0pt}\setlength{\parskip}{0.6em}\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000
         \renewcommand{\maketitle}{}
-        \AtBeginDocument{\color{fg}\includepdf[pages=1]{covers/cover_carousel.pdf}}
+        \AtBeginDocument{\color{fg}}
+        % the cover is a picture, whose links would not be clickable: its last line, the social handles, is written
+        % over it here as real links (an empty clickable area is dropped by xdvipdfmx)
+        \newcommand{\coverlinks}{\put(30.6,22){\fontsize{8}{10}\selectfont\color{linkblue}%
+          \href{https://x.com/rastadidi}{\faXTwitter\,x.com/rastadidi}\quad
+          \href{https://dev.to/adriens}{\faDev\,dev.to/adriens}\quad
+          \href{https://github.com/adriens}{\faGithub\,github.com/adriens}\quad
+          \href{https://www.linkedin.com/in/adrien-sales}{\faLinkedin\,linkedin.com/in/adrien-sales}\quad
+          \href{https://www.kaggle.com/adriensales}{\faKaggle\,kaggle.com/adriensales}}}
         % on every slide but the cover: the name of the report and the author on top, the slide number on the right
         \AddToShipoutPictureFG{\ifnum\value{page}>1
           \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.45in}){\makebox[0pt][l]{\fontsize{9}{11}\selectfont
-            \color{dim}\textbf{She Is Alone With a Man}\enspace·\enspace Adrien Sales}}}
+            \color{dim}\textbf{She Is Alone With a Man}\quad Adrien Sales}}}
           \AtPageUpperLeft{\put(\LenToUnit{\paperwidth-0.55in},\LenToUnit{-0.45in}){\makebox[0pt][r]{\fontsize{9}{11}\selectfont
             \color{dim}\thepage\,/\,18}}}
           \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.56in}){\color{panel}\rule{\dimexpr\paperwidth-1.1in\relax}{0.6pt}}}\fi}
@@ -145,8 +157,8 @@ theme_set(theme_minimal(base_size = 15, base_family = "Inter") +
         plot.title.position = "plot", legend.position = "top", legend.title = element_blank()))
 COVER_FILE <- "covers/cover_carousel"; # drawn at the width of the A4 cover, in 4:5, then scaled down to the slide
 COVER_W <- 8.27; COVER_H <- 8.27 * 1.25; COVER_GAP <- 1.7; COVER_CENTRE <- 0.78; COVER_DATE_TOP <- TRUE
-COVER_CAPTION <- paste0("7 open-weight models · 24 nationalities · 11 situations · 52k answers · 89 GPU hours (2 × NVIDIA T4), 6 CPU hours\n\n",
-  "x.com/rastadidi  ·  dev.to/adriens  ·  github.com/adriens  ·  linkedin.com/in/adrien-sales  ·  kaggle.com/adriensales")
+# the social handles are not drawn here: the slide writes them over the cover, as links (\\coverlinks)
+COVER_CAPTION <- paste0("7 open-weight models · 24 nationalities · 11 situations · 52k answers · 89 GPU hours (2 × NVIDIA T4), 6 CPU hours\n\n ")
 COVER_SUBTITLE <- paste0("Same question, same situation: only the man's nationality changes.\n",
                          "What seven open-weight AI models answer a woman alone with him.")
 source("R/cover_page.R")
@@ -246,6 +258,11 @@ WORD_EN <- c(ambassade = "embassy", argent = "money", arnaque = "scam", art = "a
 word_pts <- word_pts |> mutate(lab = coalesce(unname(WORD_EN[lab]), lab))
 ```
 
+<!-- 1: the cover, drawn by the setup chunk; in the body, once the links of hyperref are ready -->
+```{=latex}
+\includepdf[pages=1, picturecommand*={\coverlinks}]{covers/cover_carousel.pdf}
+```
+
 <!-- 2: how it started -->
 ```{=latex}
 \kicker{heat}{How it started}
@@ -269,7 +286,7 @@ word_pts <- word_pts |> mutate(lab = coalesce(unname(WORD_EN[lab]), lab))
 \end{tcolorbox}
 \end{minipage}
 \vfill
-\slidetext{dim}{A striking result, on a handful of prompts. I wanted to know if it holds at scale.}
+\slidetext{dim}{A striking result. I wanted to know if it holds at scale, in more contexts.}
 \newpage
 ```
 
