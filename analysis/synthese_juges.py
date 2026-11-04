@@ -570,6 +570,71 @@ save(fig, "fig6_accord_modeles")
 plt.show()
 
 # %% [markdown]
+# ## 7 bis. La richesse du pays (Banque mondiale)
+#
+# Les données de richesse viennent de la Banque mondiale (CC BY 4.0) : le PIB par habitant en dollars
+# courants de 2023 (indicateur `NY.GDP.PCAP.CD`) et le groupe de revenu de chaque pays. Elles sont lues dans
+# `worldbank.csv`, écrit par `analysis/wealth.py` et publié dans un petit dataset à part (licence CC BY 4.0),
+# pour que ce notebook tourne sans internet. Pour chaque nationalité, on regroupe les verdicts des sept modèles
+# et on mesure la corrélation de rang de Spearman avec le PIB par habitant, sur les 24 nationalités, puis on
+# vérifie que le lien tient à continent égal (test F d'une régression sur le continent, puis sur le continent
+# et le logarithme du PIB).
+
+# %% [markdown]
+# > **Comment lire ce graphique**
+#
+# > Chaque point est une nationalité. De gauche à droite, la richesse de son pays (PIB par habitant, échelle
+# > logarithmique : chaque graduation multiplie par dix) ; de bas en haut, la part des réponses des sept IA qui
+# > complimentent sa culture. La droite grise est la tendance. Si la richesse ne comptait pas, les points
+# > seraient éparpillés sans pente.
+
+# %%
+import statsmodels.formula.api as smf
+from IPython.display import display
+from scipy.stats import spearmanr
+from statsmodels.stats.anova import anova_lm
+
+WB_FILE = next(iter(Path("/kaggle/input").glob("**/worldbank.csv")), None) or DATA / "worldbank.csv"
+wb = pd.read_csv(WB_FILE)
+N7 = D[D.country != "BASE"]
+wealth = (N7.groupby("country")[["stereo_pos", "defensive_marking", "negative_association"]].mean() * 100)
+wealth = wealth.rename(columns={"stereo_pos": "compliment", "defensive_marking": "defensive",
+                                "negative_association": "risk"}).reset_index().merge(wb, on="country")
+# continent ONU (M49) : le lien tient-il à continent égal ?
+CONT = {"Europe": "Europe", "Africa": "Afrique", "Asia": "Asie", "America": "Amériques",
+        "Australia": "Océanie", "Melanesia": "Océanie"}
+wealth["continent"] = wealth.country.map(
+    lambda c: next(v for k, v in CONT.items() if k in countries.region_m49[c]))
+wealth["log_gdp"] = np.log10(wealth.gdp_pc)
+rows = []
+for k, lab in [("compliment", "compliments sur sa culture"), ("defensive", "« son origine ne compte pas »"),
+               ("risk", "risque lié à son origine")]:
+    rho, p = spearmanr(wealth.gdp_pc, wealth[k])
+    f0 = smf.ols(f"{k} ~ C(continent)", wealth).fit()
+    f1 = smf.ols(f"{k} ~ C(continent) + log_gdp", wealth).fit()
+    rows.append({"mesure": lab, "rho Spearman": round(rho, 2), "p": round(p, 5),
+                 "R² continent": round(f0.rsquared, 2), "R² continent + PIB": round(f1.rsquared, 2),
+                 "p du PIB à continent égal": round(anova_lm(f0, f1)["Pr(>F)"][1], 4)})
+display(pd.DataFrame(rows))
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.scatter(wealth.log_gdp, wealth.compliment, color="#1baf7a", s=40, zorder=3)
+# quelques étiquettes décalées à la main, là où deux pays se chevauchent
+NUDGE = {"ITA": (4, -11), "SWE": (4, -11), "SRB": (-34, -11), "GBR": (4, -11)}
+for _, r in wealth.iterrows():
+    ax.annotate(countries.country_name_fr.get(r.country, r.country), (r.log_gdp, r.compliment), fontsize=8,
+                xytext=NUDGE.get(r.country, (4, 3)), textcoords="offset points", color=INK)
+a, b = np.polyfit(wealth.log_gdp, wealth.compliment, 1)
+xs = np.linspace(wealth.log_gdp.min(), wealth.log_gdp.max(), 50)
+ax.plot(xs, a * xs + b, color=MUTED, lw=1)
+ax.set_xticks(np.log10([500, 1000, 3000, 10000, 30000, 100000]),
+              ["500 $", "1 k$", "3 k$", "10 k$", "30 k$", "100 k$"])
+ax.set_xlabel("PIB par habitant, 2023 (dollars courants, échelle log) — Banque mondiale")
+ax.set_ylabel("réponses qui complimentent sa culture (%)")
+ax.set_title("Plus son pays est riche, plus l'IA complimente sa culture", loc="left")
+save(fig, "fig7b_richesse")
+
+# %% [markdown]
 # ## 8. Accord juge ↔ regex (méthodologie)
 #
 # Les familles de regex `assoc_*` du bench servent de repère indépendant du juge. Pour chaque famille,

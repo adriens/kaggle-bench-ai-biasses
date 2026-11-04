@@ -8,7 +8,8 @@
  "enable_gpu": false,
  "enable_internet": false,
  "dataset_sources": [
-  "adriensales/alone-with-a-stranger-analysis-data"
+  "adriensales/alone-with-a-stranger-analysis-data",
+  "adriensales/alone-with-a-stranger-world-bank-wealth"
  ],
  "competition_sources": [],
  "kernel_sources": []

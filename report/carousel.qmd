@@ -67,7 +67,7 @@ format:
           \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.45in}){\makebox[0pt][l]{\fontsize{9}{11}\selectfont
             \color{dim}\textbf{She Is Alone With a Man}\quad Adrien Sales}}}
           \AtPageUpperLeft{\put(\LenToUnit{\paperwidth-0.55in},\LenToUnit{-0.45in}){\makebox[0pt][r]{\fontsize{9}{11}\selectfont
-            \color{dim}\thepage\,/\,18}}}
+            \color{dim}\thepage\,/\,16}}}
           \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.56in}){\color{panel}\rule{\dimexpr\paperwidth-1.1in\relax}{0.6pt}}}\fi}
         \newcommand{\kicker}[2]{{\fontsize{11}{13}\selectfont\bfseries\color{#1}\MakeUppercase{#2}\par}\vspace{0.25em}}
         \newcommand{\headline}[1]{{\fontsize{28}{32}\selectfont\bfseries\color{fg}#1\par}\vspace{0.3em}}
@@ -453,7 +453,7 @@ ggplot(cmp5, aes(p, lab, fill = grp)) +
 \newpage
 ```
 
-<!-- 7: the word map -->
+<!-- 8: the word map -->
 ```{=latex}
 \kicker{amber}{In their own words}
 \headline{Warm Italians, reserved Finns. And the others.}
@@ -497,7 +497,7 @@ ggplot(mapping = aes(x, y)) +
 \newpage
 ```
 
-<!-- 8: the map of the world -->
+<!-- 9: the map of the world -->
 ```{r}
 #| label: map-calc
 # the families of the word map, on a world map: each nationality takes the colour of its family; Romania and
@@ -561,7 +561,7 @@ p_world / key + plot_layout(heights = c(3.2, 0.7))
 \newpage
 ```
 
-<!-- 9: close-up on Europe -->
+<!-- 10: close-up on Europe -->
 ```{=latex}
 {\fontsize{11}{13}\selectfont\bfseries\color{amber}\raisebox{-0.04in}{\flag{0.2}{\euflag}}\enspace CLOSE-UP ON EUROPE\par}\vspace{0.25em}
 \headline{One continent, three families.}
@@ -577,7 +577,7 @@ p_eu / key + plot_layout(heights = c(4.5, 0.7))
 \newpage
 ```
 
-<!-- 10: wealth -->
+<!-- 11: wealth -->
 ```{=latex}
 \kicker{green}{Following the money?}
 \headline{The richer his country, the warmer the AIs.}
@@ -619,20 +619,7 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
 \newpage
 ```
 
-<!-- 8: guessed -->
-```{=latex}
-\kicker{heat}{Deeper than RTS could see}
-\headline{Hide his nationality. The words still give it away.}
-\vfill
-{\centering\hugenum{heat}{\fontsize{150}{150}\selectfont `r num(g_acc, 0)` \%}\par}
-\vspace{0.6em}
-\slidetext{fg}{A program reading only the answers, nationality hidden, guesses it `r pcl(g_acc)` of the time.}
-\slidetext{dim}{Chance would be 4 \%: one nationality in 24.}
-\vfill\vfill
-\newpage
-```
-
-<!-- 9: four ways -->
+<!-- 12: four ways -->
 ```{=latex}
 \kicker{heat}{For the others}
 \headline{The others are met with suspicion. Each AI its own way.}
@@ -654,18 +641,23 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
 \newpage
 ```
 
-<!-- 10: a real answer -->
+<!-- 13: deeper than RTS could see: the words, and one real answer -->
 ```{=latex}
-\kicker{heat}{A real answer}
+\kicker{heat}{Deeper than RTS could see}
+\headline{Hide his nationality. The words still give it away.}
+\vspace{0.4em}
+\begin{minipage}[c]{0.45\linewidth}\centering{\fontsize{74}{76}\selectfont\bfseries\color{heat}`r num(g_acc, 0)` \%\par}\end{minipage}\hfill
+\begin{minipage}[c]{0.52\linewidth}\raggedright\slidetext{fg}{A program reading only the answers, nationality hidden, guesses it `r pcl(g_acc)` of the time.}
+\slidetext{dim}{Chance would be 4 \%: one nationality in 24.}\end{minipage}
 \vfill
-{\fontsize{30}{40}\selectfont\itshape\color{fg} "If the plumber is Muslim (which is likely given his Algerian origin), make sure you are dressed in a covering way: coat, long shirt, no legs or arms exposed."\par}
-\vspace{1em}
-\slidetext{dim}{Qwen3.5-9B, to a woman at home with a plumber. The question never mentioned religion.}
+{\fontsize{11}{13}\selectfont\bfseries\color{heat}\MakeUppercase{A real answer}\par}\vspace{0.3em}
+\begin{tile}{heat}{\fontsize{21}{28}\selectfont\itshape\color{fg}"If the plumber is Muslim (which is likely given his Algerian origin), make sure you are dressed in a covering way: coat, long shirt, no legs or arms exposed."\par}\vspace{0.4em}
+{\fontsize{11}{14}\selectfont\color{dim}\textbf{Qwen3.5-9B}, to a woman at home with a plumber. The question never mentioned religion.\par}\end{tile}
 \vfill
 \newpage
 ```
 
-<!-- 11: minors -->
+<!-- 14: minors -->
 ```{=latex}
 \kicker{heat}{Even for a child}
 \headline{A girl of 15 is protected unequally.}
@@ -686,7 +678,7 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
 \newpage
 ```
 
-<!-- 12: bigger is not fairer -->
+<!-- 15: bigger is not fairer -->
 ```{=latex}
 \kicker{heat}{Bigger is not fairer}
 \headline{Same maker, bigger model, more suspicion.}
@@ -712,57 +704,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \newpage
 ```
 
-<!-- 13: iceberg -->
-```{=latex}
-\kicker{keyblue}{The whole picture}
-\headline{A quick test sees the tip.}
-```
-
-```{r}
-#| fig-height: 6.1
-NJ <- D |> filter(!is_base)
-p_neg <- 100 * mean(NJ$negative_association); p_def <- 100 * mean(NJ$defensive_marking)
-tip <- tibble(x = c(-1.3, -0.6, 0, 0.7, 1.4), y = c(0, 0.8, 1.35, 0.75, 0))
-body <- tibble(x = c(-1.3, -3.7, -4.5, -3.3, 0, 3.5, 4.6, 3.6, 1.4), y = c(0, -1.0, -3.0, -5.0, -5.6, -4.9, -2.9, -0.9, 0))
-# what lies under the water: a coloured title and one line of detail each
-under <- tibble(y = c(-0.95, -1.85, -2.75, -3.65, -4.55),
-  title = c("\"his origin does not matter\"", "unequal compliments", "refusals to help", "a religion, a dress code",
-            "nationality guessed"),
-  detail = c(sprintf("%s of the answers", pc(p_def)),
-             sprintf("Finland %s, Afghanistan %s", pc(sp_$p[sp_$country == "FIN"]), pc(sp_$p[sp_$country == "AFG"])),
-             sprintf("up to %s for an Afghan man", pc(refu$p[refu$country == "AFG"], 1)),
-             "his faith assumed, her clothes advised",
-             sprintf("%s from the words alone (chance: 4 %%)", pc(g_acc))),
-  col = c("#ff6a4d", "#2fbf8f", "#8b7cf0", "#eda100", "#5aa2ff"))
-# the sea darkens with depth; the bands overlap a little, so that no thin line shows between them
-water <- tibble(y0 = seq(0, -5.75, length.out = 40)) |> mutate(y1 = y0 - 5.75 / 40 - 0.03,
-                                                              col = colorRampPalette(c("#173556", NIGHT))(40))
-X0 <- -2.75
-ggplot() +
-  geom_rect(data = water, aes(xmin = -Inf, xmax = Inf, ymin = y1, ymax = y0, fill = col), colour = NA) +
-  geom_polygon(data = body, aes(x, y), fill = "#9fd3ff", alpha = 0.10, colour = "#5aa2ff", linewidth = 0.6) +
-  geom_polygon(data = tip, aes(x, y), fill = "#eef6ff", colour = NA) +
-  geom_polygon(data = tibble(x = c(0, 0.7, 1.4, 0.3), y = c(1.35, 0.75, 0, 0)), aes(x, y), fill = "#bcd9f5", colour = NA) +
-  geom_hline(yintercept = 0, colour = "#8ec1ff", linewidth = 0.8) +
-  annotate("label", x = -4.85, y = 0.72, hjust = 0, family = "Inter", fontface = "bold", size = 4.0, lineheight = 0.95,
-           colour = "white", fill = "#d63c2a", border.colour = "#d63c2a", label.r = unit(4, "pt"), label.padding = unit(4, "pt"),
-           label = sprintf("What a quick test sees:\nexplicit risks (scams, migration),\n%s of the answers", pc(p_neg, 1))) +
-  annotate("text", x = 4.9, y = -0.3, hjust = 1, family = "Inter", fontface = "bold", size = 3.9,
-           colour = "#8ec1ff", label = "what this study adds ↓") +
-  geom_point(data = under, aes(X0 - 0.3, y + 0.17, colour = col), size = 3.6) +
-  geom_text(data = under, aes(X0, y + 0.17, label = title, colour = col), hjust = 0, family = "Inter",
-            fontface = "bold", size = 4.6) +
-  geom_text(data = under, aes(X0, y - 0.2, label = detail), hjust = 0, family = "Inter", size = 3.9, colour = INK) +
-  scale_fill_identity() + scale_colour_identity() +
-  coord_cartesian(xlim = c(-5, 5), ylim = c(-5.75, 1.5), expand = FALSE) +
-  theme_void()
-```
-
-```{=latex}
-\newpage
-```
-
-<!-- 17: take-aways -->
+<!-- 16: take-aways -->
 ```{=latex}
 \kicker{heat}{What to take away}
 \headline{Six things to remember.}

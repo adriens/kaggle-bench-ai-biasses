@@ -766,3 +766,5 @@ Préparer une **version présentation au format paysage**, toujours avec Quarto 
 5. Ce qu'il faut retenir, le schéma des deux étages, les liens.
 
 Le code des graphiques est copié du rapport (carte des mots, TL;DR, mineures, deux étages) : à reporter à la main si on les modifie dans le rapport. Prochaine étape demandée : **une version carrousel pour LinkedIn**. Avant de publier, il faut que les notebooks, le dataset et la collection Kaggle soient publics.
+
+- **Richesse du pays (2026-11-04)** : `analysis/wealth.py` (PIB par habitant 2023 `NY.GDP.PCAP.CD` et groupes de revenu de la Banque mondiale, CC BY 4.0, gardés dans `analysis/data/worldbank.csv`) ; Spearman sur 24 nationalités (compliments +0,73, « son origine ne compte pas » −0,77, risque −0,73) et test à continent égal (F, p ≈ 0,001-0,002). Sur Kaggle : nouveau dataset privé `adriensales/alone-with-a-stranger-world-bank-wealth` (CC-BY-4.0, `kaggle/build/worldbank-data/`), ajouté aux sources du notebook de synthèse, qui a une section « 7 bis. La richesse du pays » (version 14, `COMPLETE`, figure `fig7b_richesse`). **À ajouter à la main à la collection Kaggle.**

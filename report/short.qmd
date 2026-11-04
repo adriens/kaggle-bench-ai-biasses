@@ -265,6 +265,58 @@ me?"* Only the bracket changes: *a driver*, *an Algerian driver*, *a Japanese dr
 
 Everything is public and can be rerun: prompts, answers, verdicts and code.
 
+# The richer his country, the warmer the AI
+
+```{r}
+#| label: wealth
+# GDP per capita (World Bank, 2023) against the compliments of the seven models; analysis/wealth.py
+wealth <- read.csv(file.path("..", "analysis", "out", "wealth_by_country.csv")) |> mutate(lab = nm(country))
+w_rho <- read.csv(file.path("..", "analysis", "out", "wealth_spearman.csv"))
+wr <- function(k) num(w_rho$rho[w_rho$measure == k], 2)
+```
+
+```{=latex}
+\begin{minipage}[t]{0.43\linewidth}\vspace{0pt}\raggedright
+```
+
+I set each nationality against the wealth of his country (GDP per capita, World Bank). The richer the country,
+the more the AIs compliment the man (Spearman ρ = `r wr("compliment")`), and the less they say "his origin
+does not matter" (`r wr("defensive")`) or tie him to a risk (`r wr("risk")`). It still holds between countries
+of the same continent. A link, not a proof of cause: wealth also goes with religion and with how the news
+talk about these countries.
+
+```{=latex}
+\end{minipage}\hfill\begin{minipage}[t]{0.55\linewidth}\vspace{0pt}
+```
+
+```{r}
+#| fig-width: 4
+#| fig-height: 3.3
+INC_COL <- c("High income" = "#2a78d6", "Upper middle income" = "#eda100", "Lower middle income" = "#e8452c",
+             "Low income" = "#a3261a")
+ggplot(wealth, aes(gdp_pc, compliment)) +
+  geom_smooth(method = "lm", formula = y ~ x, colour = MUTED, fill = GRID, linewidth = 0.5) +
+  geom_point(aes(colour = income_group), size = 2.2) +
+  geom_text_repel(aes(label = lab, colour = income_group), family = "Inter", size = 2.5, seed = 2,
+                  box.padding = 0.2, min.segment.length = 0.3, segment.colour = "#cfcdc7", show.legend = FALSE) +
+  scale_colour_manual(values = INC_COL, breaks = names(INC_COL),
+                      labels = c("high income", "upper middle", "lower middle", "low income")) +
+  guides(colour = guide_legend(nrow = 2)) +
+  scale_x_log10(breaks = c(500, 1000, 3000, 10000, 30000, 100000),
+                labels = c("$500", "$1k", "$3k", "$10k", "$30k", "$100k")) +
+  scale_y_continuous(labels = function(x) paste0(x, " %")) +
+  coord_cartesian(ylim = c(0, 41)) +
+  labs(x = "GDP per person, 2023 (log scale)", y = "answers complimenting\nhis culture")
+```
+
+```{=latex}
+\end{minipage}
+```
+
+```{=latex}
+{\small\color{muted} One dot per nationality, seven AIs pooled; colour: World Bank income group. Source: World Bank, GDP per capita in current US\$, 2023 (NY.GDP.PCAP.CD), \href{https://data.worldbank.org/indicator/NY.GDP.PCAP.CD}{data.worldbank.org}, CC BY 4.0.}
+```
+
 \newpage
 
 # Hide his nationality: the answers still give it away
