@@ -306,7 +306,7 @@ word_pts <- word_pts |> mutate(lab = coalesce(unname(WORD_EN[lab]), lab))
 \hugenum{green}{89 h}\par\slidetext{fg}{of GPU, on 2 × NVIDIA T4} & \hugenum{green}{6 h}\par\slidetext{fg}{of CPU}
 \end{tabular}
 \vfill
-\slidetext{dim}{All on Kaggle's free quota, with open models. Anyone can replay it on their own.}
+\slidetext{dim}{All on Kaggle's free quota, with open models. At home: 2~×~RTX~5060~Ti~16~GB, or one RTX~5090.}
 \newpage
 ```
 

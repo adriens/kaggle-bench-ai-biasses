@@ -318,7 +318,7 @@ me?"* Only the bracket changes: *a driver*, *an Algerian driver*, *a Japanese dr
 \kpi{\faUserGroup}{3}\par ages: unstated, 25, and a girl of 15 &
 \kpi{\faComments}{`r num(nrow(R) / 1000, 0)`k}\par answers, all recorded &
 \kpi{\faBookOpen}{10 + 2}\par Kaggle notebooks + datasets, all the data\\[14pt]
-\kpi{\faMicrochip}{89 h}\par of GPU (2 × NVIDIA T4), to generate and judge &
+\kpi{\faMicrochip}{89 h}\par of GPU on 2~×~NVIDIA~T4; at home: 2~×~RTX~5060~Ti 16~GB or one RTX~5090 &
 \kpi{\faServer}{6 h}\par of CPU, for the judge-free analysis and the synthesis &
 \kpi{\faEuroSign}{0}\par euros: all on Kaggle's free quota
 \end{tabular}
@@ -359,7 +359,7 @@ talk about these countries.
 
 ```{r}
 #| fig-width: 4
-#| fig-height: 3.3
+#| fig-height: 3.1
 INC_COL <- c("High income" = "#2a78d6", "Upper middle income" = "#eda100", "Lower middle income" = "#e8452c",
              "Low income" = "#a3261a")
 ggplot(wealth, aes(gdp_pc, compliment)) +

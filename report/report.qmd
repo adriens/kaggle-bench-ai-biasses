@@ -614,6 +614,12 @@ tokens per answer, the same settings for every model rather than each vendor's r
 model runs in its own Kaggle notebook built from a single parameterised source [@kaggle_granite;
 @kaggle_qwen; @kaggle_gemma_e2b; @kaggle_gemma; @kaggle_gemma_26b; @kaggle_ministral; @kaggle_nemotron].
 
+For readers who want to rerun it at home: a T4 is a 2018 datacentre card (Turing architecture, the
+generation of the GeForce RTX 20 series) with 16 GB of memory, roughly an RTX 2070 in compute; what matters
+here is the 32 GB of the pair. Two GeForce RTX 5060 Ti 16 GB (or 4060 Ti 16 GB) reproduce the same setup,
+faster and with bf16 support; a single RTX 5090 (32 GB) does too, without splitting the model across two
+cards.
+
 ```{r}
 #| label: gen-stats
 g <- R |> group_by(model) |>
