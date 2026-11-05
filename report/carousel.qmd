@@ -63,7 +63,10 @@ format:
           \href{https://dev.to/adriens}{\faDev\,dev.to/adriens}\quad
           \href{https://github.com/adriens}{\faGithub\,github.com/adriens}\quad
           \href{https://www.linkedin.com/in/adrien-sales}{\faLinkedin\,linkedin.com/in/adrien-sales}\quad
-          \href{https://www.kaggle.com/adriensales}{\faKaggle\,kaggle.com/adriensales}}}
+          \href{https://www.kaggle.com/adriensales}{\faKaggle\,kaggle.com/adriensales}}%
+          % the licence, at the right end of the caption line, aligned with the end of the handles
+          \put(485.6,52.5){\makebox[0pt][r]{\fontsize{8}{10}\selectfont
+          \href{https://creativecommons.org/licenses/by/4.0/}{\color{dim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}
         % on every slide but the cover: the name of the report and the author on top, the slide number on the right
         \AddToShipoutPictureFG{\ifnum\value{page}>1
           \AtPageUpperLeft{\put(\LenToUnit{0.55in},\LenToUnit{-0.45in}){\makebox[0pt][l]{\fontsize{9}{11}\selectfont
@@ -731,7 +734,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \takeaway{keyblue}{\faMagnifyingGlass}{Test who the people are.}{Safety tests must vary it, prompt after prompt.}
 \vfill
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, before upper=\raggedright]
-{\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\color{linkblue}\underline{the full report}} (90 pages)\enspace·\enspace\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/short.pdf}{\color{linkblue}\underline{the 7-page version}}\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\color{linkblue}\underline{the full report}} (91 pages)\enspace·\enspace\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/short.pdf}{\color{linkblue}\underline{the 7-page version}}\par}
 \vspace{0.15em}
 {\fontsize{12.5}{16}\selectfont\color{fg}\faGithub\enspace\textbf{Data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
 \vspace{0.15em}
@@ -742,6 +745,6 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \href{https://x.com/rastadidi}{\color{linkblue}\faXTwitter}\enspace
 \href{https://dev.to/adriens}{\color{linkblue}\faDev}\enspace
 \href{https://www.kaggle.com/adriensales}{\color{linkblue}\faKaggle}\enspace
-\href{https://github.com/adriens}{\color{linkblue}\faGithub}\hfill{\fontsize{9}{11}\selectfont Built with \href{https://www.r-project.org}{\color{dim}R}, \href{https://quarto.org}{\color{dim}Quarto} and \href{https://www.latex-project.org}{\color{dim}\LaTeX}}\par}
+\href{https://github.com/adriens}{\color{linkblue}\faGithub}\hfill{\fontsize{9}{11}\selectfont \href{https://creativecommons.org/licenses/by/4.0/}{\color{dim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}\enspace·\enspace Built with \href{https://www.r-project.org}{\color{dim}R}, \href{https://quarto.org}{\color{dim}Quarto} and \href{https://www.latex-project.org}{\color{dim}\LaTeX}}\par}
 \end{tcolorbox}
 ```

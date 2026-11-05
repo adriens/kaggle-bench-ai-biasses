@@ -3310,9 +3310,13 @@ record the model revision, vLLM version, seeds and every answer; the judge noteb
 the rubric, the judge revision and every verdict; the judge-free notebook [@kaggle_guess] recomputes the
 classifier and the lexicometry from every answer of every model; the synthesis notebook [@kaggle_synthesis]
 also counts the refusals. The answers and `rts-v4` verdicts analysed here are
-released under CC0-1.0 [@kaggle_data]. The GDP per capita and income groups of @sec-wealth come from the World Bank's open data, under CC BY 4.0 [@worldbank_gdp; @worldbank_class], and are kept in the repository (`analysis/data/worldbank.csv`). This report is a Quarto document that recomputes every figure,
+released under CC BY 4.0 [@kaggle_data]. The GDP per capita and income groups of @sec-wealth come from the World Bank's open data, under CC BY 4.0 [@worldbank_gdp; @worldbank_class], and are kept in the repository (`analysis/data/worldbank.csv`). This report is a Quarto document that recomputes every figure,
 table and number from that dataset. Built with [R](https://www.r-project.org), [Quarto](https://quarto.org) and
 [`\LaTeX`{=latex}](https://www.latex-project.org).
+
+`\href{https://creativecommons.org/licenses/by/4.0/}{\color{black}\Large\faCreativeCommons\,\faCreativeCommonsBy}\enspace{}`{=latex}This report, its short version and the carousel are released under the
+[Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/):
+anyone may share and adapt them, for any purpose, provided they credit the author.
 
 # Software and tools {#sec-stack .unnumbered}
 
