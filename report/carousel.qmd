@@ -731,7 +731,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \takeaway{keyblue}{\faMagnifyingGlass}{Test who the people are.}{Safety tests must vary it, prompt after prompt.}
 \vfill
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, before upper=\raggedright]
-{\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\color{linkblue}\underline{the full report}} (89 pages)\enspace·\enspace\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/short.pdf}{\color{linkblue}\underline{the 7-page version}}\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\color{linkblue}\underline{the full report}} (90 pages)\enspace·\enspace\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/short.pdf}{\color{linkblue}\underline{the 7-page version}}\par}
 \vspace{0.15em}
 {\fontsize{12.5}{16}\selectfont\color{fg}\faGithub\enspace\textbf{Data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
 \vspace{0.15em}

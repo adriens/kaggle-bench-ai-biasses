@@ -717,7 +717,7 @@ p_world / (p_eu | key) + plot_layout(heights = c(1.3, 1))
 ```{=latex}
 \begin{tcolorbox}[enhanced, colback=black!3, frame hidden, arc=2pt, left=10pt, right=10pt, top=8pt, bottom=8pt]
 \sffamily\small
-\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\textbf{The full report}} (89 pages: method, statistics, every chart, the worst answers in French and English),
+\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\textbf{The full report}} (90 pages: method, statistics, every chart, the worst answers in French and English),
 the data and the code are published under the name \textit{Alone With a Stranger}, on GitHub:
 \href{https://github.com/adriens/kaggle-bench-ai-biasses}{github.com/adriens/kaggle-bench-ai-biasses}.
 The results also come as a \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/carousel.pdf}{16-slide carousel}.\par\medskip
