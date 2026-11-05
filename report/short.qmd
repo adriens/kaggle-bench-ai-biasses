@@ -65,7 +65,11 @@ format:
         \cfoot*{\pagemark}
         \ofoot*{\sffamily\footnotesize\color{muted}Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{muted}\faXTwitter\,@rastadidi}}
         \pagestyle{scrheadings}
-        \AtBeginDocument{\includepdf[pages=1]{covers/cover_short.pdf}\setcounter{page}{1}}
+        % the licence, written over the cover as a link, at the right end of its last caption line
+        \definecolor{coverdim}{HTML}{8D8B85}
+        \newcommand{\coverlicence}{\put(537.4,58){\makebox[0pt][r]{\fontsize{8.8}{11}\selectfont\sffamily
+          \href{https://creativecommons.org/licenses/by/4.0/}{\color{coverdim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}
+        \AtBeginDocument{\includepdf[pages=1, picturecommand*={\coverlicence}]{covers/cover_short.pdf}\setcounter{page}{1}}
         % the cover carries the title: no title block on page 1, a compact heading instead
         \renewcommand{\maketitle}{}
         \newtcolorbox{bignum}[1][]{enhanced, colback=#1!7, colframe=#1, boxrule=0pt, leftrule=4pt, arc=0pt,

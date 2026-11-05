@@ -95,7 +95,11 @@ format:
         \usepackage{pdfpages}
         % the PDF information is written with the first page: set before the cover is shipped out
         \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}, pdfcreator={Quarto, R and XeLaTeX}}}
-        \AtBeginDocument{\includepdf[pages=1]{covers/cover_page.pdf}\setcounter{page}{1}}
+        % the licence, written over the cover as a link, at the right end of its last caption line
+        \definecolor{coverdim}{HTML}{8D8B85}
+        \newcommand{\coverlicence}{\put(537.4,58){\makebox[0pt][r]{\fontsize{8.8}{11}\selectfont\sffamily
+          \href{https://creativecommons.org/licenses/by/4.0/}{\color{coverdim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}
+        \AtBeginDocument{\includepdf[pages=1, picturecommand*={\coverlicence}]{covers/cover_page.pdf}\setcounter{page}{1}}
         % running head on every page: the title of the paper on the left, the author on the right, the page below
         \usepackage{scrlayer-scrpage}
         \usepackage{fontawesome6}
