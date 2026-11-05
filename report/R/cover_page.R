@@ -8,6 +8,7 @@ suppressPackageStartupMessages({
 if (!exists("rate_table")) source("R/prep.R")
 
 local({
+  VERSION <- "v1.0" # the version deposited on Zenodo, shown on the three covers
   BG <- "#0f1115"; FG <- "#f3f1ea"; DIM <- "#8d8b85"; RING <- "#2a2e36"
   CORAL <- "#ff6a4d"; GREEN <- "#2fbf8f"; BLUE <- "#5aa2ff"
   TITLE <- "Space Grotesk"; BODY <- "Inter"
@@ -85,10 +86,12 @@ local({
     annotate("segment", x = 0, xend = 0.06, y = 0.5, yend = 0.5, colour = CORAL, linewidth = 1.2) +
     annotate("text", x = 0.08, y = 0.5, hjust = 0, label = "Adrien Sales", family = TITLE,
              fontface = "bold", size = 6.2, colour = FG) +
-    # COVER_DATE_TOP puts the month on the author's line, for a document whose caption leaves it out
-    (if (exists("COVER_DATE_TOP") && COVER_DATE_TOP)
-      annotate("text", x = 1, y = 0.5, hjust = 1, family = BODY, size = 4.2, colour = DIM,
-               label = paste(month.name[as.integer(format(Sys.Date(), "%m"))], format(Sys.Date(), "%Y")))) +
+    # the version on the right of the author's line; COVER_DATE_TOP adds the month, for a document whose
+    # caption leaves it out
+    annotate("text", x = 1, y = 0.5, hjust = 1, family = BODY, size = 4.2, colour = DIM,
+             label = if (exists("COVER_DATE_TOP") && COVER_DATE_TOP)
+               paste0(VERSION, "  ·  ", month.name[as.integer(format(Sys.Date(), "%m"))], " ", format(Sys.Date(), "%Y"))
+             else VERSION) +
     scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
     scale_y_continuous(limits = c(0, 1)) +
     theme_void() + theme(plot.background = element_rect(fill = BG, colour = NA))
