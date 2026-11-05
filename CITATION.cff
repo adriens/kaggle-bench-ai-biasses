@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "She Is Alone With a Man: Nationality bias in the safety advice given by open-weight language models"
+type: dataset
+authors:
+  - family-names: Sales
+    given-names: Adrien
+version: "1.0"
+license: CC-BY-4.0
+repository-code: "https://github.com/adriens/kaggle-bench-ai-biasses"
+url: "https://www.kaggle.com/work/collections/19371544"
+keywords:
+  - AI bias
+  - large language models
+  - nationality
+  - stereotypes
+  - AI safety
+  - fairness
+  - open-weight models
+  - LLM-as-a-judge
+preferred-citation:
+  type: report
+  title: "She Is Alone With a Man: Nationality bias in the safety advice given by open-weight language models"
+  authors:
+    - family-names: Sales
+      given-names: Adrien
+  year: 2026
+  url: "https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf"
