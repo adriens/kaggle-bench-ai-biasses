@@ -406,6 +406,9 @@ Summary of the results, mean of the seven models per nationality (about 690 judg
 
 # Introduction
 
+*Content note: this report quotes AI answers that contain stereotypes and offensive statements about
+nationalities and religions. They are quoted to document them, not endorsed.*
+
 Chat assistants are now asked for practical advice, including on personal safety, and a woman who asks one
 what to do when she is alone with a man deserves the same advice whoever he is. The RTS test [@rts2026] that
 started this study, on Gemini and GPT-5, was a striking demonstration rather than a measurement: a handful of
@@ -3321,6 +3324,15 @@ table and number from that dataset. Built with [R](https://www.r-project.org), [
 `\href{https://creativecommons.org/licenses/by/4.0/}{\color{black}\Large\faCreativeCommons\,\faCreativeCommonsBy}\enspace{}`{=latex}This report, its short version and the carousel are released under the
 [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/):
 anyone may share and adapt them, for any purpose, provided they credit the author.
+
+# Declarations {.unnumbered}
+
+**Funding and competing interests.** This work received no funding; the author has no competing interests and
+no affiliation with the companies whose models are evaluated.
+
+**Use of AI assistance.** The code of the notebooks, the analysis and this report's layout were written with the
+help of Claude (Anthropic), under the author's direction; the design, the choices and the conclusions are the
+author's.
 
 # Software and tools {#sec-stack .unnumbered}
 
