@@ -3,7 +3,7 @@ title: "She Is Alone With a Man"
 subtitle: "Nationality bias in the safety advice given by open-weight language models"
 author:
   - name: Adrien Sales
-date: today
+date: "2026-11-06"
 date-format: "D MMMM YYYY"
 lang: en-GB
 abstract: |
@@ -94,11 +94,22 @@ format:
         \setkomafont{descriptionlabel}{\normalfont\bfseries}
         \usepackage{pdfpages}
         % the PDF information is written with the first page: set before the cover is shipped out
-        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}, pdfcreator={Quarto, R and XeLaTeX}}}
-        % the licence, written over the cover as a link, at the right end of its last caption line
+        % the Zenodo DOI of version 1.0, in the text, on the cover and in the XMP metadata of the PDF
+        \newcommand{\zenododoi}{10.5281/zenodo.23991569}
+        \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
+        % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
+        \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
+        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}, pdfcreator={Quarto, R and XeLaTeX},
+          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.0}, pdfpublication={Zenodo},
+          pdfcopyright={Copyright (C) 2026 Adrien Sales, released under CC BY 4.0},
+          pdflicenseurl={https://creativecommons.org/licenses/by/4.0/}}}
+        % the licence, written over the cover as a link, at the right end of its last caption line, and the DOI
+        % under the version, at the right end of the author's line
         \definecolor{coverdim}{HTML}{8D8B85}
         \newcommand{\coverlicence}{\put(537.4,58){\makebox[0pt][r]{\fontsize{8.8}{11}\selectfont\sffamily
-          \href{https://creativecommons.org/licenses/by/4.0/}{\color{coverdim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}
+          \href{https://creativecommons.org/licenses/by/4.0/}{\color{coverdim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}%
+          \put(560.5,643){\makebox[0pt][r]{\fontsize{8.8}{11}\selectfont\sffamily
+          \href{https://doi.org/\zenododoi}{\color{coverdim}DOI \zenododoi}}}}
         \AtBeginDocument{\includepdf[pages=1, picturecommand*={\coverlicence}]{covers/cover_page.pdf}\setcounter{page}{1}}
         % running head on every page: the title of the paper on the left, the author on the right, the page below
         \usepackage{scrlayer-scrpage}
@@ -3310,7 +3321,8 @@ audit.
 All notebooks and datasets of the project, published under the name *Alone With a Stranger*, are gathered in a
 Kaggle collection [@kaggle_collection]; the source of every notebook, of the analysis scripts and of this report
 is on GitHub, at [github.com/adriens/kaggle-bench-ai-biasses](https://github.com/adriens/kaggle-bench-ai-biasses). A
-[7-page version](https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/short.pdf) and a [16-slide carousel](https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/carousel.pdf) of the results sit next to this report. The
+7-page version and a 16-slide carousel of the results sit next to this report, in the same Zenodo record,
+[doi.org/10.5281/zenodo.23991569](https://doi.org/10.5281/zenodo.23991569). The
 generation notebooks, one per model [@kaggle_granite; @kaggle_qwen; @kaggle_gemma_e2b; @kaggle_gemma; @kaggle_gemma_26b;
 @kaggle_ministral; @kaggle_nemotron],
 record the model revision, vLLM version, seeds and every answer; the judge notebook [@kaggle_judge] records
@@ -3324,6 +3336,10 @@ table and number from that dataset. Built with [R](https://www.r-project.org), [
 `\href{https://creativecommons.org/licenses/by/4.0/}{\color{black}\Large\faCreativeCommons\,\faCreativeCommonsBy}\enspace{}`{=latex}This report, its short version and the carousel are released under the
 [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/):
 anyone may share and adapt them, for any purpose, provided they credit the author.
+
+**How to cite.** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
+open-weight language models* (Version 1.0) \[Report\]. Zenodo.
+[https://doi.org/10.5281/zenodo.23991569](https://doi.org/10.5281/zenodo.23991569)
 
 # Declarations {.unnumbered}
 

@@ -3,7 +3,7 @@ title: "She Is Alone With a Man: Same question, different man"
 subtitle: "How AI advice to a woman alone with a man changes with his nationality"
 author:
   - name: Adrien Sales
-date: today
+date: "2026-11-06"
 date-format: "MMMM YYYY"
 lang: en-GB
 subject: "Nationality bias in the safety advice of seven open-weight LLMs: 52k answers, 24 nationalities, 11 situations (short version)"
@@ -32,8 +32,16 @@ format:
         \usepackage[most]{tcolorbox}
         \usepackage{pdfpages}
         \usepackage{fontawesome6}
+        % the Zenodo DOI of version 1.0, in the text, on the cover and in the XMP metadata of the PDF
+        \newcommand{\zenododoi}{10.5281/zenodo.23991569}
+        \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
+        % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
+        \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
         % the PDF author: the name, then the X handle
-        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}}}
+        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)},
+          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.0}, pdfpublication={Zenodo},
+          pdfcopyright={Copyright (C) 2026 Adrien Sales, released under CC BY 4.0},
+          pdflicenseurl={https://creativecommons.org/licenses/by/4.0/}}}
         \definecolor{heat}{HTML}{E8452C}
         \definecolor{keyblue}{HTML}{2A78D6}
         \definecolor{ink}{HTML}{1B1B1B}
@@ -65,10 +73,13 @@ format:
         \cfoot*{\pagemark}
         \ofoot*{\sffamily\footnotesize\color{muted}Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{muted}\faXTwitter\,@rastadidi}}
         \pagestyle{scrheadings}
-        % the licence, written over the cover as a link, at the right end of its last caption line
+        % the licence, written over the cover as a link, at the right end of its last caption line, and the DOI
+        % under the version, at the right end of the author's line
         \definecolor{coverdim}{HTML}{8D8B85}
         \newcommand{\coverlicence}{\put(537.4,58){\makebox[0pt][r]{\fontsize{8.8}{11}\selectfont\sffamily
-          \href{https://creativecommons.org/licenses/by/4.0/}{\color{coverdim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}
+          \href{https://creativecommons.org/licenses/by/4.0/}{\color{coverdim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}%
+          \put(560.5,643){\makebox[0pt][r]{\fontsize{8.8}{11}\selectfont\sffamily
+          \href{https://doi.org/\zenododoi}{\color{coverdim}DOI \zenododoi}}}}
         \AtBeginDocument{\includepdf[pages=1, picturecommand*={\coverlicence}]{covers/cover_short.pdf}\setcounter{page}{1}}
         % the cover carries the title: no title block on page 1, a compact heading instead
         \renewcommand{\maketitle}{}
@@ -721,10 +732,12 @@ p_world / (p_eu | key) + plot_layout(heights = c(1.3, 1))
 ```{=latex}
 \begin{tcolorbox}[enhanced, colback=black!3, frame hidden, arc=2pt, left=10pt, right=10pt, top=8pt, bottom=8pt]
 \sffamily\small
-\href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/report.pdf}{\textbf{The full report}} (91 pages: method, statistics, every chart, the worst answers in French and English),
-the data and the code are published under the name \textit{Alone With a Stranger}, on GitHub:
-\href{https://github.com/adriens/kaggle-bench-ai-biasses}{github.com/adriens/kaggle-bench-ai-biasses}.
-The results also come as a \href{https://github.com/adriens/kaggle-bench-ai-biasses/blob/main/report/carousel.pdf}{16-slide carousel}.\par\medskip
+\href{https://doi.org/\zenododoi}{\textbf{The full report}} (91 pages: method, statistics, every chart, the worst answers in French and English)
+and a \href{https://doi.org/\zenododoi}{16-slide carousel} sit next to this version on Zenodo; the data and the code are
+published under the name \textit{Alone With a Stranger}, on GitHub:
+\href{https://github.com/adriens/kaggle-bench-ai-biasses}{github.com/adriens/kaggle-bench-ai-biasses}.\par\medskip
+\textbf{How to cite.} Sales, A. (2026). \textit{She Is Alone With a Man: Nationality bias in the safety advice given by
+open-weight language models} (Version 1.0) [Report]. Zenodo. \href{https://doi.org/\zenododoi}{https://doi.org/\zenododoi}\par\medskip
 {\color{muted}Made with open-weight models (IBM, Alibaba, Google, Mistral AI, NVIDIA) on Kaggle's free GPUs.
 Built with \href{https://www.r-project.org}{\color{muted}R}, \href{https://quarto.org}{\color{muted}Quarto} and \href{https://www.latex-project.org}{\color{muted}\LaTeX}.
 These are model outputs, not claims.\hfill\href{https://creativecommons.org/licenses/by/4.0/}{\color{muted}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}
