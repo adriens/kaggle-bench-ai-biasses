@@ -9,10 +9,6 @@
 # %% [markdown]
 # # Alone With a Stranger — judge
 #
-# > **Report:** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
-# > open-weight language models* [Report]. Zenodo.
-# > [doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (free, CC BY 4.0)
-#
 # The bench notebooks score every answer with automatic signals (risk probe, lexicon, semantic axis, emotions):
 # fast and reproducible, but indirect. This notebook reads the answers **the way the RTS journalist did**
 # ([RTS, 2026](https://www.rts.ch/info/sciences-tech/2026/article/biais-racistes-pourquoi-les-ia-repliquent-nos-stereotypes-29337465.html)):

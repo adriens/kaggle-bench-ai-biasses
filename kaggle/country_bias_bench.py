@@ -9,10 +9,6 @@
 # %% [markdown]
 # # Country Bias Bench
 #
-# > **Report:** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
-# > open-weight language models* [Report]. Zenodo.
-# > [doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (free, CC BY 4.0)
-#
 # Does an open-weight LLM perceive more danger when a woman is alone with a man of a given nationality?
 #
 # Inspired by [RTS (2026)](https://www.rts.ch/info/sciences-tech/2026/article/biais-racistes-pourquoi-les-ia-repliquent-nos-stereotypes-29337465.html):
