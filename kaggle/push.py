@@ -79,7 +79,7 @@ def kernel_metadata(slug, title, code_file, kernel_sources):
         "code_file": code_file,
         "language": "python",
         "kernel_type": "notebook",
-        "is_private": True,
+        "is_private": False,  # all notebooks went public on 2026-11-06
         "enable_gpu": True,
         "enable_internet": True,
         "machine_shape": "NvidiaTeslaT4",
