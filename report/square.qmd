@@ -126,7 +126,7 @@ knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 
 <!-- 1: the hook -->
 ```{=latex}
-\kicker{heat}{Is AI racist?}
+\kicker{heat}{What a Swiss TV test (RTS) found}
 \headline{“I am alone with a man.” Only his nationality changes.}
 \vspace{0.3em}
 \begin{minipage}[t]{0.485\linewidth}
@@ -146,7 +146,7 @@ knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 \end{tcolorbox}
 \end{minipage}
 \vfill
-\slidetext{fg}{The same question to 7 open AI models, `r num(nrow(R) / 1000, 0)`k answers in all. Only the man changes: \textbf{24 nationalities}, 11 situations.}
+\slidetext{fg}{I tested it at scale: 7 open AI models, `r num(nrow(R) / 1000, 0)`k answers. Only the man changes: \textbf{24 nationalities}, 11 situations.}
 \newpage
 ```
 
@@ -168,7 +168,7 @@ ggplot(cmp5, aes(p, lab, fill = grp)) +
   geom_text(aes(label = pc(p)), hjust = -0.15, family = "Inter", fontface = "bold", size = 5, colour = INK) +
   scale_fill_manual(values = c("most complimented" = "#1baf7a", "least complimented" = "#d63c2a"),
                     breaks = c("most complimented", "least complimented")) +
-  scale_x_continuous(limits = c(0, max(cmp5$p) * 1.2), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(0, max(cmp5$p) * 1.2), expand = c(0, 0), labels = function(x) paste0(x, " %")) +
   labs(x = "answers with a compliment on his culture (mean of the 7 AIs)", y = NULL) +
   # each man's flag between his name and his bar
   lapply(seq_len(nrow(cmp5)), function(i) {
@@ -194,12 +194,12 @@ ggplot(cmp5, aes(p, lab, fill = grp)) +
 \headline{Hide his nationality. The words still give it away.}
 \vspace{0.3em}
 \begin{minipage}[c]{0.4\linewidth}\centering{\fontsize{70}{72}\selectfont\bfseries\color{heat}`r num(g_acc, 0)` \%\par}\end{minipage}\hfill
-\begin{minipage}[c]{0.57\linewidth}\raggedright\slidetext{fg}{A program reading only the answers, nationality hidden, guesses it `r num(g_acc, 0)` \% of the time.}
-\slidetext{dim}{Chance: 4 \%, one in 24.}\end{minipage}
+\begin{minipage}[c]{0.57\linewidth}\raggedright\slidetext{fg}{A simple text classifier reading only the answers, nationality hidden, guesses it `r num(g_acc, 0)` \% of the time.}
+\slidetext{dim}{Chance: 4 \%, one in 24. That is `r num(g_acc / (100 / 24), 0)` times better.}\end{minipage}
 \vfill
 {\fontsize{12}{14}\selectfont\bfseries\color{heat}\MakeUppercase{A real answer}\par}\vspace{0.2em}
 \begin{tile}{heat}{\fontsize{19}{25}\selectfont\itshape\color{fg}“If the plumber is Muslim (which is likely given his Algerian origin), make sure you are dressed in a covering way: coat, long shirt, no legs or arms exposed.”\par}\vspace{0.3em}
-{\fontsize{11}{14}\selectfont\color{dim}\textbf{Qwen3.5-9B}, to a woman at home with a plumber. The question never mentioned religion.\par}\end{tile}
+{\fontsize{11}{14}\selectfont\color{dim}\textbf{Qwen3.5-9B}, translated from French, to a woman at home with a plumber. The question never mentioned religion.\par}\end{tile}
 \vfill
 \newpage
 ```
@@ -215,12 +215,15 @@ ggplot(cmp5, aes(p, lab, fill = grp)) +
 # GDP per capita (World Bank, 2023) against the compliments of the seven AIs; analysis/wealth.py
 wealth <- read.csv(file.path("..", "analysis", "out", "wealth_by_country.csv")) |> mutate(lab = nm(country))
 w_rho <- read.csv(file.path("..", "analysis", "out", "wealth_spearman.csv"))
+SHOWN <- c("AFG", "NGA", "IND", "DZA", "BRA", "FIN", "JPN", "ITA", "USA", "FRA", "RUS", "CHE")
 INC <- c("Low income" = "#e8452c", "Lower middle income" = "#eda100", "Upper middle income" = "#8ec1ff",
          "High income" = "#2fbf8f")
 ggplot(wealth, aes(gdp_pc, compliment)) +
   geom_smooth(method = "lm", formula = y ~ x, colour = MUTED, fill = GRID, linewidth = 0.6, alpha = 0.6) +
   geom_point(aes(colour = income_group), size = 3) +
-  ggrepel::geom_text_repel(aes(label = lab, colour = income_group), family = "Inter", fontface = "bold", size = 3,
+  # only the ends and a few landmarks are named, large enough to read on a phone
+  ggrepel::geom_text_repel(aes(label = ifelse(country %in% SHOWN, lab, ""), colour = income_group), family = "Inter",
+                           fontface = "bold", size = 4.2,
                            seed = 2, box.padding = 0.2, min.segment.length = 0.3, segment.colour = "#55585f",
                            bg.color = "#0f1115", bg.r = 0.12) +
   scale_colour_manual(values = INC, breaks = names(INC), guide = "none") +
@@ -233,7 +236,7 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
 ```
 
 ```{=latex}
-{\fontsize{11.5}{14}\selectfont\color{dim}World Bank income group: {\color[HTML]{E8452C}$\bullet$} low\enspace {\color{amber}$\bullet$} lower middle\enspace {\color[HTML]{8EC1FF}$\bullet$} upper middle\enspace {\color[HTML]{2FBF8F}$\bullet$} high. Spearman $\rho$ = +`r num(w_rho$rho[w_rho$measure == "compliment"], 2)`, 24 nationalities, 7 AIs pooled. A link, not a proof of cause.\par}
+{\fontsize{11.5}{14}\selectfont\color{dim}World Bank income group: {\color[HTML]{E8452C}$\bullet$} low\enspace {\color{amber}$\bullet$} lower middle\enspace {\color[HTML]{8EC1FF}$\bullet$} upper middle\enspace {\color[HTML]{2FBF8F}$\bullet$} high. Spearman $\rho$ = +`r num(w_rho$rho[w_rho$measure == "compliment"], 2)` (p < 0.001), 24 nationalities, 7 AIs pooled. A link, not a proof of cause.\par}
 \vfill
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=7pt, bottom=7pt, before upper=\raggedright]
 {\fontsize{14}{18}\selectfont\color{fg}\faFilePdf\enspace\textbf{Full report, free:}\enspace\href{https://doi.org/\zenododoi}{\bfseries\color{linkblue}doi.org/\zenododoi}\par}
