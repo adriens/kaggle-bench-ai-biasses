@@ -60,15 +60,15 @@ format:
         % image has it in a box)
         \AddToShipoutPictureFG{%
           \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.42in}){\makebox[0pt][l]{\fontsize{10}{12}\selectfont
-            \color{dim}\textbf{She Is Alone With a Man}\quad Adrien Sales\enspace\faXTwitter\,@rastadidi}}}
+            \color{dim}\textbf{She Is Alone With a Man}\quad Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{dim}\faXTwitter\,@rastadidi}}}}
           \AtPageUpperLeft{\put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{-0.42in}){\makebox[0pt][r]{\fontsize{10}{12}\selectfont
             \color{dim}\thepage\,/\,4}}}
           \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.54in}){\color{panel}\rule{\dimexpr\paperwidth-1in\relax}{2.2pt}}}%
           \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.54in}){\color{heat}\rule{\dimexpr(\paperwidth-1in)*\value{page}/4\relax}{2.2pt}}}%
           \ifnum\value{page}<4\AtPageLowerLeft{\put(\LenToUnit{0.5in},\LenToUnit{0.27in}){\makebox[0pt][l]{\fontsize{10}{12}\selectfont
-            \color{dim}Full report, free: \textbf{\color{linkblue}doi.org/\zenododoi}}}}\fi
+            \color{dim}Full report, free: \href{https://doi.org/\zenododoi}{\textbf{\color{linkblue}doi.org/\zenododoi}}}}}\fi
           \AtPageLowerLeft{\put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{0.27in}){\makebox[0pt][r]{\fontsize{10}{12}\selectfont
-            \color{dim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}
+            \href{https://creativecommons.org/licenses/by/4.0/}{\color{dim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}}
         \newcommand{\kicker}[2]{{\fontsize{12}{14}\selectfont\bfseries\color{#1}\MakeUppercase{#2}\par}\vspace{0.2em}}
         \newcommand{\headline}[1]{{\fontsize{29}{33}\selectfont\bfseries\color{fg}#1\par}\vspace{0.2em}}
         \newcommand{\slidetext}[2]{{\fontsize{16}{21}\selectfont\color{#1}#2\par}}
@@ -236,6 +236,6 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
 {\fontsize{11.5}{14}\selectfont\color{dim}World Bank income group: {\color[HTML]{E8452C}$\bullet$} low\enspace {\color{amber}$\bullet$} lower middle\enspace {\color[HTML]{8EC1FF}$\bullet$} upper middle\enspace {\color[HTML]{2FBF8F}$\bullet$} high. Spearman $\rho$ = +`r num(w_rho$rho[w_rho$measure == "compliment"], 2)`, 24 nationalities, 7 AIs pooled. A link, not a proof of cause.\par}
 \vfill
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=7pt, bottom=7pt, before upper=\raggedright]
-{\fontsize{14}{18}\selectfont\color{fg}\faFilePdf\enspace\textbf{Full report, free:}\enspace{\bfseries\color{linkblue}doi.org/\zenododoi}\par}
+{\fontsize{14}{18}\selectfont\color{fg}\faFilePdf\enspace\textbf{Full report, free:}\enspace\href{https://doi.org/\zenododoi}{\bfseries\color{linkblue}doi.org/\zenododoi}\par}
 \end{tcolorbox}
 ```
