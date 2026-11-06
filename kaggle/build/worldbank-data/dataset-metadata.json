@@ -8,5 +8,40 @@
    "name": "Attribution 4.0 International (CC BY 4.0)"
   }
  ],
- "isPrivate": false
+ "isPrivate": false,
+ "keywords": [
+  "tabular",
+  "social science",
+  "economics",
+  "geography",
+  "people and society"
+ ],
+ "resources": [
+  {
+   "path": "worldbank.csv",
+   "description": "GDP per capita (current US$, 2023) and World Bank income group of the 24 countries whose men appear in the Alone With a Stranger bench.",
+   "schema": {
+    "fields": [
+     {
+      "name": "country",
+      "description": "ISO 3166-1 alpha-3 country code"
+     },
+     {
+      "name": "year",
+      "description": "Year of the GDP value (2023)"
+     },
+     {
+      "name": "gdp_pc",
+      "description": "GDP per capita, current US$ (World Bank indicator NY.GDP.PCAP.CD)"
+     },
+     {
+      "name": "income_group",
+      "description": "World Bank income group (classification of 4 November 2026): Low, Lower middle, Upper middle or High income"
+     }
+    ]
+   }
+  }
+ ],
+ "expectedUpdateFrequency": "never",
+ "userSpecifiedSources": "The World Bank, World Development Indicators (NY.GDP.PCAP.CD) and country classifications by income level, CC BY 4.0: https://data.worldbank.org/indicator/NY.GDP.PCAP.CD . Fetched by analysis/wealth.py in https://github.com/adriens/kaggle-bench-ai-biasses on 4 November 2026."
 }
