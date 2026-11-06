@@ -34,6 +34,14 @@ Rscript R/covers.R                                   # social-media cover propos
 Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by open-weight
 language models* (Version 1.1) [Report]. Zenodo. https://doi.org/10.5281/zenodo.23992096
 
+## Versions
+
+Each version deposited on Zenodo has a git tag with the same number, on the commit whose PDFs are the ones
+deposited: [`v1.0`](https://github.com/adriens/kaggle-bench-ai-biasses/releases/tag/v1.0)
+([10.5281/zenodo.23991569](https://doi.org/10.5281/zenodo.23991569)),
+[`v1.1`](https://github.com/adriens/kaggle-bench-ai-biasses/releases/tag/v1.1)
+([10.5281/zenodo.23992096](https://doi.org/10.5281/zenodo.23992096)).
+
 The documents and the data are released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); the
 Kaggle notebooks are under Apache 2.0, Kaggle's licence for public notebooks.
 
