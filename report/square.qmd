@@ -1,0 +1,241 @@
+---
+title: "She Is Alone With a Man"
+author: "Adrien Sales"
+subtitle: "Four square images for X: what seven open-weight AI models answer a woman alone with a man, when only his nationality changes"
+subject: "Nationality bias in the safety advice of seven open-weight LLMs: 52k answers, 24 nationalities, 11 situations"
+keywords: [AI bias, LLM, nationality, stereotypes, AI safety, open-weight models, Kaggle, Quarto]
+date: "2026-11-06"
+lang: en-GB
+format:
+  pdf:
+    pdf-engine: xelatex
+    documentclass: scrartcl
+    fontsize: 12pt
+    # square pages, exported to 1080 × 1080 PNG at 144 dpi (see the end of this file)
+    geometry: [paperwidth=7.5in, paperheight=7.5in, margin=0.5in, top=0.8in, bottom=0.6in]
+    colorlinks: true
+    urlcolor: "linkblue"
+    linkcolor: "linkblue"
+    mainfont: Inter
+    sansfont: Inter
+    include-in-header:
+      text: |
+        \usepackage{microtype}
+        \usepackage[most]{tcolorbox}
+        \usepackage{eso-pic}
+        \usepackage{fontawesome6}
+        \usepackage{tikz}\usetikzlibrary{shapes.geometric, calc}
+        \input{flags/flags.tex}
+        % the icons of the carousel: the four forms of suspicion, the sun of the ice-breakers, the warning sign
+        \newcommand{\talkicon}{\tikz{\fill[heat, rounded corners=5pt] (0,0.1in) rectangle (0.6in,0.5in); \fill[heat] (0.1in,0.12in) -- (0.08in,0) -- (0.24in,0.12in) -- cycle;
+          \node[night, font=\bfseries\fontsize{16}{16}\selectfont] at (0.3in,0.3in) {!};}}
+        \newcommand{\riskicon}{\tikz{\fill[amber, rounded corners=2pt] (90:0.3in) -- (210:0.3in) -- (330:0.3in) -- cycle;
+          \node[night, font=\bfseries\fontsize{14}{14}\selectfont] at (0,-0.02in) {!};}}
+        \newcommand{\refuseicon}{\tikz{\fill[violet] (0,0) circle (0.25in); \fill[night] (-0.15in,-0.04in) rectangle (0.15in,0.04in);}}
+        \newcommand{\hangericon}{\tikz{\draw[green, line width=2pt, line cap=round, line join=round] (0.3in,0.36in) arc (-90:180:0.07in);
+          \draw[green, line width=2pt, line cap=round, line join=round] (0.3in,0.36in) -- (0,0.08in) -- (0.6in,0.08in) -- cycle;}}
+        \newcommand{\sunicon}{\tikz{\fill[amber] (0,0) circle (0.22in);
+          \foreach \a in {0,45,...,315} \draw[amber, line width=2.6pt, line cap=round] (\a:0.32in) -- (\a:0.44in);}}
+        \newcommand{\warnicon}{\tikz{\fill[heat, rounded corners=3pt] (90:0.5in) -- (210:0.5in) -- (330:0.5in) -- cycle;
+          \fill[night, rounded corners=1pt] (-0.035in,-0.06in) rectangle (0.035in,0.22in); \fill[night] (0,-0.16in) circle (0.045in);}}
+        \definecolor{heat}{HTML}{FF6A4D}
+        \definecolor{keyblue}{HTML}{5AA2FF}
+        \definecolor{green}{HTML}{2FBF8F}
+        \definecolor{amber}{HTML}{EDA100}
+        \definecolor{violet}{HTML}{8B7CF0}
+        \definecolor{fg}{HTML}{F3F1EA}
+        \definecolor{dim}{HTML}{A9A7A0}
+        \definecolor{night}{HTML}{0F1115}
+        \definecolor{panel}{HTML}{1B1F27}
+        \definecolor{linkblue}{HTML}{8EC1FF}
+        \pagestyle{empty}
+        \newcommand{\zenododoi}{10.5281/zenodo.23991569}
+        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}}}
+        \pagecolor{night}
+        \setlength{\parindent}{0pt}\setlength{\parskip}{0.6em}\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000
+        \renewcommand{\maketitle}{}
+        \AtBeginDocument{\color{fg}}
+        % on every image: the name of the report and the author on top, the image number on the right, a progress
+        % bar under them; at the bottom, the DOI, so that an image shared alone still leads to the report (the last
+        % image has it in a box)
+        \AddToShipoutPictureFG{%
+          \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.42in}){\makebox[0pt][l]{\fontsize{10}{12}\selectfont
+            \color{dim}\textbf{She Is Alone With a Man}\quad Adrien Sales\enspace\faXTwitter\,@rastadidi}}}
+          \AtPageUpperLeft{\put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{-0.42in}){\makebox[0pt][r]{\fontsize{10}{12}\selectfont
+            \color{dim}\thepage\,/\,4}}}
+          \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.54in}){\color{panel}\rule{\dimexpr\paperwidth-1in\relax}{2.2pt}}}%
+          \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.54in}){\color{heat}\rule{\dimexpr(\paperwidth-1in)*\value{page}/4\relax}{2.2pt}}}%
+          \ifnum\value{page}<4\AtPageLowerLeft{\put(\LenToUnit{0.5in},\LenToUnit{0.27in}){\makebox[0pt][l]{\fontsize{10}{12}\selectfont
+            \color{dim}Full report, free: \textbf{\color{linkblue}doi.org/\zenododoi}}}}\fi
+          \AtPageLowerLeft{\put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{0.27in}){\makebox[0pt][r]{\fontsize{10}{12}\selectfont
+            \color{dim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}
+        \newcommand{\kicker}[2]{{\fontsize{12}{14}\selectfont\bfseries\color{#1}\MakeUppercase{#2}\par}\vspace{0.2em}}
+        \newcommand{\headline}[1]{{\fontsize{29}{33}\selectfont\bfseries\color{fg}#1\par}\vspace{0.2em}}
+        \newcommand{\slidetext}[2]{{\fontsize{16}{21}\selectfont\color{#1}#2\par}}
+        \newtcolorbox{tile}[1]{enhanced, colback=panel, frame hidden, borderline west={4pt}{0pt}{#1}, arc=3pt,
+          left=10pt, right=8pt, top=8pt, bottom=8pt, before skip=4pt, after skip=6pt, before upper=\raggedright}
+execute:
+  echo: false
+  warning: false
+  message: false
+knitr:
+  opts_chunk:
+    dev: cairo_pdf
+    fig.align: center
+    fig.width: 6.5
+    out.width: "100%"
+---
+
+```{r}
+#| label: setup
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+})
+source("R/prep.R")
+
+num <- function(x, d = 1) formatC(x, format = "f", digits = d, big.mark = ",")
+pc <- function(x, d = 0) paste0(num(x, d), " %")
+nm <- function(iso) unname(country_lbl[iso])
+GR <- "granite-4.2-8b"; MI <- "ministral-3-8b-instruct-2512"; E2 <- "gemma-4-e2b-it"
+
+# the facts of the carousel, from the same data
+sp_ <- rate_table("stereo_pos") |> filter(country != "BASE") |> group_by(country) |> summarise(p = mean(pct))
+dm_ <- rate_table("defensive_marking")
+na_ <- rate_table("negative_association")
+r5_ <- R |> filter(model == E2, context_id == "C5_home_night") |> group_by(country) |> summarise(p = 100 * mean(refusal))
+rel_ <- read.csv(file.path("..", "analysis", "out", "religion_counts.csv"))
+rel_n <- tapply(rel_$any, rel_$country, sum)
+v <- function(t, m, c) t$pct[t$model == m & t$country == c]
+# the judge-free classifier: share of masked answers whose nationality it guesses (analysis/guess_nationality.py)
+gm_ <- read.csv(file.path("..", "analysis", "out", "guess", "metrics.csv"))
+g_acc <- 100 * gm_$accuracy[gm_$setting == "shared" & gm_$scope == "both" & gm_$algo == "logreg"]
+
+# dark, like the carousel: light ink on a near-black page, charts on a transparent background
+INK <- "#f3f1ea"; MUTED <- "#a9a7a0"; GRID <- "#2a2e36"
+theme_set(theme_minimal(base_size = 15, base_family = "Inter") +
+  theme(plot.background = element_rect(fill = NA, colour = NA), panel.background = element_rect(fill = NA, colour = NA),
+        text = element_text(colour = INK), panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(colour = GRID, linewidth = 0.3),
+        axis.text = element_text(colour = MUTED), axis.title = element_text(colour = MUTED),
+        legend.text = element_text(colour = INK), plot.title.position = "plot", legend.position = "top",
+        legend.title = element_blank()))
+knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
+```
+
+<!-- 1: the hook -->
+```{=latex}
+\kicker{heat}{Is AI racist?}
+\headline{“I am alone with a man.” Only his nationality changes.}
+\vspace{0.3em}
+\begin{minipage}[t]{0.485\linewidth}
+\begin{tcolorbox}[enhanced, colback=keyblue!18!night, frame hidden, arc=4pt, height=3.45in, valign=top, top=14pt, halign=center]
+\itflag\hspace{0.15in}\chflag\par\vspace{0.5em}
+\sunicon\par\vspace{0.3em}
+{\fontsize{25}{28}\selectfont\bfseries\color{fg} ice-breakers\par}\vspace{0.2em}
+{\fontsize{15}{19}\selectfont\color{dim} talk about his country,\\ get to know him\par}
+\end{tcolorbox}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.485\linewidth}
+\begin{tcolorbox}[enhanced, colback=heat!18!night, frame hidden, arc=4pt, height=3.45in, valign=top, top=14pt, halign=center]
+\dzflag\par\vspace{0.5em}
+\warnicon\par\vspace{0.3em}
+{\fontsize{25}{28}\selectfont\bfseries\color{fg} keep your distance\par}\vspace{0.2em}
+{\fontsize{15}{19}\selectfont\color{dim} stay alert,\\ emergency numbers\par}
+\end{tcolorbox}
+\end{minipage}
+\vfill
+\slidetext{fg}{The same question to 7 open AI models, `r num(nrow(R) / 1000, 0)`k answers in all. Only the man changes: \textbf{24 nationalities}, 11 situations.}
+\newpage
+```
+
+<!-- 2: compliments -->
+```{=latex}
+\kicker{green}{Shared by all seven AIs}
+\headline{The same men are flattered by every AI.}
+```
+
+```{r}
+#| fig-height: 3.75
+ISO2 <- c(FIN = "fi", JPN = "jp", AUS = "au", ITA = "it", SWE = "se", RUS = "ru", DZA = "dz", IND = "in",
+          NGA = "ng", AFG = "af", FRA = "fr", BEL = "be", ESP = "es", CHE = "ch", GBR = "gb")
+cmp <- sp_ |> arrange(desc(p)) |> mutate(rank = row_number(), lab = nm(country))
+cmp5 <- bind_rows(head(cmp, 5), tail(cmp, 5)) |>
+  mutate(grp = ifelse(rank <= 5, "most complimented", "least complimented"), lab = factor(lab, levels = rev(lab)))
+ggplot(cmp5, aes(p, lab, fill = grp)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = pc(p)), hjust = -0.15, family = "Inter", fontface = "bold", size = 5, colour = INK) +
+  scale_fill_manual(values = c("most complimented" = "#1baf7a", "least complimented" = "#d63c2a"),
+                    breaks = c("most complimented", "least complimented")) +
+  scale_x_continuous(limits = c(0, max(cmp5$p) * 1.2), expand = c(0, 0)) +
+  labs(x = "answers with a compliment on his culture (mean of the 7 AIs)", y = NULL) +
+  # each man's flag between his name and his bar
+  lapply(seq_len(nrow(cmp5)), function(i) {
+    f <- file.path("flags", "png", paste0(ISO2[[cmp5$country[i]]], ".png"))
+    annotation_custom(grid::rasterGrob(png::readPNG(f), x = unit(-0.24, "in"), width = unit(0.3, "in"),
+                                       height = unit(0.2, "in")),
+                      xmin = 0, xmax = 0, ymin = as.integer(cmp5$lab[i]), ymax = as.integer(cmp5$lab[i]))
+  }) +
+  coord_cartesian(clip = "off") +
+  theme(panel.grid.major.y = element_blank(), axis.text.y = element_text(size = 14, colour = INK),
+        axis.ticks.y = element_line(colour = NA), axis.ticks.length.y = unit(0.44, "in"),
+        axis.title.x = element_text(size = 11))
+```
+
+```{=latex}
+\slidetext{dim}{Five companies, seven models, the same ranking.}
+\newpage
+```
+
+<!-- 3: the proof without a judge: the nationality, hidden, is still guessed; and one real answer -->
+```{=latex}
+\kicker{heat}{No judge needed}
+\headline{Hide his nationality. The words still give it away.}
+\vspace{0.3em}
+\begin{minipage}[c]{0.4\linewidth}\centering{\fontsize{70}{72}\selectfont\bfseries\color{heat}`r num(g_acc, 0)` \%\par}\end{minipage}\hfill
+\begin{minipage}[c]{0.57\linewidth}\raggedright\slidetext{fg}{A program reading only the answers, nationality hidden, guesses it `r num(g_acc, 0)` \% of the time.}
+\slidetext{dim}{Chance: 4 \%, one in 24.}\end{minipage}
+\vfill
+{\fontsize{12}{14}\selectfont\bfseries\color{heat}\MakeUppercase{A real answer}\par}\vspace{0.2em}
+\begin{tile}{heat}{\fontsize{19}{25}\selectfont\itshape\color{fg}“If the plumber is Muslim (which is likely given his Algerian origin), make sure you are dressed in a covering way: coat, long shirt, no legs or arms exposed.”\par}\vspace{0.3em}
+{\fontsize{11}{14}\selectfont\color{dim}\textbf{Qwen3.5-9B}, to a woman at home with a plumber. The question never mentioned religion.\par}\end{tile}
+\vfill
+\newpage
+```
+
+<!-- 4: wealth, then where to read more -->
+```{=latex}
+\kicker{green}{Following the money?}
+\headline{The richer his country, the warmer the AI.}
+```
+
+```{r}
+#| fig-height: 3.2
+# GDP per capita (World Bank, 2023) against the compliments of the seven AIs; analysis/wealth.py
+wealth <- read.csv(file.path("..", "analysis", "out", "wealth_by_country.csv")) |> mutate(lab = nm(country))
+w_rho <- read.csv(file.path("..", "analysis", "out", "wealth_spearman.csv"))
+INC <- c("Low income" = "#e8452c", "Lower middle income" = "#eda100", "Upper middle income" = "#8ec1ff",
+         "High income" = "#2fbf8f")
+ggplot(wealth, aes(gdp_pc, compliment)) +
+  geom_smooth(method = "lm", formula = y ~ x, colour = MUTED, fill = GRID, linewidth = 0.6, alpha = 0.6) +
+  geom_point(aes(colour = income_group), size = 3) +
+  ggrepel::geom_text_repel(aes(label = lab, colour = income_group), family = "Inter", fontface = "bold", size = 3,
+                           seed = 2, box.padding = 0.2, min.segment.length = 0.3, segment.colour = "#55585f",
+                           bg.color = "#0f1115", bg.r = 0.12) +
+  scale_colour_manual(values = INC, breaks = names(INC), guide = "none") +
+  scale_x_log10(breaks = c(500, 1000, 3000, 10000, 30000, 100000),
+                labels = c("$500", "$1k", "$3k", "$10k", "$30k", "$100k")) +
+  scale_y_continuous(labels = function(x) paste0(x, " %")) +
+  coord_cartesian(ylim = c(0, 41)) +
+  labs(x = "GDP per person, 2023 (World Bank, log scale)", y = "compliments on his culture") +
+  theme(axis.title = element_text(size = 10.5))
+```
+
+```{=latex}
+{\fontsize{11.5}{14}\selectfont\color{dim}World Bank income group: {\color[HTML]{E8452C}$\bullet$} low\enspace {\color{amber}$\bullet$} lower middle\enspace {\color[HTML]{8EC1FF}$\bullet$} upper middle\enspace {\color[HTML]{2FBF8F}$\bullet$} high. Spearman $\rho$ = +`r num(w_rho$rho[w_rho$measure == "compliment"], 2)`, 24 nationalities, 7 AIs pooled. A link, not a proof of cause.\par}
+\vfill
+\begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=7pt, bottom=7pt, before upper=\raggedright]
+{\fontsize{14}{18}\selectfont\color{fg}\faFilePdf\enspace\textbf{Full report, free:}\enspace{\bfseries\color{linkblue}doi.org/\zenododoi}\par}
+\end{tcolorbox}
+```
