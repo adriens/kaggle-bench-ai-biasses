@@ -49,7 +49,7 @@ format:
         \definecolor{panel}{HTML}{1B1F27}
         \definecolor{linkblue}{HTML}{8EC1FF}
         \pagestyle{empty}
-        \newcommand{\zenododoi}{10.5281/zenodo.23992096}
+        \newcommand{\zenododoi}{10.5281/zenodo.23992483}
         \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}}}
         \pagecolor{night}
         \setlength{\parindent}{0pt}\setlength{\parskip}{0.6em}\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000

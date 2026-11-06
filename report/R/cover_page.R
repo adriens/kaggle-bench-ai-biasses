@@ -8,7 +8,7 @@ suppressPackageStartupMessages({
 if (!exists("rate_table")) source("R/prep.R")
 
 local({
-  VERSION <- "v1.1" # the version deposited on Zenodo, shown on the three covers
+  VERSION <- "v1.2" # the version deposited on Zenodo, shown on the three covers
   BG <- "#0f1115"; FG <- "#f3f1ea"; DIM <- "#8d8b85"; RING <- "#2a2e36"
   CORAL <- "#ff6a4d"; GREEN <- "#2fbf8f"; BLUE <- "#5aa2ff"
   TITLE <- "Space Grotesk"; BODY <- "Inter"
