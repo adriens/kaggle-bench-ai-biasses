@@ -21,6 +21,38 @@ rubric `rts-v4`).
 | `report/` | scientific report: Quarto + R, compiled with XeLaTeX (`report.pdf`) |
 | `covers/` | early cover visuals |
 
+## Resources
+
+**Report** (Zenodo, CC BY 4.0): [doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568), all
+versions, always the latest; [v1.1](https://doi.org/10.5281/zenodo.23992096), [v1.0](https://doi.org/10.5281/zenodo.23991569).
+
+**Kaggle datasets** (CC BY 4.0)
+
+- [Alone With a Stranger - analysis data](https://www.kaggle.com/datasets/adriensales/alone-with-a-stranger-analysis-data):
+  51,975 answers of the 7 models and the judge's verdicts
+- [Alone With a Stranger - World Bank wealth](https://www.kaggle.com/datasets/adriensales/alone-with-a-stranger-world-bank-wealth):
+  GDP per capita and income group of the 24 countries
+
+**Kaggle notebooks** (Apache 2.0), all in the [Alone With a Stranger collection](https://www.kaggle.com/work/collections/19371544)
+
+| Notebook | Role |
+|---|---|
+| [granite-4.2-8b](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-granite-4-2-8b) | bench, Granite 4.2 8B (IBM) |
+| [qwen3.5-9b](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-qwen3-5-9b) | bench, Qwen3.5-9B (Alibaba) |
+| [gemma-4-e2b-it](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-gemma-4-e2b-it) | bench, Gemma 4 E2B (Google) |
+| [gemma-4-e4b-it](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-gemma-4-e4b-it) | bench, Gemma 4 E4B (Google) |
+| [gemma-4-26b-a4b-awq](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-gemma-4-26b-a4b-awq) | bench, Gemma 4 26B-A4B, 4-bit AWQ (Google) |
+| [ministral-3-8b](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-ministral-3-8b) | bench, Ministral 3 8B (Mistral AI) |
+| [nemotron-3.5-bolt-e4b](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-nemotron-3-5-bolt-e4b) | bench, Nemotron 3.5 Bolt E4B (NVIDIA) |
+| [gemma-4-31b-awq](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-gemma-4-31b-awq) | bench attempt, Gemma 4 31B AWQ: out of memory on 2 × T4, not in the report |
+| [judge](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-judge) | LLM judge (Qwen3-32B-AWQ, rubric `rts-v4`) |
+| [synthese-des-juges](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-synthese-des-juges) | synthesis of the verdicts, figures (French) |
+| [guess-the-nationality](https://www.kaggle.com/code/adriensales/alone-with-a-stranger-guess-the-nationality) | judge-free check: guess the nationality from the masked answers |
+
+**Data sources**: [RTS report](https://www.rts.ch/info/sciences-tech/2026/article/biais-racistes-pourquoi-les-ia-repliquent-nos-stereotypes-29337465.html)
+and [France Inter debate](https://www.radiofrance.fr/franceinter/podcasts/le-debat/le-debat-de-la-grand-matinale-du-jeudi-03-septembre-2026-5351193)
+(the starting point); [World Bank GDP per capita](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD) (CC BY 4.0).
+
 ## Rebuild the report
 
 ```sh
