@@ -5,8 +5,8 @@ type: dataset
 authors:
   - family-names: Sales
     given-names: Adrien
-version: "1.0"
-doi: "10.5281/zenodo.23991569"
+version: "1.1"
+doi: "10.5281/zenodo.23992096"
 date-released: "2026-11-06"
 license: CC-BY-4.0
 repository-code: "https://github.com/adriens/kaggle-bench-ai-biasses"

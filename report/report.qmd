@@ -95,12 +95,12 @@ format:
         \usepackage{pdfpages}
         % the PDF information is written with the first page: set before the cover is shipped out
         % the Zenodo DOI of version 1.0, in the text, on the cover and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.23991569}
+        \newcommand{\zenododoi}{10.5281/zenodo.23992096}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
         \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}, pdfcreator={Quarto, R and XeLaTeX},
-          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.0}, pdfpublication={Zenodo},
+          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.1}, pdfpublication={Zenodo},
           pdfcopyright={Copyright (C) 2026 Adrien Sales, released under CC BY 4.0},
           pdflicenseurl={https://creativecommons.org/licenses/by/4.0/}}}
         % the licence, written over the cover as a link, at the right end of its last caption line, and the DOI
@@ -327,7 +327,7 @@ tp_ <- D |> mutate(prej = negative_association | defensive_marking | coalesce(st
 tp_none <- 100 * mean(tp_$prej[tp_$is_base]); tp_nat <- 100 * mean(tp_$prej[!tp_$is_base])
 ```
 
-Ask seven open AI models for advice about being alone with a man, and his nationality decides the tone: some
+Ask seven open-weight AI models for advice about being alone with a man, and his nationality decides the tone: some
 men get compliments and ice-breakers, others a "his origin does not matter" that nobody asked for, a
 warning about scams or migration, or, from the smallest model, no advice at all. The seven models agree on
 who gets the compliments, probably learnt from the same data; they differ on how they treat the others,
@@ -3235,13 +3235,13 @@ draw the same line, and both single out Nigeria and Afghanistan. The refusals, c
 too, are a third reading, and they fall on the same men.
 
 **Relation to the RTS report.** I find the "encounter" versus "distrust" contrast described by RTS. In
-most of the models tested it is attenuated: these open models rarely tip into outright alarm for a given
+most of the models tested it is attenuated: these open-weight models rarely tip into outright alarm for a given
 nationality, and the bias becomes visible only with a repeated design and a control. Ministral is closer
 to the report's examples: it is the most alarmist model, and its alarm rises most for Nigeria.
 
 # Limitations {#sec-limitations}
 
-- **Seven open models, one of them quantised.** Six have 2 to 9 billion parameters (counting the
+- **Seven open-weight models, one of them quantised.** Six have 2 to 9 billion parameters (counting the
   effective size of E2B and E4B); Gemma 26B-A4B is a mixture of experts with 4 billion active parameters,
   run in 4-bit AWQ, so its answers are those of the quantised model, which may differ slightly from the
   original. All run on two T4 GPUs; Llama and dense models above 10 billion parameters remain to be done
@@ -3295,7 +3295,7 @@ changes the answer.
 - **It shows even without a judge.** With the nationality hidden, a simple program still guesses it from the
   answer six times more often than chance.
 
-These are not the large commercial chatbots that RTS tested, but open models that anyone can download, and
+These are not the large commercial chatbots that RTS tested, but open-weight models that anyone can download, and
 the same pattern shows up in all of them. Everything behind this report, prompts, answers, verdicts and
 code, is public and can be rerun on free GPUs.
 
@@ -3322,7 +3322,7 @@ All notebooks and datasets of the project, published under the name *Alone With 
 Kaggle collection [@kaggle_collection]; the source of every notebook, of the analysis scripts and of this report
 is on GitHub, at [github.com/adriens/kaggle-bench-ai-biasses](https://github.com/adriens/kaggle-bench-ai-biasses). A
 7-page version and a 16-slide carousel of the results sit next to this report, in the same Zenodo record,
-[doi.org/10.5281/zenodo.23991569](https://doi.org/10.5281/zenodo.23991569). The
+[doi.org/10.5281/zenodo.23992096](https://doi.org/10.5281/zenodo.23992096). The
 generation notebooks, one per model [@kaggle_granite; @kaggle_qwen; @kaggle_gemma_e2b; @kaggle_gemma; @kaggle_gemma_26b;
 @kaggle_ministral; @kaggle_nemotron],
 record the model revision, vLLM version, seeds and every answer; the judge notebook [@kaggle_judge] records
@@ -3338,8 +3338,8 @@ table and number from that dataset. Built with [R](https://www.r-project.org), [
 anyone may share and adapt them, for any purpose, provided they credit the author.
 
 **How to cite.** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
-open-weight language models* (Version 1.0) \[Report\]. Zenodo.
-[https://doi.org/10.5281/zenodo.23991569](https://doi.org/10.5281/zenodo.23991569)
+open-weight language models* (Version 1.1) \[Report\]. Zenodo.
+[https://doi.org/10.5281/zenodo.23992096](https://doi.org/10.5281/zenodo.23992096)
 
 # Declarations {.unnumbered}
 
