@@ -146,7 +146,7 @@ knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 \end{tcolorbox}
 \end{minipage}
 \vfill
-\slidetext{fg}{I tested it at scale: 7 open AI models, `r num(nrow(R) / 1000, 0)`k answers. Only the man changes: \textbf{24 nationalities}, 11 situations.}
+\slidetext{fg}{I tested it at scale: 7 open-weight AI models, `r num(nrow(R) / 1000, 0)`k answers. Only the man changes: \textbf{24 nationalities}, 11 situations.}
 \newpage
 ```
 
