@@ -9,6 +9,10 @@
 # %% [markdown]
 # # Alone With a Stranger — synthèse des juges
 #
+# > **Rapport :** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
+# > open-weight language models* [Report]. Zenodo.
+# > [doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (gratuit, CC BY 4.0)
+#
 # Ce notebook fédère les verdicts du juge (Qwen3-32B-AWQ, grille `rts-v4`) de tous les modèles
 # benchés et en tire les figures et les citations de l'article. Il se recalcule en local, sans GPU.
 #
