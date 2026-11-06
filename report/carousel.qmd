@@ -51,13 +51,13 @@ format:
         \definecolor{linkblue}{HTML}{8EC1FF}
         \pagestyle{empty}
         % the Zenodo DOI of version 1.0, on the cover, on the last slide and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.23992483}
+        \newcommand{\zenododoi}{10.5281/zenodo.23992909}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
         % the PDF author: the name, then the X handle
         \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)},
-          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.2}, pdfpublication={Zenodo},
+          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.3}, pdfpublication={Zenodo},
           pdfcopyright={Copyright (C) 2026 Adrien Sales, released under CC BY 4.0},
           pdflicenseurl={https://creativecommons.org/licenses/by/4.0/}}}
         \pagecolor{night}
@@ -215,8 +215,6 @@ g_acc <- 100 * gm_$accuracy[gm_$setting == "shared" & gm_$scope == "both" & gm_$
 v <- function(t, m, c) t$pct[t$model == m & t$country == c]
 # the slides are raw LaTeX: a percentage there needs an escaped sign
 pcl <- function(x, d = 0) paste0(num(x, d), " \\%")
-r5_ <- R |> filter(model == E2, context_id == "C5_home_night") |> group_by(country) |> summarise(p = 100 * mean(refusal))
-r5_all <- r5_$country[r5_$country != "BASE" & r5_$p >= 99.9]
 gem_def <- rate_table("defensive_marking") |> filter(country != "BASE", model %in% c(E2, GE, G26)) |>
   group_by(model) |> summarise(p = mean(pct), .groups = "drop")
 gm_mask <- 100 * gm_$accuracy[gm_$setting == "masked" & gm_$scope == "both" & gm_$algo == "logreg"]
@@ -486,10 +484,11 @@ ggplot(mapping = aes(x, y)) +
                              alpha = 0.16, linewidth = 0.35, expand = unit(4, "mm"), show.legend = FALSE) +
   geom_point(data = nat_pts, aes(colour = col), size = 3) +
   geom_text_repel(data = bind_rows(word_pts, nat_pts),
+                  # point.size: the labels keep clear of the drawn dots of the nationalities; a word has no dot
                   aes(label = lab, colour = col, fontface = ifelse(kind == "nat", "bold", "italic"),
-                      size = ifelse(kind == "nat", 3.7, 3.1)),
-                  family = "Inter", seed = 5, max.overlaps = Inf, box.padding = 0.3, point.padding = 0.2, force = 4,
-                  force_pull = 0.5, max.iter = 50000, max.time = 5,
+                      size = ifelse(kind == "nat", 3.7, 3.1), point.size = ifelse(kind == "nat", 3, 0)),
+                  family = "Inter", seed = 13, max.overlaps = Inf, box.padding = 0.25, point.padding = 0.3, force = 3,
+                  force_pull = 0.2, max.iter = 1e6, max.time = 15,
                   ylim = c(min(word_pts$y, nat_pts$y) - 0.12, NA),
                   min.segment.length = 0.4, segment.colour = "#55585f", segment.size = 0.2) +
   annotate("text", x = 0, y = max(word_pts$y, nat_pts$y) + 0.12, label = "\u2191 warm, passionate",
@@ -548,9 +547,10 @@ lab_eu <- tribble(~lab, ~x, ~y,
   "Germany", 10.4, 51, "Belgium", 4.6, 50.6, "Switzerland", 8.2, 46.85, "Sweden", 15.5, 62.5,
   "Finland", 26, 63.5, "Serbia", 20.9, 44, "Romania", 25, 45.9, "Albania", 20, 41.1, "Turkey", 34, 39,
   "Morocco", -6.5, 31.5, "Algeria", 2.8, 28)
-# Fiji is too small to see: a ring shows where it is
+# Fiji is too small to see: a ring shows where it is; the map runs a little past 180° so that the ring,
+# next to the date line, is not cut in half by the edge of the panel
 fiji_ring <- annotate("point", x = 178.5, y = -17.8, shape = 21, size = 4, colour = map_fill[["origin"]], stroke = 1)
-p_world <- base_map(c(-170, 180), c(-48, 75), lab_world) + fiji_ring
+p_world <- base_map(c(-170, 184), c(-48, 75), lab_world) + fiji_ring
 p_eu <- base_map(c(-16, 50), c(27, 66), lab_eu)
 # the key, in two columns under the maps
 key <- tibble(fam = names(fam_lab), x = c(0, 0, 1, 1), y = c(0, -1, 0, -1)) |>
@@ -612,7 +612,8 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
   geom_smooth(method = "lm", formula = y ~ x, colour = MUTED, fill = GRID, linewidth = 0.6, alpha = 0.6) +
   geom_point(aes(colour = fam), size = 3.6) +
   geom_text_repel(aes(label = lab, colour = fam), family = "Inter", fontface = "bold", size = 3.5, seed = 2,
-                  box.padding = 0.3, min.segment.length = 0.3, segment.colour = "#55585f", bg.color = NIGHT, bg.r = 0.12) +
+                  box.padding = 0.45, point.padding = 0.4, force = 3, max.overlaps = Inf, max.iter = 50000,
+                  min.segment.length = 0.3, segment.colour = "#55585f", bg.color = NIGHT, bg.r = 0.12) +
   scale_colour_manual(values = map_fill, guide = "none") +
   scale_x_log10(breaks = c(500, 1000, 3000, 10000, 30000, 100000),
                 labels = c("$500", "$1k", "$3k", "$10k", "$30k", "$100k")) +
@@ -652,7 +653,7 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
 \begin{tcbraster}[raster columns=2, raster column skip=8pt, raster row skip=8pt]
 \formcard{heat}{\talkicon}{"His origin does not matter"}{\inflag}{`r num(v(dm_, GR, "IND"), 0)` \%}{\frflag}{`r num(v(dm_, GR, "FRA"), 0)` \%}{Granite, unasked: Indian vs French man}
 \formcard{amber}{\riskicon}{A risk tied to his origin}{\afflag}{`r num(v(na_, MI, "AFG"), 0)` \%}{\frflag}{`r num(v(na_, MI, "FRA"), 0)` \%}{Ministral: Afghan vs French man}
-\formcard{violet}{\refuseicon}{No help at all}{\dzflag}{`r num(r5_$p[r5_$country == "DZA"], 0)` \%}{\gbflag}{`r num(r5_$p[r5_$country == "GBR"], 0)` \%}{Gemma E2B refuses, at his place at night: Algerian vs British man}
+\formcard{violet}{\refuseicon}{No help at all}{\afflag}{`r num(refu$p[refu$country == "AFG"], 0)` \%}{\gbflag}{`r num(refu$p[refu$country == "GBR"], 0)` \%}{The smallest model, Gemma E2B, refuses to answer: Afghan vs British man}
 \formcard{green}{\hangericon}{A religion, a dress code}{\afflag}{`r rel_n["AFG"]`}{\frflag}{`r rel_n["FRA"]`}{answers giving him a religion, 7 AIs: Afghan vs French man}
 \end{tcbraster}
 \vfill
@@ -747,7 +748,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, before upper=\raggedright]
 {\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the full report}} (91 pages)\enspace·\enspace\href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the 7-page version}}\par}
 \vspace{0.15em}
-{\fontsize{12.5}{16}\selectfont\color{fg}\faQuoteRight\enspace\textbf{Cite:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{doi.org/\zenododoi}}\enspace(Zenodo, v1.2)\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faQuoteRight\enspace\textbf{Cite:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{doi.org/\zenododoi}}\enspace(Zenodo, v1.3)\par}
 \vspace{0.15em}
 {\fontsize{12.5}{16}\selectfont\color{fg}\faGithub\enspace\textbf{Data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
 \vspace{0.15em}
