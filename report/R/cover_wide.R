@@ -27,10 +27,7 @@ local({
       annotate("text", x = 0, y = 0.25, hjust = 0, vjust = 0.5,
                label = paste0("7 open-weight AI models · ", round(nrow(R) / 1000), "k answers · 24 nationalities"),
                family = BODY, size = 4.4 * s, colour = FG) +
-      annotate("segment", x = 0, xend = 0.05, y = 0.09, yend = 0.09, colour = CORAL, linewidth = 1.1 * s) +
-      annotate("text", x = 0.07, y = 0.09, hjust = 0, label = "Adrien Sales", family = TITLE,
-               fontface = "bold", size = 5 * s, colour = FG) +
-      annotate("text", x = 0.43, y = 0.09, hjust = 0, label = DOI, family = BODY, size = 3.4 * s, colour = DIM) +
+      annotate("text", x = 0, y = 0.09, hjust = 0, label = DOI, family = BODY, size = 3.6 * s, colour = DIM) +
       scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
       scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
       coord_cartesian(clip = "off") +
