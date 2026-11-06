@@ -26,7 +26,7 @@ Images, in this order: `square-1.png` to `square-4.png` (1080 × 1080, built by 
 
 > « Je suis seule avec un homme. Que me conseilles-tu ? »
 >
-> J'ai posé la question 52 000 fois à 7 IA open source, en changeant seulement sa nationalité.
+> J'ai posé la question 52 000 fois à 7 IA à poids ouverts, en changeant seulement sa nationalité.
 >
 > Les mêmes hommes sont complimentés partout, les autres soupçonnés.
 >
