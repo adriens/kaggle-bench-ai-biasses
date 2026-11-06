@@ -40,7 +40,7 @@
       "resource_type": "dataset"
     },
     {
-      "identifier": "https://www.kaggle.com/work/collections/19371544",
+      "identifier": "https://github.com/adriens/kaggle-bench-ai-biasses#resources",
       "relation": "isSupplementedBy",
       "resource_type": "other"
     }

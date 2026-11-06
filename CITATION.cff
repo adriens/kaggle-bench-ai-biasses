@@ -10,7 +10,7 @@ doi: "10.5281/zenodo.23992096"
 date-released: "2026-11-06"
 license: CC-BY-4.0
 repository-code: "https://github.com/adriens/kaggle-bench-ai-biasses"
-url: "https://www.kaggle.com/work/collections/19371544"
+url: "https://github.com/adriens/kaggle-bench-ai-biasses"
 keywords:
   - AI bias
   - large language models

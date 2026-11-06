@@ -5,8 +5,8 @@
 
 Report: *She Is Alone With a Man* (`report/report.pdf`), with a 7-page version (`report/short.pdf`), a
 16-slide carousel (`report/carousel.pdf`) and 4 square images (`report/square.pdf`), deposited on Zenodo:
-[doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (all versions; version 1.1 is [doi.org/10.5281/zenodo.23992096](https://doi.org/10.5281/zenodo.23992096)). Notebooks and datasets: the
-[Kaggle collection](https://www.kaggle.com/work/collections/19371544).
+[doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (all versions; version 1.1 is [doi.org/10.5281/zenodo.23992096](https://doi.org/10.5281/zenodo.23992096)). Notebooks and datasets on Kaggle:
+see [Resources](#resources).
 
 Benchmark of nationality bias in the safety advice that open-weight language models give to a woman
 alone with a man. Same French prompt, only the man's nationality changes (24 nationalities + a control),
@@ -33,7 +33,7 @@ versions, always the latest; [v1.1](https://doi.org/10.5281/zenodo.23992096), [v
 - [Alone With a Stranger - World Bank wealth](https://www.kaggle.com/datasets/adriensales/alone-with-a-stranger-world-bank-wealth):
   GDP per capita and income group of the 24 countries
 
-**Kaggle notebooks** (Apache 2.0), all in the [Alone With a Stranger collection](https://www.kaggle.com/work/collections/19371544)
+**Kaggle notebooks** (Apache 2.0)
 
 | Notebook | Role |
 |---|---|
