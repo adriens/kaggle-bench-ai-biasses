@@ -3,7 +3,7 @@ title: "She Is Alone With a Man"
 subtitle: "Nationality bias in the safety advice given by open-weight language models"
 author:
   - name: Adrien Sales
-date: "2026-11-06"
+date: "2026-11-07"
 date-format: "D MMMM YYYY"
 lang: en-GB
 abstract: |
@@ -91,8 +91,8 @@ format:
         \usepackage{pdfpages}
         % the PDF information is written with the first page: set before the cover is shipped out
         % the Zenodo DOI of version 1.0, in the text, on the cover and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.23992909}
-        \newcommand{\zenodoversion}{1.3}
+        \newcommand{\zenododoi}{10.5281/zenodo.24028517}
+        \newcommand{\zenodoversion}{1.4}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
@@ -3105,7 +3105,7 @@ All notebooks and datasets of the project, published under the name *Alone With 
 their links, in the GitHub repository [@kaggle_collection]; the source of every notebook, of the analysis scripts and of this report
 is on GitHub, at [github.com/adriens/kaggle-bench-ai-biasses](https://github.com/adriens/kaggle-bench-ai-biasses). A
 7-page version and a 16-slide carousel of the results sit next to this report, in the same Zenodo record,
-[doi.org/10.5281/zenodo.23992909](https://doi.org/10.5281/zenodo.23992909). The
+[doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (all versions). The
 generation notebooks, one per model [@kaggle_granite; @kaggle_qwen; @kaggle_gemma_e2b; @kaggle_gemma; @kaggle_gemma_26b;
 @kaggle_ministral; @kaggle_nemotron],
 record the model revision, vLLM version, seeds and every answer; the judge notebook [@kaggle_judge] records
@@ -3121,8 +3121,8 @@ table and number from that dataset. Built with [R](https://www.r-project.org), [
 anyone may share and adapt them, for any purpose, provided they credit the author.
 
 **How to cite.** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
-open-weight language models* (Version 1.3) \[Report\]. Zenodo.
-[https://doi.org/10.5281/zenodo.23992909](https://doi.org/10.5281/zenodo.23992909)
+open-weight language models* (Version 1.4) \[Report\]. Zenodo.
+[https://doi.org/10.5281/zenodo.24028517](https://doi.org/10.5281/zenodo.24028517)
 
 # Declarations {.unnumbered}
 

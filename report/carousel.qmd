@@ -4,7 +4,7 @@ author: "Adrien Sales"
 subtitle: "What seven open-weight AI models answer a woman alone with a man, when only his nationality changes"
 subject: "Nationality bias in the safety advice of seven open-weight LLMs: 52k answers, 24 nationalities, 11 situations"
 keywords: [AI bias, LLM, nationality, stereotypes, AI safety, open-weight models, Kaggle, Quarto]
-date: "2026-11-06"
+date: "2026-11-07"
 lang: en-GB
 format:
   pdf:
@@ -51,13 +51,13 @@ format:
         \definecolor{linkblue}{HTML}{8EC1FF}
         \pagestyle{empty}
         % the Zenodo DOI of version 1.0, on the cover, on the last slide and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.23992909}
+        \newcommand{\zenododoi}{10.5281/zenodo.24028517}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
         % the PDF author: the name, then the X handle
         \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)},
-          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.3}, pdfpublication={Zenodo},
+          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.4}, pdfpublication={Zenodo},
           pdfcopyright={Copyright (C) 2026 Adrien Sales, released under CC BY 4.0},
           pdflicenseurl={https://creativecommons.org/licenses/by/4.0/}}}
         \pagecolor{night}
@@ -748,7 +748,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, before upper=\raggedright]
 {\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the full report}} (91 pages)\enspace·\enspace\href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the 7-page version}}\par}
 \vspace{0.15em}
-{\fontsize{12.5}{16}\selectfont\color{fg}\faQuoteRight\enspace\textbf{Cite:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{doi.org/\zenododoi}}\enspace(Zenodo, v1.3)\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faQuoteRight\enspace\textbf{Cite:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{doi.org/\zenododoi}}\enspace(Zenodo, v1.4)\par}
 \vspace{0.15em}
 {\fontsize{12.5}{16}\selectfont\color{fg}\faGithub\enspace\textbf{Data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
 \vspace{0.15em}
