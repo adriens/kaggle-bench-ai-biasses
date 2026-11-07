@@ -664,7 +664,7 @@ Ministral's, `r sum(!R$model %in% c(GR, MI) & R$finish_reason == "length")` answ
 These truncated answers are excluded from the judged sample, which leaves Ministral 3 cells one answer short
 (2,571 answers). Nemotron's answers show no trace of its reasoning mode.
 
-::: {#fig-length fig-pos="H"}
+::: {#fig-length}
 
 ```{=latex}
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
@@ -1573,6 +1573,10 @@ sig |>
 @tbl-quotes gives representative quotes in the original French, each followed by my English translation. **These are model outputs, not claims**; the nationality is masked (`[X]`) as the judge
 read it.
 
+
+```{=latex}
+\global\LTsplittrue
+```
 
 ```{r}
 #| label: tbl-quotes
@@ -2813,7 +2817,8 @@ ggplot(ed, aes(x, y, colour = g)) +
               linewidth = 0.4, linetype = "dashed") +
   geom_point(size = 2.2) +
   ggrepel::geom_text_repel(aes(label = lab), size = 2.6, family = "Inter", seed = 3, show.legend = FALSE,
-                           min.segment.length = 0.3, box.padding = 0.2) +
+                           min.segment.length = 0.3, box.padding = 0.35, point.padding = 0.2, force = 2,
+                           max.overlaps = Inf) +
   scale_colour_manual(values = TW_COL, name = NULL, breaks = c("qualities", "origin", "between"),
                       labels = c(qualities = "described by his qualities", origin = "described by his origin",
                                  between = "in between")) +
@@ -2901,9 +2906,6 @@ in the notebook [@kaggle_guess].
 \FloatBarrier
 ```
 
-```{=latex}
-\clearpage
-```
 
 
 # Discussion
@@ -2985,9 +2987,8 @@ does with the other men differs from one model to the next, even between models 
 looks like a choice made when each was aligned. The "his origin does not matter" answer is the clearest case. It
 presupposes a suspicion the user never expressed, and it is aimed at the same men by four models: a model that
 guards against accusations of racism only for some groups reveals that it associates those groups with the
-risk. A model that seems neutral on one indicator can therefore be biased on another. A benchmark limited to
-explicit associations would have rated the three Gemma models almost perfect; one limited to a judge's reading
-would have missed Gemma E2B's refusals, the strongest nationality effect of that model.
+risk. A model neutral on one indicator can be biased on another: a benchmark limited to explicit risks would
+have rated the three Gemma models almost perfect, and one limited to a judge would have missed Gemma E2B's refusals.
 
 **The reflex is acquired.** Within the Gemma family, the "his origin does not matter" reflex appears with size
 (26B) or with NVIDIA's post-training (Nemotron), and both routes aim it at the same men: it is not a trace of
@@ -3014,9 +3015,8 @@ models: the advice received depends on who is named, and an answer that sounds b
 suspicion. For those who align them: a reassurance aimed only at some groups is itself a signal of the
 association it tries to hide.
 
-**Relation to the RTS report.** I find the "encounter" versus "distrust" contrast described by RTS. In
-most of the models tested it is attenuated: these open-weight models rarely tip into outright alarm for a given
-nationality, and the bias becomes visible only with a repeated design and a control. Ministral is closer
+**Relation to the RTS report.** I find the "encounter" versus "distrust" contrast described by RTS, attenuated:
+these open-weight models rarely tip into outright alarm, and the bias shows only with a repeated design and a control. Ministral is closer
 to the report's examples: it is the most alarmist model, and its alarm rises most for Nigeria.
 
 # Limitations {#sec-limitations}
@@ -3134,6 +3134,10 @@ help of Claude (Anthropic), under the author's direction; the design, the choice
 author's.
 
 # Software and tools {#sec-stack .unnumbered}
+
+```{=latex}
+\global\LTsplittrue
+```
 
 ```{r}
 #| label: tbl-stack

@@ -10,7 +10,7 @@ Images, in this order: `square-1.png` to `square-4.png` (1080 × 1080, built by 
 >
 > I asked 7 open-weight AI models 52k times, changing only his nationality.
 >
-> Same men flattered by every AI, the others get suspicion. The richer his country, the warmer the advice.
+> Same men complimented by every AI, the others get suspicion. The richer his country, the warmer the advice.
 >
 > Full report, free (CC BY): https://doi.org/10.5281/zenodo.23991568
 
@@ -36,7 +36,7 @@ Images, in this order: `square-1.png` to `square-4.png` (1080 × 1080, built by 
 
 **Image 1.** Title: "I am alone with a man." Only his nationality changes. What a Swiss TV test (RTS) found: for an Italian or a Swiss man (Italian and Swiss flags, a sun), chatbots suggested ice-breakers: talk about his country, get to know him. For an Algerian man (Algerian flag, a warning sign), they said keep your distance: stay alert, emergency numbers. Below: I tested it at scale: 7 open-weight AI models, 52k answers. Only the man changes: 24 nationalities, 11 situations. Footer: full report, free, doi.org/10.5281/zenodo.23992909, CC BY 4.0.
 
-**Image 2.** Title: The same men are flattered by every AI. Bar chart of the answers with a compliment on the man's culture, mean of the 7 AIs. Most complimented: Finland 38 %, Japan 36 %, Australia 36 %, Italy 36 %, Sweden 36 %. Least complimented: Russia 9 %, Algeria 9 %, India 9 %, Nigeria 7 %, Afghanistan 5 %. Caption: five companies, seven models, the same ranking. Footer: doi.org/10.5281/zenodo.23992909.
+**Image 2.** Title: The same men are complimented by every AI. Bar chart of the answers with a compliment on the man's culture, mean of the 7 AIs. Most complimented: Finland 38 %, Japan 36 %, Australia 36 %, Italy 36 %, Sweden 36 %. Least complimented: Russia 9 %, Algeria 9 %, India 9 %, Nigeria 7 %, Afghanistan 5 %. Caption: five companies, seven models, the same ranking. Footer: doi.org/10.5281/zenodo.23992909.
 
 **Image 3.** Title: Hide his nationality. The words still give it away. 27 %: a simple text classifier reading only the answers, nationality hidden, guesses it 27 % of the time; chance is 4 %, one in 24, so 6 times better. No judge needed. A real answer, from Qwen3.5-9B, translated from French, to a woman at home with a plumber: "If the plumber is Muslim (which is likely given his Algerian origin), make sure you are dressed in a covering way: coat, long shirt, no legs or arms exposed." The question never mentioned religion. Footer: doi.org/10.5281/zenodo.23992909.
 

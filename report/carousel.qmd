@@ -326,7 +326,7 @@ word_pts <- word_pts |> mutate(lab = coalesce(unname(WORD_EN[lab]), lab))
 ```{=latex}
 \kicker{heat}{The tipping point}
 \headline{Name his nationality, and the answer turns.}
-\slidetext{dim}{Prejudiced answers from the larger AI models, in a taxi, an elevator or an isolated street:}
+\slidetext{dim}{Prejudiced answers from four of the seven AIs (Granite, Qwen, Ministral, Gemma 26B), in a taxi, an elevator or an isolated street:}
 ```
 
 ```{r}
@@ -351,7 +351,7 @@ ggplot(tp, aes(who, p, fill = who)) +
 <!-- 5: the quadrant -->
 ```{=latex}
 \kicker{keyblue}{Two treatments}
-\headline{A cultural guide for some men, a security guard for others.}
+\headline{Compliments for some men, suspicion for others.}
 ```
 
 ```{r}
@@ -374,11 +374,11 @@ ggplot(nat, aes(def, pos)) +
   geom_vline(xintercept = mx, linetype = "dashed", colour = GRID) +
   geom_hline(yintercept = my, linetype = "dashed", colour = GRID) +
   annotate("text", x = 1, y = YMAX - 1, hjust = 0, vjust = 1, family = "Inter", fontface = "bold",
-           size = 4.62, colour = "#2a78d6", label = "CULTURAL GUIDE") +
+           size = 4.62, colour = "#2a78d6", label = "COMPLIMENTED") +
   annotate("text", x = 1, y = YMAX - 4, hjust = 0, vjust = 1, family = "Inter", size = 3.64,
            colour = MUTED, label = "compliments, ice-breakers") +
   annotate("text", x = XMAX - 1, y = my - 1, hjust = 1, vjust = 1, family = "Inter", fontface = "bold",
-           size = 4.62, colour = "#d63c2a", label = "SECURITY GUARD") +
+           size = 4.62, colour = "#d63c2a", label = "SUSPECTED") +
   geom_point(aes(size = neg, fill = lean), shape = 21, colour = NIGHT, stroke = 0.6, alpha = 0.95) +
   geom_point(data = ctl, shape = 8, size = 4.20, colour = INK, stroke = 0.8) +
   annotate("text", x = ctl$def + 2, y = ctl$pos + 2.2, hjust = 0, family = "Inter", size = 3.64,
@@ -394,7 +394,7 @@ ggplot(nat, aes(def, pos)) +
   guides(size = guide_legend(override.aes = list(fill = "#b9b7b1"))) +
   scale_x_continuous(labels = \(x) paste0(x, " %"), limits = c(-1.5, XMAX), expand = c(0, 0)) +
   scale_y_continuous(labels = \(x) paste0(x, " %"), limits = c(-2, YMAX), expand = c(0, 0)) +
-  labs(x = "\"his origin does not matter\" (defensive marking)", y = "compliments on his culture") +
+  labs(x = "\"his origin does not matter\" (\"defended\")", y = "compliments on his culture") +
   theme(legend.position = "none")
 ```
 
@@ -407,7 +407,7 @@ ggplot(nat, aes(def, pos)) +
 <!-- 6: compliments -->
 ```{=latex}
 \kicker{green}{Shared by all seven AIs}
-\headline{The same men are flattered by every AI.}
+\headline{The same men are complimented by every AI.}
 ```
 
 ```{r}
@@ -741,7 +741,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \vfill
 \takeaway{green}{\faSackDollar}{The richer his country, the warmer the AI.}{Even within a continent. A link, not a proof of cause.}
 \vfill
-\takeaway{violet}{\faChartColumn}{Bigger is not fairer.}{The bias changes form, it does not go away.}
+\takeaway{violet}{\faChartColumn}{Bigger is not fairer.}{Within one family, the bias changes form.}
 \vfill
 \takeaway{keyblue}{\faMagnifyingGlass}{Test who the people are.}{Safety tests must vary it, prompt after prompt.}
 \vfill

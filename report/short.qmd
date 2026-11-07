@@ -214,7 +214,7 @@ open-weight models (2 to 26 billion parameters) from five companies (IBM, Alibab
 which a woman is alone with a man; only his nationality changed (24 countries, or none), across 11 situations and 3
 ages. An LLM judge blind to the nationality rated `r num(nrow(D), 0)` answers; a judge-free classifier read them all.
 In a taxi, an elevator or an isolated street, naming any nationality raised prejudiced answers from `r pc(p_none)` to
-`r pc(p_nat)` (larger models). Every model complimented and suspected the same men; compliments tracked the wealth of
+`r pc(p_nat)` (four of the seven models). All complimented the same men, most suspected the same others; compliments tracked the wealth of
 their country (Spearman ρ = `r wr("compliment")`), even within a continent; and the nationality could be guessed from
 the answers alone `r pc(g_acc)` of the time (chance: 4 %). **Safety evaluations should vary who the people in a
 prompt are.**
@@ -255,7 +255,7 @@ nationality.**
 \begin{minipage}[c]{0.62\linewidth}\raggedright{\small as soon as he has one,\\ \textbf{any} nationality}\end{minipage}\par\smallskip
 \pbar{heat}{`r num(p_nat / 100, 3)`}
 \end{minipage}\par\smallskip
-{\footnotesize\color{muted}Prejudiced answers of the larger AI models, in a taxi, an elevator or an isolated street.}
+{\footnotesize\color{muted}Prejudiced answers of four of the seven AIs (8B and more), in a taxi, an elevator or an isolated street.}
 \end{bignum}
 ```
 
@@ -282,11 +282,11 @@ ggplot(nat, aes(def, pos)) +
   geom_vline(xintercept = mx, linetype = "dashed", colour = GRID) +
   geom_hline(yintercept = my, linetype = "dashed", colour = GRID) +
   annotate("text", x = 1, y = YMAX - 1, hjust = 0, vjust = 1, family = "Inter", fontface = "bold",
-           size = 3.3, colour = "#2a78d6", label = "CULTURAL GUIDE") +
+           size = 3.3, colour = "#2a78d6", label = "COMPLIMENTED") +
   annotate("text", x = 1, y = YMAX - 4, hjust = 0, vjust = 1, family = "Inter", size = 2.6,
            colour = MUTED, label = "compliments, ice-breakers") +
   annotate("text", x = XMAX - 1, y = my - 1, hjust = 1, vjust = 1, family = "Inter", fontface = "bold",
-           size = 3.3, colour = "#d63c2a", label = "SECURITY GUARD") +
+           size = 3.3, colour = "#d63c2a", label = "SUSPECTED") +
   annotate("text", x = XMAX - 1, y = my - 4, hjust = 1, vjust = 1, family = "Inter", size = 2.6,
            colour = MUTED, label = "\"his origin does not matter\",\nnamed risks") +
   geom_point(aes(size = neg, fill = lean), shape = 21, colour = "white", stroke = 0.6, alpha = 0.95) +
@@ -294,7 +294,7 @@ ggplot(nat, aes(def, pos)) +
   annotate("text", x = ctl$def + 2, y = ctl$pos + 2.2, hjust = 0, family = "Inter", size = 2.6,
            colour = INK, label = "\"a man\" (no nationality)") +
   # point.size: the labels keep clear of the bubbles, whose area grows with the negative associations
-  # unlabelled points under the "security guard" note: the labels keep clear of it
+  # unlabelled points under the "suspected" note: the labels keep clear of it
   geom_text_repel(data = bind_rows(nat |> mutate(ps = sqrt(neg / max(nat$neg)) * 11 + 1.8),
                                    tibble(def = XMAX - c(2, 6, 10, 2, 6, 10), pos = my - c(1.5, 1.5, 1.5, 5, 5, 5),
                                           lab = "", ps = 14)),
@@ -309,7 +309,7 @@ ggplot(nat, aes(def, pos)) +
   scale_x_continuous(labels = \(x) paste0(x, " %"), limits = c(-1.5, XMAX), expand = c(0, 0)) +
   scale_y_continuous(labels = \(x) paste0(x, " %"), limits = c(-2, YMAX), expand = c(0, 0)) +
   # no size key: the caption says what the size shows, and page 1 has no room for one
-  labs(x = "\"his origin does not matter\" (defensive marking)", y = "compliments on his culture")
+  labs(x = "\"his origin does not matter\" (\"defended\")", y = "compliments on his culture")
 ```
 
 ```{=latex}
