@@ -85,7 +85,7 @@ local({
         "Granite 4.2 8B, Qwen3.5-9B, Gemma 4 E2B, E4B and 26B-A4B, Ministral 3 8B and Nemotron 3.5 Bolt E4B\n",
         format(nrow(R), big.mark = ","), " answers in French · ", format(nrow(D), big.mark = ","),
         " rated by an LLM judge (Qwen3-32B) · 24 nationalities · 11 situations · 3 ages\n",
-        "Petals: share of answers, mean of the seven models, sorted from \"cultural guide\" (blue) to \"security guard\" (coral).\n",
+        "Petals: share of answers, mean of the seven models, sorted from compliments (blue) to suspicion (coral).\n",
         "The empty centre is \"a man\" with no nationality: he gets almost neither.\n",
         "All runs used Kaggle's free GPU quota: this work would not have been possible without it.\n\n",
         month.name[as.integer(format(Sys.Date(), "%m"))], " ", format(Sys.Date(), "%Y"),

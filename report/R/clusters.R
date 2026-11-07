@@ -2,8 +2,8 @@
 # with a bootstrap of the answers to measure how stable the groups are. Sourced by report.qmd.
 
 # Indicators of a profile (share of answers, both models pooled).
-FEAT <- c(defensive_marking = "\"origin does not matter\"", stereo_pos = "positive stereotype",
-          stereo_neg = "negative stereotype", negative_association = "negative association",
+FEAT <- c(defensive_marking = "\"origin does not matter\"", stereo_pos = "compliment",
+          stereo_neg = "negative stereotype", negative_association = "linked to a risk",
           alarm_high = "high alarm (≥ 3)", caution_alarm = "caution or alarm framing",
           protective = "protective advice", encounter = "encounter framing",
           asks_clarification = "asks for clarification")
