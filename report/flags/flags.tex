@@ -69,3 +69,33 @@
 \newcommand{\euflag}{\tikz{\fill[eublue] (0,0) rectangle (1.2in,0.8in);
   \foreach \a in {0,30,...,330} \node[star, star points=5, star point ratio=2.5, fill=euyellow, inner sep=0pt,
     minimum size=0.09in] at ($(0.6in,0.4in)+(\a:0.267in)$) {};}}
+% Germany, Serbia (the national flag without the arms, as flown by citizens), Albania (the double-headed eagle,
+% simplified), Fiji (the Union Jack in the canton, the shield simplified to its red cross)
+\definecolor{degold}{HTML}{FFCE00}\definecolor{dered}{HTML}{DD0000}
+\newcommand{\deflag}{\tikz{\fill[black] (0,0.533in) rectangle (1.2in,0.8in); \fill[dered] (0,0.267in) rectangle (1.2in,0.533in);
+  \fill[degold] (0,0) rectangle (1.2in,0.267in);}}
+\definecolor{rsred}{HTML}{C6363C}\definecolor{rsblue}{HTML}{0C4076}
+\newcommand{\rsflag}{\tikz{\fill[rsred] (0,0.533in) rectangle (1.2in,0.8in); \fill[rsblue] (0,0.267in) rectangle (1.2in,0.533in);
+  \fill[white] (0,0) rectangle (1.2in,0.267in); \draw[dim, line width=0.4pt] (0,0) rectangle (1.2in,0.8in);}}
+\definecolor{alred}{HTML}{E41E20}
+\newcommand{\alwing}{(0.56in,0.47in) -- (0.40in,0.64in) -- (0.24in,0.66in) -- (0.30in,0.59in) -- (0.20in,0.57in)
+  -- (0.29in,0.51in) -- (0.20in,0.47in) -- (0.30in,0.43in) -- (0.24in,0.37in) -- (0.40in,0.36in) -- (0.53in,0.33in) -- cycle}
+\newcommand{\alflag}{\tikz{\fill[alred] (0,0) rectangle (1.2in,0.8in);
+  \fill[black] \alwing; \fill[black, xscale=-1, xshift=-1.2in] \alwing;
+  \fill[black] (0.6in,0.40in) ellipse (0.065in and 0.15in);
+  \fill[black] (0.6in,0.20in) -- (0.53in,0.11in) -- (0.6in,0.14in) -- (0.67in,0.11in) -- cycle;
+  \draw[black, line width=2.2pt] (0.57in,0.52in) -- (0.53in,0.64in) (0.63in,0.52in) -- (0.67in,0.64in);
+  \fill[black] (0.52in,0.66in) circle (0.035in) (0.68in,0.66in) circle (0.035in);
+  \fill[black] (0.49in,0.68in) -- (0.44in,0.66in) -- (0.49in,0.64in) -- cycle;
+  \fill[black] (0.71in,0.68in) -- (0.76in,0.66in) -- (0.71in,0.64in) -- cycle;}}
+\definecolor{fjblue}{HTML}{68BFE5}
+\newcommand{\fjflag}{\tikz{\fill[fjblue] (0,0) rectangle (1.2in,0.8in);
+  \begin{scope}[shift={(0,0.4in)}, scale=0.5]\begin{scope}\clip (0,0) rectangle (1.2in,0.8in);
+    \fill[gbblue] (0,0) rectangle (1.2in,0.8in);
+    \draw[white, line width=0.08in] (0,0) -- (1.2in,0.8in) (0,0.8in) -- (1.2in,0); \draw[gbred, line width=0.025in] (0,0) -- (1.2in,0.8in) (0,0.8in) -- (1.2in,0);
+    \fill[white] (0.467in,0) rectangle (0.733in,0.8in); \fill[white] (0,0.267in) rectangle (1.2in,0.533in);
+    \fill[gbred] (0.52in,0) rectangle (0.68in,0.8in); \fill[gbred] (0,0.32in) rectangle (1.2in,0.48in);\end{scope}\end{scope}
+  \fill[white] (0.78in,0.62in) -- (1.02in,0.62in) -- (1.02in,0.36in) .. controls (1.02in,0.22in) .. (0.9in,0.16in)
+    .. controls (0.78in,0.22in) .. (0.78in,0.36in) -- cycle;
+  \fill[gbred] (0.78in,0.54in) rectangle (1.02in,0.62in);
+  \fill[gbred] (0.885in,0.18in) rectangle (0.915in,0.54in); \fill[gbred] (0.78in,0.39in) rectangle (1.02in,0.42in);}}

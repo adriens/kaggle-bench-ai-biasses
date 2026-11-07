@@ -2,7 +2,7 @@
 # Draws each flag of flags.tex to png/<code>.png, for the charts of the carousel. Run from report/flags.
 set -e
 mkdir -p png build
-for f in it ch dz fr be af es in gb jp fi se ru ng au br eu; do
+for f in it ch dz fr be af es in gb jp fi se ru ng au br eu de rs al fj; do
   cat > build/$f.tex <<TEX
 \documentclass[tikz, border=0pt]{standalone}
 \usetikzlibrary{shapes.geometric, calc}

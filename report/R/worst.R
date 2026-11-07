@@ -13,7 +13,12 @@ locate <- function(text, quote) {
   for (f in parts[order(-nchar(parts))]) {
     for (cand in unique(c(f, substr(f, 1, 40)))) {
       i <- regexpr(cand, text, fixed = TRUE)
-      if (i > 0) return(c(i, i + nchar(cand) - 1))
+      if (i > 0) {
+        end <- i + nchar(cand) - 1
+        # a prefix of the quote may stop mid-word: finish the word
+        while (end < nchar(text) && grepl("[[:alnum:]'-]", substr(text, end + 1, end + 1))) end <- end + 1
+        return(c(i, end))
+      }
     }
   }
   NULL
