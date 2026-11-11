@@ -108,7 +108,7 @@ theme_set(theme_minimal(base_size = 15, base_family = "Inter") +
         axis.text = element_text(colour = MUTED), axis.title = element_text(colour = MUTED),
         legend.position = "none"))
 knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
-n_m <- sum(cov$`This study` == "m"); n_q <- nrow(cov)
+n_m <- sum(cov$`This study` == "m"); n_q <- nrow(cov); n_u <- sum(cov$UN != "a")
 ```
 
 <!-- 1: the three works -->
@@ -133,7 +133,7 @@ n_m <- sum(cov$`This study` == "m"); n_q <- nrow(cov)
 <!-- 2: coverage of the fifteen questions -->
 ```{=latex}
 \kicker{keyblue}{Read against the UN report}
-\headline{Of `r n_q` questions the UN raises, the study measures `r n_m`.}
+\headline{Of `r n_q` questions on AI bias, the study measures `r n_m`.}
 ```
 
 ```{r}
@@ -155,7 +155,7 @@ cov_long |>
 ```
 
 ```{=latex}
-\slidetext{fg}{Among them: is technology neutral, national origin, minors, North and South, tests before deployment, audits.}
+\slidetext{fg}{The UN raises `r n_u` of them. Among them: is technology neutral, national origin, minors, North and South, tests before deployment, audits.}
 \vfill
 \newpage
 ```

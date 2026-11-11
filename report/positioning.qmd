@@ -156,8 +156,8 @@ source("R/positioning.R")
 report by Swiss broadcaster RTS on a viral test [@rts2026] raised the alarm, with no stated method. The report of the UN Special Rapporteur
 on racism, [A/HRC/56/68](https://docs.un.org/en/A/HRC/56/68) [@un_hrc_56_68], explains how AI feeds racial discrimination and what States and companies
 should require. *She Is Alone With a Man* [@sales2026] measures the bias at scale: `r num(nrow(R), 0)` answers of
-seven open-weight models, `r n_countries` nationalities and a control. Of fifteen questions the UN report raises that bear on
-this study, the study measures thirteen and illustrates two; it leaves aside regulation, remedies and the sector cases of the report. It turns four UN recommendations, on testing, audits, disaggregated data and transparency, into a
+seven open-weight models, `r n_countries` nationalities and a control. Of fifteen questions that bear on this study, thirteen
+raised by the UN report and two it does not cover (a control group, personal safety advice), the study measures thirteen and illustrates two; it leaves aside regulation, remedies and the sector cases of the report. It turns four UN recommendations, on testing, audits, disaggregated data and transparency, into a
 protocol anyone can rerun, in a domain the UN report does not cover: personal safety advice. **The UN asks for
 tests; here is one.**
 ```{=latex}
@@ -208,7 +208,8 @@ every answer and verdict is published [@kaggle_collection; @kaggle_data].
 
 # Who covers what
 
-For each of fifteen questions that the UN report raises and that bear on this study, the level at which each work answers it:
+For each of fifteen questions that bear on this study, thirteen raised by the UN report and two it does not cover (a control group,
+personal safety advice), the level at which each work answers it:
 **measured** with controlled data, **illustrated** by examples, **stated** as a definition or a recommendation, or
 **not covered**. The questions and levels are my reading of the three works; the UN report is quoted in its original English.
 

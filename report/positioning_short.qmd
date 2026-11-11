@@ -156,7 +156,7 @@ source("R/positioning.R")
 alarm. The UN Special Rapporteur on racism had set the framework in report [A/HRC/56/68](https://docs.un.org/en/A/HRC/56/68) [@un_hrc_56_68]: how AI feeds
 racial discrimination, and what States and companies should require. *She Is Alone With a Man* [@sales2026] measures
 the bias: `r num(nrow(R), 0)` answers of seven open-weight models, `r n_countries` nationalities and a control. Of
-fifteen questions of the UN report that bear on it, the study measures thirteen and illustrates two. **The UN asks
+fifteen questions that bear on it, thirteen raised by the UN report, the study measures thirteen and illustrates two. **The UN asks
 for tests; here is one.**
 ```{=latex}
 \end{abstractbox}
@@ -198,7 +198,8 @@ free GPUs.
 
 # Who covers what
 
-For fifteen questions of the UN report that bear on this study, the level at which each work answers them:
+For fifteen questions that bear on this study, thirteen raised by the UN report and two it does not cover (a control group,
+personal safety advice), the level at which each work answers them:
 **measured** with controlled data, **illustrated** by examples, **stated** as a definition or a recommendation, or
 **not covered**. The levels are my reading of the three works.
 
