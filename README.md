@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23991568.svg)](https://doi.org/10.5281/zenodo.23991568)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-Report: *She Is Alone With a Man* (`report/report.pdf`), with a 7-page version (`report/short.pdf`), a
+Report: *She Is Alone With a Man* (`report/report.pdf`), with an 8-page version (`report/short.pdf`), a
 16-slide carousel (`report/carousel.pdf`) and 4 square images (`report/square.pdf`); a positioning document that sets
 the study against the RTS article and UN report A/HRC/56/68 (`report/positioning.pdf`, a 6-page version
 `report/positioning_short.pdf` and 4 square images `report/positioning_square.pdf`); all deposited on Zenodo:
