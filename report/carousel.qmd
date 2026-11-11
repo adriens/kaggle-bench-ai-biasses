@@ -51,13 +51,13 @@ format:
         \definecolor{linkblue}{HTML}{8EC1FF}
         \pagestyle{empty}
         % the Zenodo DOI of version 1.0, on the cover, on the last slide and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.24123961}
+        \newcommand{\zenododoi}{10.5281/zenodo.24129227}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
         % the PDF author: the name, then the X handle
         \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)},
-          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.5}, pdfpublication={Zenodo},
+          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.6}, pdfpublication={Zenodo},
           pdfcopyright={Copyright (C) 2026 Adrien Sales, released under CC BY 4.0},
           pdflicenseurl={https://creativecommons.org/licenses/by/4.0/}}}
         \pagecolor{night}
@@ -208,7 +208,9 @@ sp_ <- rate_table("stereo_pos") |> filter(country != "BASE") |> group_by(country
 dm_ <- rate_table("defensive_marking")
 na_ <- rate_table("negative_association")
 refu <- R |> filter(model == E2) |> group_by(country) |> summarise(p = 100 * mean(refusal))
-m15_ <- rate_table("protective", D |> filter(age %in% 15, !is_base))
+# the seven models pooled: about 231 verdicts per nationality (33 for one model alone is too few)
+m15_ <- D |> filter(age %in% 15, !is_base) |> group_by(country) |> summarise(pct = 100 * mean(protective))
+v15 <- function(c) m15_$pct[m15_$country == c]
 rel_ <- read.csv(file.path("..", "analysis", "out", "religion_counts.csv"))
 gm_ <- read.csv(file.path("..", "analysis", "out", "guess", "metrics.csv"))
 g_acc <- 100 * gm_$accuracy[gm_$setting == "shared" & gm_$scope == "both" & gm_$algo == "logreg"]
@@ -680,16 +682,16 @@ ggplot(wealth, aes(gdp_pc, compliment)) +
 ```{=latex}
 \kicker{heat}{Even for a child}
 \headline{A girl of 15 is protected unequally.}
-\slidetext{fg}{She should always be told: talk to a trusted adult, do not stay alone with him. Granite tells her so:}
+\slidetext{fg}{She should always be told: talk to a trusted adult, do not stay alone with him. The seven AIs tell her so:}
 \vfill
-% one card per man: his flag, how often Granite protects her, and who he is
+% one card per man: his flag, how often the seven AIs protect her, and who he is
 \newcommand{\minorcard}[4]{\begin{tcolorbox}[enhanced, colback=panel, frame hidden, borderline north={3pt}{0pt}{#1}, arc=4pt,
   height=3.3in, valign=center, halign=center]
   \flag{0.85}{#2}\par\vspace{0.5em}{\fontsize{64}{66}\selectfont\bfseries\color{#1}#3\par}\vspace{0.3em}
   {\fontsize{15}{19}\selectfont\color{fg}#4\par}\end{tcolorbox}}
 \begin{tcbraster}[raster columns=2, raster column skip=10pt]
-\minorcard{heat}{\jpflag}{`r num(v(m15_, GR, "JPN"), 0)` \%}{of the time\\ when the man is Japanese}
-\minorcard{keyblue}{\ngflag}{`r num(v(m15_, GR, "NGA"), 0)` \%}{of the time\\ when he is Nigerian}
+\minorcard{heat}{\jpflag}{`r num(v15("JPN"), 0)` \%}{of the time\\ when the man is Japanese}
+\minorcard{keyblue}{\ngflag}{`r num(v15("NGA"), 0)` \%}{of the time\\ when he is Nigerian}
 \end{tcbraster}
 \vfill
 \slidetext{dim}{And no AI protects her every time.}
@@ -748,7 +750,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, before upper=\raggedright]
 {\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the full report}} (91 pages)\enspace·\enspace\href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the 7-page version}}\par}
 \vspace{0.15em}
-{\fontsize{12.5}{16}\selectfont\color{fg}\faQuoteRight\enspace\textbf{Cite:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{doi.org/\zenododoi}}\enspace(Zenodo, v1.5)\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faQuoteRight\enspace\textbf{Cite:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{doi.org/\zenododoi}}\enspace(Zenodo, v1.6)\par}
 \vspace{0.15em}
 {\fontsize{12.5}{16}\selectfont\color{fg}\faGithub\enspace\textbf{Data and code:} \href{https://github.com/adriens/kaggle-bench-ai-biasses}{\color{linkblue}\underline{github.com/adriens/kaggle-bench-ai-biasses}}\par}
 \vspace{0.15em}

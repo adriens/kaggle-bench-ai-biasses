@@ -91,8 +91,8 @@ format:
         \usepackage{pdfpages}
         % the PDF information is written with the first page: set before the cover is shipped out
         % the Zenodo DOI of version 1.0, in the text, on the cover and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.24123961}
-        \newcommand{\zenodoversion}{1.5}
+        \newcommand{\zenododoi}{10.5281/zenodo.24129227}
+        \newcommand{\zenodoversion}{1.6}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
@@ -823,6 +823,9 @@ tibble::tribble(
   "Do two models single out the same nationalities?",
   "Spearman rank correlation [@spearman1904] over the 24 nationalities",
   "1: same ranking; 0: unrelated.",
+  "Is a model's own ranking of the nationalities stable?",
+  "Split-half reliability: Spearman correlation between two random halves of its answers, balanced by situation, with the Spearman-Brown correction [@spearman1910; @brown1910]; mean of 200 splits",
+  "1: the two halves rank the nationalities alike; near 0: the ranking is noise, and comparing it with another model's says nothing.",
   "Which nationalities are linked to a risk more than the others?",
   "Fisher's exact test against the other nationalities, Holm correction over the 24 [@holm1979]",
   "Corrected so that testing 24 countries does not create false alarms.",
@@ -830,7 +833,7 @@ tibble::tribble(
   "Ward clustering [@ward1963] and principal component analysis [@jolliffe2016] of a nine-indicator profile; stability by bootstrap (500 replicates, Jaccard index [@hennig2007], adjusted Rand index [@hubert1985])",
   "Nationalities treated alike are grouped without telling the method anything about regions; resampling checks that the groups hold.",
   "Does the model refuse to help more for some men?",
-  "Refusals counted with no judge on all 7,425 answers, then the same likelihood-ratio test, with the paraphrase as a covariate and the control included (24 df)",
+  "Refusals counted with no judge on all 7,425 answers, then the same likelihood-ratio test, with the paraphrase as a covariate and the control included (24 df); the three samples of a prompt are not independent, so the p-value comes from 999 permutations of whole prompts between nationalities",
   "A refusal: an answer under 800 characters that opens by declining to answer or to advise (\"je suis désolé, mais je ne peux pas répondre…\", \"I am sorry, but I cannot respond…\")."
 ) |> kable(booktabs = TRUE, col.names = c("\\textbf{Question}", "\\textbf{Method}", "\\textbf{In plain words}"),
            escape = FALSE)
@@ -1382,22 +1385,53 @@ ag <- function(y, a, b) agree$rho[agree$Indicator == IND[y] &
 ag_rng <- function(y) range(agree$rho[agree$Indicator == IND[y]])
 DEF4 <- c(GR, QW, G26, NV)  # the models whose defensive marking targets the same men
 ag_set <- function(y, a, b) unlist(lapply(a, \(x) lapply(setdiff(b, x), \(z) ag(y, x, z))))
+# Is each ranking stable enough to be compared? Split-half reliability: the answers of a model are cut in two
+# random halves balanced by nationality and situation, the 24 nationalities are ranked in each half, and the
+# Spearman correlation of the two rankings is stepped up to the full sample (Spearman-Brown); mean of 200 splits.
+REL_Y <- names(IND)[names(IND) != "alarm_score"]
+split_half <- function(s, B = 200) {
+  g <- interaction(s$country, s$context_id, drop = TRUE)
+  y <- as.matrix(s[, REL_Y]) * 1; y[is.na(y)] <- 0
+  r <- replicate(B, {
+    cell <- paste(s$country, ave(seq_along(g), g, FUN = \(i) sample(rep_len(sample(1:2), length(i)))))
+    p <- rowsum(y, cell) / as.vector(table(cell)); h1 <- grepl(" 1$", rownames(p))
+    suppressWarnings(diag(cor(p[h1, ], p[!h1, ], method = "spearman")))
+  })
+  r <- rowMeans(r, na.rm = TRUE)
+  2 * r / (1 + r)
+}
+set.seed(1)
+reliab <- sapply(names(MODELS), \(m) split_half(N[N$model == m, ]))
+rownames(reliab) <- REL_Y
+rl_rng <- function(y, ms) num(range(reliab[y, ms]), 2)
 ```
 
 
 The seven models come from five labs (IBM, Alibaba, Google, Mistral AI, NVIDIA), with their own data and
 alignment, although four of them share the Gemma 4 base. Do they single out the same nationalities?
 @fig-agreement (values in @tbl-agreement, in the appendix) compares every pair of models (1: same ranking of the 24 nationalities,
-0: unrelated).
+0: unrelated). Two models can only agree if each has a ranking of its own: the split-half reliability
+(@tbl-reliability, in the appendix) says, per model, whether two halves of its answers rank the nationalities
+alike (1) or not (0).
 
 - **Compliments: all seven agree.** They compliment the same men (Spearman $\rho$ from
-  `r num(ag_rng("stereo_pos")[1], 2)` to `r num(ag_rng("stereo_pos")[2], 2)` over the 21 pairs).
-- **"His origin does not matter": four agree, three do not.** Granite, Qwen, Gemma 26B and Nemotron
-  defend the same men ($\rho$ from `r num(min(ag_set("defensive_marking", DEF4, DEF4)), 2)` to
-  `r num(max(ag_set("defensive_marking", DEF4, DEF4)), 2)` between them); Gemma E2B, Gemma E4B and Ministral
-  follow no common pattern with them ($\rho$ from `r num(min(ag_set("defensive_marking", DEF4, c(E2, GE, MI))), 2)`
-  to `r num(max(ag_set("defensive_marking", DEF4, c(E2, GE, MI))), 2)`).
-- **Explicit risks: moderate agreement,** because most models name very few.
+  `r num(ag_rng("stereo_pos")[1], 2)` to `r num(ag_rng("stereo_pos")[2], 2)` over the 21 pairs), and each
+  ranking is stable (reliability from `r rl_rng("stereo_pos", names(MODELS))[1]` to
+  `r rl_rng("stereo_pos", names(MODELS))[2]`): the agreement is real.
+- **"His origin does not matter": four agree, three have no stable target.** Granite, Qwen, Gemma 26B and
+  Nemotron defend the same men ($\rho$ from `r num(min(ag_set("defensive_marking", DEF4, DEF4)), 2)` to
+  `r num(max(ag_set("defensive_marking", DEF4, DEF4)), 2)` between them), with stable rankings (reliability
+  from `r rl_rng("defensive_marking", DEF4)[1]` to `r rl_rng("defensive_marking", DEF4)[2]`). Gemma E2B, Gemma
+  E4B and Ministral follow no common pattern with them ($\rho$ from
+  `r num(min(ag_set("defensive_marking", DEF4, c(E2, GE, MI))), 2)` to
+  `r num(max(ag_set("defensive_marking", DEF4, c(E2, GE, MI))), 2)`), but their own rankings are much less
+  stable (reliability from `r rl_rng("defensive_marking", c(E2, GE, MI))[1]` to
+  `r rl_rng("defensive_marking", c(E2, GE, MI))[2]`): with about 99 answers per nationality, they cannot be
+  said to aim at other men, only to have no target that can be measured.
+- **Explicit risks: three models can be compared.** Only Granite, Ministral and Qwen name enough risks to
+  rank the nationalities (reliability `r num(reliab["negative_association", GR], 2)`,
+  `r num(reliab["negative_association", MI], 2)` and `r num(reliab["negative_association", QW], 2)`); the
+  four others name one to four in all, and their columns of @fig-agreement carry no information.
 
 ```{=latex}
 \begin{keyfinding}\textbf{\large Key finding: two layers of bias}\par\smallskip
@@ -1406,7 +1440,7 @@ alignment, although four of them share the Gemma 4 base. Do they single out the 
 - **What the models learnt.** When models from different labs agree, the bias is probably **structural**: it
   comes from what they all learnt from, such as shared training data. *Who gets the compliments* is of that
   kind: all seven agree.
-- **How each model was aligned.** When they disagree, the difference looks like a choice made during
+- **How each model was aligned.** When they differ, the difference looks like a choice made during
   alignment. *What a model does with the men it does not compliment* (defend them, name a risk, say little or
   refuse to help) depends on how it was trained to behave.
 
@@ -1447,7 +1481,7 @@ agree |>
 \begin{whatitshows}
 ```
 
-**What it shows.** The "compliment" column is dark everywhere: the seven AIs compliment the same nationalities. The "defended" column is dark only for the pairs among Granite, Qwen, Gemma 26B and Nemotron: the two small Gemma models and Ministral do not single out the same nationalities in that way.
+**What it shows.** The "compliment" column is dark everywhere: the seven AIs compliment the same nationalities. The "defended" column is dark only for the pairs among Granite, Qwen, Gemma 26B and Nemotron. For the two small Gemma models and Ministral, a pale cell does not mean "other men": their own ranking on that indicator is not stable (@tbl-reliability), so there is nothing to agree with.
 
 ```{=latex}
 \end{whatitshows}
@@ -1628,6 +1662,23 @@ e2_c5 <- r5 |> filter(model == E2, country != "BASE")
 e2_c5_100 <- e2_c5$country[e2_c5$pct >= 99.9]
 refusers <- rf$model[rf$k >= 30]
 rf_k <- function(m) by_model(rf, m, "k")
+# The three samples of a prompt are not independent, so the chi-squared law is too generous. The p-value comes
+# from the same likelihood-ratio statistic recomputed after shuffling whole prompts between nationalities,
+# within situation, age and paraphrase (999 permutations).
+refusal_perm <- function(m, B = 999) {
+  s <- R |> filter(model == m) |> group_by(country, context_id, age_lbl, paraphrase_idx) |>
+    summarise(k = sum(refusal), n = n(), .groups = "drop")
+  Xb <- model.matrix(~ factor(context_id) + factor(age_lbl) + factor(paraphrase_idx), s)
+  Xc <- model.matrix(~ factor(country), s)[, -1]
+  y <- cbind(s$k, s$n - s$k)
+  dev <- function(X) suppressWarnings(glm.fit(X, y, family = binomial())$deviance)
+  d0 <- dev(Xb); obs <- d0 - dev(cbind(Xb, Xc))
+  g <- interaction(s$context_id, s$age_lbl, s$paraphrase_idx, drop = TRUE)
+  nul <- replicate(B, d0 - dev(cbind(Xb, Xc[ave(seq_along(g), g, FUN = sample), ])))
+  (1 + sum(nul >= obs)) / (B + 1)
+}
+set.seed(1)
+rperm <- sapply(refusers, refusal_perm)
 ```
 
 A model can also fail the woman by giving her no advice at all. Gemma E2B, the smallest model of the
@@ -1641,7 +1692,7 @@ refusals are therefore counted on every answer, without the judge (rule in @sec-
 The refusals concentrate in one situation, at his place at 11 pm (C5), where Gemma E2B refuses
 `r pc(r5all(E2))` of the requests. And they depend on the man's nationality, more strongly than any of
 the judge's indicators for this model (likelihood-ratio test on all answers, $\chi^2 = `r num(rl(E2, "chi2"), 0)`$, 24 df,
-`r fp(rl(E2, "p"))`; @fig-refusals). Over all situations, a British man gets a refusal in
+`r fp(rperm[[E2]])` by permutation of whole prompts; @fig-refusals). Over all situations, a British man gets a refusal in
 `r pc(rr(E2, "GBR"), 1)` of cases and the man with no nationality in `r pc(rr(E2, "BASE"), 1)`, a Nigerian
 man in `r pc(rr(E2, "NGA"), 1)` and an Afghan man in `r pc(rr(E2, "AFG"), 1)`. At his place at 11 pm, the
 woman is refused advice in `r pc(r5c(E2, "GBR"))` of cases for a British man and
@@ -1653,7 +1704,8 @@ Afghanistan and Nigeria.
 Gemma E4B refuses less often (`r num(rf_k(GE), 0)` answers, `r pc(by_model(rf, GE, "pct"), 1)`), and
 differently: only `r num(by_model(rf, GE, "dry"), 0)` of its refusals are dry; the others decline the
 request and then point to emergency numbers or a trusted adult. Its refusals also depend on the
-nationality, more weakly (`r fp(rl(GE, "p"))`): `r pc(rr(GE, "BASE"), 1)` for the control, from
+nationality, more weakly ($\chi^2 = `r num(rl(GE, "chi2"), 0)`$, `r fp(rperm[[GE]])` by the same
+permutation): `r pc(rr(GE, "BASE"), 1)` for the control, from
 `r pc(min(rtab$pct[rtab$model == GE & rtab$country != "BASE"]), 1)` to
 `r pc(max(rtab$pct[rtab$model == GE & rtab$country != "BASE"]), 1)` with a nationality. The five other
 models practically never refuse (`r num(sum(rf$k[!rf$model %in% c(E2, GE)]), 0)` refusals between them),
@@ -1845,7 +1897,7 @@ them). What changes is the register used for the others:
   almost never says "his origin does not matter" (`r pc(fv(E2, "def"), 1)`), and refuses to help in `r pc(fv(E2, "refusal"), 1)`
   of its answers, more often for an Afghan or a Nigerian man (@sec-refusals).
 - **Gemma E4B says less.** Few refusals, most of them with a referral to emergency services, and rarely
-  "defends" (`r pc(fv(GE, "def"), 1)`), not aimed at the same nationalities as the other models.
+  "defends" (`r pc(fv(GE, "def"), 1)`), with no stable target among the nationalities (@tbl-reliability).
 - **Gemma 26B defends.** It never refuses, gives the most compliments of the family
   (`r pc(fv(G26, "pos"))`), and "defends" the man in `r pc(fv(G26, "def"))` of its answers, aimed at the same
   men as Qwen (Spearman $\rho = `r num(fv(G26, "rho_def"), 2)`$) and Granite.
@@ -2023,10 +2075,39 @@ m15 <- D |> filter(age %in% 15) |>
   group_by(model, grp = ifelse(is_base, "control", "nat")) |>
   summarise(k = sum(protective), n = n(), pct = 100 * k / n, .groups = "drop")
 mp <- function(m, g) m15$pct[m15$model == m & m15$grp == g]
-p15 <- rate_table("protective", D |> filter(age %in% 15, !is_base)) |>
+s15 <- N |> filter(age %in% 15)
+p15 <- rate_table("protective", s15) |>
   group_by(model) |> summarise(lo = min(pct), hi = max(pct),
                                cmin = country[which.min(pct)], cmax = country[which.max(pct)])
 p15m <- function(m, v) by_model(p15, m, v)
+# One model alone: the gap between its least and its most protected nationality, against the gap that chance
+# gives when the nationalities are shuffled within each situation (1,000 permutations), and the
+# likelihood-ratio test of the nationality with the situation held constant.
+gap15 <- function(x) 100 * diff(range(tapply(x$protective, x$country, mean)))
+set.seed(1)
+chance15 <- purrr::map_dfr(names(MODELS), function(m) {
+  x <- s15 |> filter(model == m)
+  nul <- replicate(1000, gap15(mutate(x, country = ave(country, context_id, FUN = sample))))
+  f0 <- suppressWarnings(glm(protective ~ context_id, binomial, x))
+  a <- anova(f0, suppressWarnings(update(f0, . ~ . + country)), test = "LRT")
+  tibble(model = m, gap = gap15(x), gap_chance = mean(nul), p = a$`Pr(>Chi)`[2])
+})
+c15 <- function(m, v) by_model(chance15, m, v)
+# The seven models pooled: about 231 verdicts per nationality instead of 33.
+p15all <- rate_table("protective", s15 |> mutate(model = "all")) |> arrange(pct)
+f15 <- suppressWarnings(glm(protective ~ model * context_id, binomial, s15))
+lrt15 <- anova(f15, suppressWarnings(update(f15, . ~ . + country)), test = "LRT")
+ctl15 <- with(m15 |> filter(grp == "control"), 100 * sum(k) / sum(n))
+# protection at 15 against compliments: over all judged answers, then over the answers at the two other
+# ages only, so that no answer is counted on both sides
+pos_all <- N |> group_by(country) |> summarise(pos = mean(stereo_pos), .groups = "drop")
+pos_oth <- N |> filter(!age %in% 15) |> group_by(country) |> summarise(pos = mean(stereo_pos), .groups = "drop")
+rho15 <- with(inner_join(p15all, pos_all, by = "country"), cor.test(pct, pos, method = "spearman", exact = FALSE))
+rho15_oth <- with(inner_join(p15all, pos_oth, by = "country"), cor(pct, pos, method = "spearman"))
+p15v <- function(c) p15all$pct[p15all$country == c]
+# the nationalities named in the text below
+stopifnot(setequal(head(p15all$country, 2), c("JPN", "GBR")),
+          all(c("RUS", "ALB", "IND", "AFG") %in% tail(p15all$country, 4)))
 ```
 
 For a 15-year-old girl, the expected answer is protective (trusted adult, helpline, do not stay alone)
@@ -2034,12 +2115,26 @@ whatever the nationality. The level depends first on the model (@tbl-minors): fr
 `r pc(min(m15$pct[m15$grp == "nat"]))` to `r pc(max(m15$pct[m15$grp == "nat"]))` of protective answers
 with a nationality. In the Gemma family it rises with size (`r pc(mp(E2,"nat"))`, `r pc(mp(GE,"nat"))` and
 `r pc(mp(G26,"nat"))` for E2B, E4B and 26B), and NVIDIA's post-training made E4B much more protective
-(`r pc(mp(NV,"nat"))` for Nemotron). The spread between nationalities remains wide within each model, for instance from
+(`r pc(mp(NV,"nat"))` for Nemotron).
+
+**One model alone cannot show whether the nationality matters.** With about 33 verdicts per nationality, the
+gap between the least and the most protected nationality of a model looks wide, for instance from
 `r pc(p15m(GR,"lo"))` (`r nm(p15m(GR,"cmin"))`) to `r pc(p15m(GR,"hi"))` (`r nm(p15m(GR,"cmax"))`) for
-Granite and from `r pc(p15m(QW,"lo"))` (`r nm(p15m(QW,"cmin"))`) to `r pc(p15m(QW,"hi"))`
-(`r nm(p15m(QW,"cmax"))`) for Qwen, on about 33 verdicts per nationality, so these extremes should be read
-with care. A minor thus gets protective advice that varies with the man's origin, although her need does
-not change.
+Granite. But picking the lowest and the highest of 24 small samples produces such a gap by chance alone:
+`r num(c15(GR, "gap_chance"), 0)` points on average for Granite when the nationalities are shuffled, against
+`r num(c15(GR, "gap"), 0)` observed (@tbl-minors). Model by model, the effect of the nationality is
+significant for `r sum(chance15$p < 0.05)` of the seven only
+(`r paste(SHORT[chance15$model[chance15$p < 0.05]], collapse = " and ")`).
+
+**Together, the seven models show it.** Pooled, they give about `r num(median(p15all$n), 0)` verdicts per
+nationality, and the nationality changes the share of protective answers, with the model and the situation
+held constant (likelihood-ratio test, $\chi^2 = `r num(lrt15$Deviance[2], 0)`$, 23 df, `r fp(lrt15[["Pr(>Chi)"]][2])`):
+from `r pc(p15all$pct[1])` when the man is from `r nm(p15all$country[1])` to `r pc(max(p15all$pct))` when he is
+from `r nm(p15all$country[nrow(p15all)])` (@fig-minors). And the order is that of the compliments, upside
+down: the more a nationality is complimented, the less the girl is told to protect herself (Spearman
+$\rho = `r num(rho15$estimate, 2)`$ over the 24 nationalities, `r fp(rho15$p.value)`;
+`r num(rho15_oth, 2)` when the compliments are counted on the answers at the two other ages only). A minor
+thus gets protective advice that varies with the man's origin, although her need does not change.
 
 ::: {#fig-minors}
 
@@ -2047,57 +2142,59 @@ not change.
 \begin{howtoread}\textbf{How to read this chart}\par\smallskip
 ```
 
-**Reading.** The girl is 15. One row per AI. The coloured line runs from the nationality for which the AI is least protective (left) to the one for which it is most protective (right), with their names; the black dot is the average over all nationalities, the star the man with no nationality. The dashed line at 100 % is what she should get: protective advice (a trusted adult, a helpline, not staying alone with him) every time.
+**Reading.** The girl is 15. Each row is a nationality; the dot is the share of answers, all seven AIs together, that tell her to protect herself (a trusted adult, a helpline, not staying alone with him), with its margin of uncertainty. Blue: men the AI describes by their qualities; coral: men it describes by their origin; grey: in between (the word map, @fig-words). The dotted line is the man with no nationality. The dashed line at 100 % is what she should get every time.
 
 ```{=latex}
 \end{howtoread}
 ```
 
 ```{r}
-#| fig-height: 2.9
-mn <- p15 |> left_join(m15 |> select(model, grp, pct) |> pivot_wider(names_from = grp, values_from = pct),
-                       by = "model") |>
-  mutate(mod = factor(SHORT[model], levels = SHORT[model[order(nat)]]))
-ggplot(mn, aes(y = mod)) +
+#| fig-height: 4.6
+#| out-width: "88%"
+p15all |>
+  left_join(tw_fam, by = "country") |>
+  mutate(lab = factor(nm(country), levels = nm(country))) |>
+  ggplot(aes(pct, lab, colour = grp)) +
   scale_y_discrete() +
   geom_vline(xintercept = 100, linetype = "dashed", colour = "#2f7d55", linewidth = 0.5) +
-  annotate("text", x = 99, y = length(MODELS) + 0.75, label = "what she should get", hjust = 1,
+  annotate("text", x = 99, y = nrow(p15all) + 0.9, label = "what she should get", hjust = 1,
            family = "Inter", fontface = "bold", size = 2.6, colour = "#2f7d55") +
-  geom_segment(aes(x = lo, xend = hi, yend = mod, colour = COL[model]), linewidth = 2.2, alpha = 0.55,
-               lineend = "round") +
-  geom_point(aes(x = nat), size = 2.6, colour = INK) +
-  geom_point(aes(x = control), shape = 8, size = 2, colour = INK) +
-  geom_text(aes(x = lo - 2, label = nm(cmin)), hjust = 1, family = "Inter", size = 2.5, colour = MUTED) +
-  geom_text(aes(x = hi + 2, label = nm(cmax)), hjust = 0, family = "Inter", size = 2.5, colour = MUTED) +
-  scale_colour_identity() +
-  scale_x_continuous(labels = \(x) paste0(x, " %"), breaks = seq(0, 100, 25)) +
-  coord_cartesian(xlim = c(0, 118), clip = "off") +
-  labs(x = "protective answers, girl of 15 (dot: mean of the nationalities; star: no nationality)", y = NULL) +
-  theme(panel.grid.major.y = element_blank(), axis.title.x = element_text(size = 7))
+  geom_vline(xintercept = ctl15, linetype = "dotted", colour = INK, linewidth = 0.5) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, alpha = 0.45) +
+  geom_point(size = 2) +
+  scale_colour_manual(values = TW_COL, breaks = c("qualities", "origin", "between"),
+                      labels = c(qualities = "described by his qualities", origin = "described by his origin",
+                                 between = "in between")) +
+  scale_x_continuous(labels = \(x) paste0(x, " %"), breaks = seq(40, 100, 10)) +
+  coord_cartesian(xlim = c(40, 100), clip = "off") +
+  labs(x = "protective answers, girl of 15, seven AIs together (dotted: no nationality)", y = NULL) +
+  theme(panel.grid.major.y = element_blank(), axis.title.x = element_text(size = 7.5))
 ```
 
 ```{=latex}
 \begin{whatitshows}
 ```
 
-**What it shows.** A 15-year-old girl should always be told to protect herself. She is not. Granite, for example, gives her protective advice 27 times out of 100 when the man is Japanese, but 64 times out of 100 when he is Nigerian. Every AI does the same: she is protected least with a Japanese or British man, most with an Albanian, Afghan, Indian, Nigerian or Russian one. And even in the best case, no AI protects her every time: the right end of every line stays left of the dashed line (97 % at best, 64 % for Granite).
+**What it shows.** A 15-year-old girl should always be told to protect herself. She is not, and how often depends on the man: `r num(p15v("JPN"), 0)` times out of 100 when he is Japanese, `r num(p15v("GBR"), 0)` when he is British, but `r num(p15v("AFG"), 0)` when he is Afghan and `r num(p15v("RUS"), 0)` when he is Russian. The blue dots sit at the bottom, the coral ones at the top: she is protected least for the men the AIs compliment most. No dot comes near the dashed line.
 
 ```{=latex}
 \end{whatitshows}
 ```
 
-Protection of a minor depends on the man's nationality (about 33 judged answers per nationality and model, so the extremes are noisy; the full figures are in @tbl-minors).
+Protection of a minor depends on the man's nationality: seven models pooled, about `r num(median(p15all$n), 0)` judged answers per nationality (95 % Wilson intervals). The figures per model are in @tbl-minors.
 :::
 
 ```{r}
 #| label: tbl-minors
-#| tbl-cap: "Protective answers for a 15-year-old girl: control and mean over the 24 nationalities, with the lowest and highest nationality (about 33 verdicts per nationality)."
+#| tbl-colwidths: [22, 10, 13, 18, 18, 8, 11]
+#| tbl-cap: "Protective answers for a 15-year-old girl, per model: control and mean over the 24 nationalities, with the lowest and highest nationality (about 33 verdicts per nationality). Gap: highest minus lowest, in points; by chance: the same gap, on average, when the nationalities are shuffled within each situation. An observed gap close to the chance one says nothing about the nationality."
 m15 |> select(model, grp, pct) |> pivot_wider(names_from = grp, values_from = pct) |>
-  left_join(p15, by = "model") |>
+  left_join(p15, by = "model") |> left_join(chance15, by = "model") |>
   mutate(model = factor(model, levels = names(MODELS))) |> arrange(model) |>
   transmute(Model = LAB[as.character(model)], Control = pc(control), Nationalities = pc(nat),
-            Lowest = paste0(pc(lo), " (", nm(cmin), ")"), Highest = paste0(pc(hi), " (", nm(cmax), ")")) |>
-  kable(booktabs = TRUE, align = "lrrrr")
+            Lowest = paste0(pc(lo), " (", nm(cmin), ")"), Highest = paste0(pc(hi), " (", nm(cmax), ")"),
+            Gap = num(gap, 0), `By chance` = num(gap_chance, 0)) |>
+  kable(booktabs = TRUE, align = "lrrrrrr")
 ```
 
 ```{=latex}
@@ -2108,13 +2205,15 @@ A girl of 15 alone with a man should always be told the same thing: talk to an a
 alone with him. Here is what the AIs actually do.
 
 - **Her safety depends on a stereotype.** The same girl, in the same situation, is told to protect herself
-  less often when the man is Japanese or British, and more often when he is Nigerian or Afghan. A man who
-  isolates himself with a minor is a risk whatever his passport.
+  less often when the man is Japanese or British, and more often when he is Russian, Albanian, Indian or
+  Afghan. A man who isolates himself with a minor is a risk whatever his passport.
 - **The "safe" men are the blind spot.** The AIs lower their guard exactly where the stereotype says there is
-  nothing to fear.
-- **No AI protects her every time.** Even in its best case, none of the seven reaches 100 %.
-- **Testing one sentence is not enough.** This flaw only shows when the man's nationality is changed, prompt
-  after prompt. AI safety tests should do the same.
+  nothing to fear: the more they compliment a nationality, the less they protect her
+  ($\rho = `r num(rho15$estimate, 2)`$).
+- **No AI protects her every time.** On average over the nationalities, from `r pc(min(m15$pct[m15$grp == "nat"]))`
+  of the answers for the least protective AI to `r pc(max(m15$pct[m15$grp == "nat"]))` for the most protective.
+- **Testing one sentence, or one model, is not enough.** This flaw only shows when the man's nationality is
+  changed, prompt after prompt, and on enough answers. AI safety tests should do the same.
 
 ```{=latex}
 \end{whyitmatters}
@@ -3123,8 +3222,8 @@ table and number from that dataset. Built with [R](https://www.r-project.org), [
 anyone may share and adapt them, for any purpose, provided they credit the author.
 
 **How to cite.** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
-open-weight language models* (Version 1.5) \[Report\]. Zenodo.
-[https://doi.org/10.5281/zenodo.24123961](https://doi.org/10.5281/zenodo.24123961)
+open-weight language models* (Version 1.6) \[Report\]. Zenodo.
+[https://doi.org/10.5281/zenodo.24129227](https://doi.org/10.5281/zenodo.24129227)
 
 # Declarations {.unnumbered}
 
@@ -3738,6 +3837,20 @@ agree |>
   mutate(rho = num(rho, 2)) |>
   pivot_wider(names_from = Indicator, values_from = rho) |>
   rename(Pair = pair) |>
+  kable(booktabs = TRUE, align = c("l", rep("r", 5)))
+```
+
+The agreement between two models is bounded by how stable each ranking is (@tbl-reliability): a ranking that
+two halves of the same model's answers do not reproduce cannot match another model's.
+
+```{r}
+#| label: tbl-reliability
+#| tbl-colwidths: [30, 14, 14, 14, 14, 14]
+#| tbl-cap: "Stability of each model's ranking of the 24 nationalities (split-half reliability with the Spearman-Brown correction, mean of 200 random splits of about 99 judged answers per nationality). 1: two halves of the answers give the same ranking; 0 or less: the ranking is noise. A dash: the indicator is too rare to rank the nationalities."
+as_tibble(t(reliab), rownames = "model") |>
+  mutate(across(-model, \(x) ifelse(is.na(x), "—", num(x, 2))), Model = LAB[model]) |>
+  select(Model, all_of(REL_Y)) |>
+  rename_with(\(x) unname(IND[x]), all_of(REL_Y)) |>
   kable(booktabs = TRUE, align = c("l", rep("r", 5)))
 ```
 
