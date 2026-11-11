@@ -33,8 +33,8 @@ format:
         \usepackage[most]{tcolorbox}
         \usepackage{pdfpages}
         \usepackage{fontawesome6}
-        % the Zenodo DOI of the report this document positions (version 1.7), in the text
-        \newcommand{\zenododoi}{10.5281/zenodo.24130638}
+        % the Zenodo DOI of the report this document positions (version 1.8), in the text
+        \newcommand{\zenododoi}{10.5281/zenodo.24146738}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
@@ -175,7 +175,7 @@ tibble::tribble(
   ~` `, ~RTS, ~UN, ~`This study`,
   "**Role**", "the alert", "the framework", "the measure",
   "**Question**", "Does it happen?", "Why does it happen, and what should be required?", "How much, towards whom, in which models?",
-  "**Date**", "2026", "3 June 2024", "November 2026 (v1.7)",
+  "**Date**", "2026", "3 June 2024", "November 2026 (v1.8)",
   "**Own test**", "a viral test, method not stated", "none (synthesis)", "51,975 answers"
 ) |> kable()
 ```
@@ -241,7 +241,7 @@ the part of the UN report that raises each question to the part of the full repo
 
 ```{r}
 #| label: tbl-refs
-#| tbl-cap: "Where each question is raised in the UN report and answered in the full report (version 1.7)."
+#| tbl-cap: "Where each question is raised in the UN report and answered in the full report (version 1.8)."
 #| tbl-colwidths: [40, 26, 34]
 cov |>
   transmute(Question = gsub("\\?$", "", question), `Raised by the UN` = ref,
@@ -255,7 +255,7 @@ cov |>
 
 ```{r}
 #| label: fig-sankey
-#| fig-cap: "From the UN report to the full report (version 1.7). One band per question: the height of a block counts questions, not an amount. Grey: issues outside this study."
+#| fig-cap: "From the UN report to the full report (version 1.8). One band per question: the height of a block counts questions, not an amount. Grey: issues outside this study."
 #| fig-height: 7.6
 #| fig-pos: H
 sankey_plot(7.5, 7.6)
@@ -347,7 +347,7 @@ tibble::tribble(
 the data and the code are published under the name \textit{Alone With a Stranger}, on GitHub:
 \href{https://github.com/adriens/kaggle-bench-ai-biasses}{github.com/adriens/kaggle-bench-ai-biasses}.\par\medskip
 \textbf{How to cite the study.} Sales, A. (2026). \textit{She Is Alone With a Man: Nationality bias in the safety advice given by
-open-weight language models} (Version 1.7) [Report]. Zenodo. \href{https://doi.org/\zenododoi}{https://doi.org/\zenododoi}\par\medskip
+open-weight language models} (Version 1.8) [Report]. Zenodo. \href{https://doi.org/\zenododoi}{https://doi.org/\zenododoi}\par\medskip
 {\color{muted}Built with \href{https://www.r-project.org}{\color{muted}R}, \href{https://quarto.org}{\color{muted}Quarto} and \href{https://www.latex-project.org}{\color{muted}\LaTeX}.\hfill\href{https://creativecommons.org/licenses/by/4.0/}{\color{muted}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}
 \end{tcolorbox}
 ```

@@ -91,8 +91,8 @@ format:
         \usepackage{pdfpages}
         % the PDF information is written with the first page: set before the cover is shipped out
         % the Zenodo DOI of version 1.0, in the text, on the cover and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.24130638}
-        \newcommand{\zenodoversion}{1.7}
+        \newcommand{\zenododoi}{10.5281/zenodo.24146738}
+        \newcommand{\zenodoversion}{1.8}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
@@ -3222,8 +3222,8 @@ table and number from that dataset. Built with [R](https://www.r-project.org), [
 anyone may share and adapt them, for any purpose, provided they credit the author.
 
 **How to cite.** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
-open-weight language models* (Version 1.7) \[Report\]. Zenodo.
-[https://doi.org/10.5281/zenodo.24130638](https://doi.org/10.5281/zenodo.24130638)
+open-weight language models* (Version 1.8) \[Report\]. Zenodo.
+[https://doi.org/10.5281/zenodo.24146738](https://doi.org/10.5281/zenodo.24146738)
 
 # Declarations {.unnumbered}
 

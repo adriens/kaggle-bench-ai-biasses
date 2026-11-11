@@ -33,13 +33,13 @@ format:
         \usepackage{pdfpages}
         \usepackage{fontawesome6}
         % the Zenodo DOI of version 1.0, in the text, on the cover and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.24130638}
+        \newcommand{\zenododoi}{10.5281/zenodo.24146738}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
         % the PDF author: the name, then the X handle
         \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)},
-          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.7}, pdfpublication={Zenodo},
+          pdfdoi={\zenododoi}, pdfurl={https://doi.org/\zenododoi}, pdfversionid={1.8}, pdfpublication={Zenodo},
           pdfcopyright={Copyright (C) 2026 Adrien Sales, released under CC BY 4.0},
           pdflicenseurl={https://creativecommons.org/licenses/by/4.0/}}}
         \definecolor{heat}{HTML}{E8452C}
@@ -740,7 +740,7 @@ and a \href{https://doi.org/\zenododoi}{16-slide carousel} sit next to this vers
 published under the name \textit{Alone With a Stranger}, on GitHub:
 \href{https://github.com/adriens/kaggle-bench-ai-biasses}{github.com/adriens/kaggle-bench-ai-biasses}.\par\medskip
 \textbf{How to cite.} Sales, A. (2026). \textit{She Is Alone With a Man: Nationality bias in the safety advice given by
-open-weight language models} (Version 1.7) [Report]. Zenodo. \href{https://doi.org/\zenododoi}{https://doi.org/\zenododoi}\par\medskip
+open-weight language models} (Version 1.8) [Report]. Zenodo. \href{https://doi.org/\zenododoi}{https://doi.org/\zenododoi}\par\medskip
 {\color{muted}Made with open-weight models (IBM, Alibaba, Google, Mistral AI, NVIDIA) on Kaggle's free GPUs.
 Built with \href{https://www.r-project.org}{\color{muted}R}, \href{https://quarto.org}{\color{muted}Quarto} and \href{https://www.latex-project.org}{\color{muted}\LaTeX}.
 These are model outputs, not claims.\hfill\href{https://creativecommons.org/licenses/by/4.0/}{\color{muted}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}
