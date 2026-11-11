@@ -1,0 +1,195 @@
+---
+title: "She Is Alone With a Man"
+author: "Adrien Sales"
+subtitle: "Four square images for X: where the study stands between the RTS article and UN report A/HRC/56/68"
+subject: "Positioning of a nationality-bias benchmark against the RTS article and UN report A/HRC/56/68"
+keywords: [AI bias, LLM, nationality, racial discrimination, United Nations, A/HRC/56/68, AI audit, open-weight models, Quarto]
+date: "2026-11-11"
+lang: en-GB
+format:
+  pdf:
+    pdf-engine: xelatex
+    documentclass: scrartcl
+    fontsize: 12pt
+    # square pages, exported to 1080 × 1080 PNG at 144 dpi (see the end of this file)
+    geometry: [paperwidth=7.5in, paperheight=7.5in, margin=0.5in, top=0.8in, bottom=0.6in]
+    colorlinks: true
+    urlcolor: "linkblue"
+    linkcolor: "linkblue"
+    mainfont: Inter
+    sansfont: Inter
+    include-in-header:
+      text: |
+        \usepackage{microtype}
+        \usepackage[most]{tcolorbox}
+        \usepackage{eso-pic}
+        \usepackage{fontawesome6}
+        \usepackage{tikz}\usetikzlibrary{shapes.geometric, calc}
+        \input{flags/flags.tex}
+        % the icons of the carousel: the four forms of suspicion, the sun of the ice-breakers, the warning sign
+        \newcommand{\talkicon}{\tikz{\fill[heat, rounded corners=5pt] (0,0.1in) rectangle (0.6in,0.5in); \fill[heat] (0.1in,0.12in) -- (0.08in,0) -- (0.24in,0.12in) -- cycle;
+          \node[night, font=\bfseries\fontsize{16}{16}\selectfont] at (0.3in,0.3in) {!};}}
+        \newcommand{\riskicon}{\tikz{\fill[amber, rounded corners=2pt] (90:0.3in) -- (210:0.3in) -- (330:0.3in) -- cycle;
+          \node[night, font=\bfseries\fontsize{14}{14}\selectfont] at (0,-0.02in) {!};}}
+        \newcommand{\refuseicon}{\tikz{\fill[violet] (0,0) circle (0.25in); \fill[night] (-0.15in,-0.04in) rectangle (0.15in,0.04in);}}
+        \newcommand{\hangericon}{\tikz{\draw[green, line width=2pt, line cap=round, line join=round] (0.3in,0.36in) arc (-90:180:0.07in);
+          \draw[green, line width=2pt, line cap=round, line join=round] (0.3in,0.36in) -- (0,0.08in) -- (0.6in,0.08in) -- cycle;}}
+        \newcommand{\sunicon}{\tikz{\fill[amber] (0,0) circle (0.22in);
+          \foreach \a in {0,45,...,315} \draw[amber, line width=2.6pt, line cap=round] (\a:0.32in) -- (\a:0.44in);}}
+        \newcommand{\warnicon}{\tikz{\fill[heat, rounded corners=3pt] (90:0.5in) -- (210:0.5in) -- (330:0.5in) -- cycle;
+          \fill[night, rounded corners=1pt] (-0.035in,-0.06in) rectangle (0.035in,0.22in); \fill[night] (0,-0.16in) circle (0.045in);}}
+        \definecolor{heat}{HTML}{FF6A4D}
+        \definecolor{keyblue}{HTML}{5AA2FF}
+        \definecolor{green}{HTML}{2FBF8F}
+        \definecolor{amber}{HTML}{EDA100}
+        \definecolor{violet}{HTML}{8B7CF0}
+        \definecolor{fg}{HTML}{F3F1EA}
+        \definecolor{dim}{HTML}{A9A7A0}
+        \definecolor{night}{HTML}{0F1115}
+        \definecolor{panel}{HTML}{1B1F27}
+        \definecolor{linkblue}{HTML}{8EC1FF}
+        \pagestyle{empty}
+        \newcommand{\zenododoi}{10.5281/zenodo.24123961}
+        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}}}
+        \pagecolor{night}
+        \setlength{\parindent}{0pt}\setlength{\parskip}{0.6em}\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000
+        \renewcommand{\maketitle}{}
+        \AtBeginDocument{\color{fg}}
+        % on every image: the name of the report and the author on top, the image number on the right, a progress
+        % bar under them; at the bottom, the DOI, so that an image shared alone still leads to the report (the last
+        % image has it in a box)
+        \AddToShipoutPictureFG{%
+          \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.42in}){\makebox[0pt][l]{\fontsize{10}{12}\selectfont
+            \color{dim}\textbf{Alert, framework, measure}\quad Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{dim}\faXTwitter\,@rastadidi}}}}
+          \AtPageUpperLeft{\put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{-0.42in}){\makebox[0pt][r]{\fontsize{10}{12}\selectfont
+            \color{dim}\thepage\,/\,4}}}
+          \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.54in}){\color{panel}\rule{\dimexpr\paperwidth-1in\relax}{2.2pt}}}%
+          \AtPageUpperLeft{\put(\LenToUnit{0.5in},\LenToUnit{-0.54in}){\color{heat}\rule{\dimexpr(\paperwidth-1in)*\value{page}/4\relax}{2.2pt}}}%
+          \ifnum\value{page}<4\AtPageLowerLeft{\put(\LenToUnit{0.5in},\LenToUnit{0.27in}){\makebox[0pt][l]{\fontsize{10}{12}\selectfont
+            \color{dim}The study, free: \href{https://doi.org/\zenododoi}{\textbf{\color{linkblue}doi.org/\zenododoi}}}}}\fi
+          \AtPageLowerLeft{\put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{0.27in}){\makebox[0pt][r]{\fontsize{10}{12}\selectfont
+            \href{https://creativecommons.org/licenses/by/4.0/}{\color{dim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}}
+        \newcommand{\kicker}[2]{{\fontsize{12}{14}\selectfont\bfseries\color{#1}\MakeUppercase{#2}\par}\vspace{0.2em}}
+        \newcommand{\headline}[1]{{\fontsize{29}{33}\selectfont\bfseries\color{fg}#1\par}\vspace{0.2em}}
+        \newcommand{\slidetext}[2]{{\fontsize{16}{21}\selectfont\color{#1}#2\par}}
+        \newtcolorbox{tile}[1]{enhanced, colback=panel, frame hidden, borderline west={4pt}{0pt}{#1}, arc=3pt,
+          left=10pt, right=8pt, top=8pt, bottom=8pt, before skip=4pt, after skip=6pt, before upper=\raggedright}
+execute:
+  echo: false
+  warning: false
+  message: false
+knitr:
+  opts_chunk:
+    dev: cairo_pdf
+    fig.align: center
+    fig.width: 6.5
+    out.width: "100%"
+---
+
+```{r}
+#| label: setup
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(knitr)
+})
+source("R/prep.R")
+source("R/positioning.R")  # the coverage of the fifteen questions and the key figures, as in positioning.qmd
+
+# dark, like the other square images: light ink on a near-black page, charts on a transparent background
+INK <- "#f3f1ea"; MUTED <- "#a9a7a0"; GRID <- "#2a2e36"
+# the three works in their dark-page shades
+DARK <- c(RTS = "#2FBF8F", UN = "#5AA2FF", "This study" = "#FF6A4D")
+theme_set(theme_minimal(base_size = 15, base_family = "Inter") +
+  theme(plot.background = element_rect(fill = NA, colour = NA), panel.background = element_rect(fill = NA, colour = NA),
+        text = element_text(colour = INK), panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(colour = GRID, linewidth = 0.3),
+        axis.text = element_text(colour = MUTED), axis.title = element_text(colour = MUTED),
+        legend.position = "none"))
+knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
+n_m <- sum(cov$`This study` == "m"); n_q <- nrow(cov)
+```
+
+<!-- 1: the three works -->
+```{=latex}
+\kicker{heat}{Three works on AI bias}
+\headline{An alert, a framework, a measure.}
+{\fontsize{15}{19}\selectfont\color{dim}The RTS article, UN report \href{https://docs.un.org/en/A/HRC/56/68}{\textbf{\color{linkblue}A/HRC/56/68}} and this study.\par}
+\vspace{0.2em}
+\newcommand{\work}[5]{\begin{tcolorbox}[enhanced, colback=#1!16!night, frame hidden, borderline north={4pt}{0pt}{#1}, arc=4pt,
+  height=3.9in, valign=top, top=12pt, left=8pt, right=8pt, before upper=\raggedright]
+  {\fontsize{12}{14}\selectfont\bfseries\color{#1}\MakeUppercase{#2}\par}\vspace{0.4em}
+  {\fontsize{22}{25}\selectfont\bfseries\color{fg}#3\par}\vspace{0.6em}
+  {\fontsize{13.5}{17}\selectfont\color{fg}#4\par}\vfill
+  {\fontsize{11}{13}\selectfont\color{dim}#5\par}\end{tcolorbox}}
+\begin{minipage}[t]{0.315\linewidth}\work{green}{The alert}{RTS}{A viral test: ice-breakers for an Italian, ``keep your distance'' for an Algerian.}{No count of prompts, no control. August 2026.}\end{minipage}\hfill
+\begin{minipage}[t]{0.315\linewidth}\work{keyblue}{The framework}{UN}{Report \href{https://docs.un.org/en/A/HRC/56/68}{\color{linkblue}A/HRC/56/68}: how AI feeds racial discrimination, what to require.}{A synthesis; no test of its own. June 2024.}\end{minipage}\hfill
+\begin{minipage}[t]{0.315\linewidth}\work{heat}{The measure}{This study}{The same question, `r num(nrow(R), 0)` times, to 7 open-weight AIs. Only his nationality changes.}{24 nationalities and a control. Nov.\ 2026.}\end{minipage}
+\vfill
+\newpage
+```
+
+<!-- 2: coverage of the fifteen questions -->
+```{=latex}
+\kicker{keyblue}{Read against the UN report}
+\headline{Of `r n_q` questions the UN raises, the study measures `r n_m`.}
+```
+
+```{r}
+#| fig-height: 3.1
+cov_long |>
+  count(work, level, .drop = FALSE) |>
+  mutate(level = factor(level, levels = rev(LEVELS))) |>
+  ggplot(aes(n, work, fill = work, alpha = level)) +
+  geom_col(colour = "#0f1115", linewidth = 1.2, width = 0.72) +
+  geom_text(aes(label = ifelse(n >= 4, paste(n, tolower(level)), ifelse(n > 0, n, ""))),
+            position = position_stack(vjust = 0.5), colour = INK, size = 5.4, alpha = 1, family = "Inter",
+            fontface = "bold") +
+  scale_fill_manual(values = DARK) +
+  scale_alpha_manual(values = c("Measured" = 0.95, "Illustrated" = 0.6, "Stated" = 0.35, "Not covered" = 0.1)) +
+  scale_x_continuous(breaks = NULL, expand = c(0, 0)) +
+  scale_y_discrete(limits = rev(names(DARK))) +
+  labs(x = NULL, y = NULL) +
+  theme(panel.grid = element_blank(), axis.text.y = element_text(colour = INK, face = "bold", size = 17))
+```
+
+```{=latex}
+\slidetext{fg}{Among them: is technology neutral, national origin, minors, North and South, tests before deployment, audits.}
+\vfill
+\newpage
+```
+
+<!-- 3: the UN asks for tests -->
+```{=latex}
+\kicker{heat}{From recommendation to tool}
+\headline{The UN asks for tests. Here is one.}
+\vspace{0.2em}
+\newcommand{\rec}[3]{\begin{tile}{heat}{\fontsize{11}{13}\selectfont\color{keyblue}\textbf{UN #1}\enspace\color{dim}#2\par}\vspace{0.15em}
+  {\fontsize{15}{19}\selectfont\color{fg}#3\par}\end{tile}}
+\rec{§68 d}{test before deployment}{\textbf{A protocol:} change one word, the nationality, and compare with ``a man''.}
+\rec{§68 m}{audit over time}{\textbf{Rerun it} on free Kaggle GPUs, \href{https://github.com/adriens/kaggle-bench-ai-biasses\#resources}{\color{linkblue}public Kaggle notebooks}; each new model joins the seven.}
+\rec{§68 k}{disaggregated data}{\textbf{Rates by nationality, situation and age,} every answer published.}
+\rec{§68 f}{transparency}{\textbf{Open models, open data,} a judge that quotes before it labels.}
+\vfill
+\newpage
+```
+
+<!-- 4: what the measure adds, and where to read -->
+```{=latex}
+\kicker{heat}{What the measure adds}
+\headline{Name any nationality: prejudice jumps.}
+\vspace{0.4em}
+\begin{minipage}[c]{0.42\linewidth}\centering{\fontsize{64}{66}\selectfont\bfseries\color{dim}`r num(p_none, 0)` \%\par}
+{\fontsize{14}{17}\selectfont\color{dim}with ``a man'',\\ no nationality\par}\end{minipage}\hfill
+\begin{minipage}[c]{0.1\linewidth}\centering{\fontsize{40}{40}\selectfont\color{heat}$\rightarrow$}\end{minipage}\hfill
+\begin{minipage}[c]{0.42\linewidth}\centering{\fontsize{64}{66}\selectfont\bfseries\color{heat}`r num(p_nat, 0)` \%\par}
+{\fontsize{14}{17}\selectfont\color{fg}as soon as he has\\ \textbf{any} nationality\par}\end{minipage}
+\par\vspace{0.6em}
+{\fontsize{11.5}{14}\selectfont\color{dim}Prejudiced answers of four of the seven AIs (8B and more), in a taxi, an elevator or an isolated street. Neither the RTS article nor the UN report gives such a figure.\par}
+\vfill
+\begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=7pt, bottom=7pt, before upper=\raggedright]
+{\fontsize{12.5}{16}\selectfont\color{fg}\faNewspaper\enspace\href{https://www.rts.ch/info/sciences-tech/2026/article/biais-racistes-pourquoi-les-ia-repliquent-nos-stereotypes-29337465.html}{\color{linkblue}RTS, 26 Aug.\ 2026}\quad\faLandmark\enspace\href{https://docs.un.org/en/A/HRC/56/68}{\color{linkblue}UN A/HRC/56/68}\par}\vspace{0.3em}
+{\fontsize{14}{18}\selectfont\color{fg}\faFilePdf\enspace\textbf{The study, free:}\enspace\href{https://doi.org/\zenododoi}{\bfseries\color{linkblue}doi.org/\zenododoi}\par}
+\end{tcolorbox}
+```

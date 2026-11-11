@@ -3,12 +3,12 @@ title: "She Is Alone With a Man"
 subtitle: "Nationality bias in the safety advice given by open-weight language models"
 author:
   - name: Adrien Sales
-date: "2026-11-07"
+date: "2026-11-11"
 date-format: "D MMMM YYYY"
 lang: en-GB
 abstract: |
-  \noindent Told *"I am alone with a man"*, chatbots tested by Swiss broadcaster RTS suggested ice-breakers for an
-  Italian and keeping one's distance for an Algerian [@rts2026]. I measured this at scale: the same question, put
+  \noindent Told *"I am alone with a man"*, chatbots in a viral test reported by Swiss broadcaster RTS suggested
+  ice-breakers for an Italian and keeping one's distance for an Algerian [@rts2026]. I measured this at scale: the same question, put
   7,425 times to each of seven open-weight models on Kaggle's free GPUs, changing only the man's nationality (one of
   24, or none), the situation (one of 11) and the woman's age (one of 3). A judge model rated the answers without seeing the
   nationality.
@@ -91,8 +91,8 @@ format:
         \usepackage{pdfpages}
         % the PDF information is written with the first page: set before the cover is shipped out
         % the Zenodo DOI of version 1.0, in the text, on the cover and in the XMP metadata of the PDF
-        \newcommand{\zenododoi}{10.5281/zenodo.24028517}
-        \newcommand{\zenodoversion}{1.4}
+        \newcommand{\zenododoi}{10.5281/zenodo.24123961}
+        \newcommand{\zenodoversion}{1.5}
         \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
         % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
         \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
@@ -432,9 +432,10 @@ How an AI describes the man you are alone with: correspondence analysis of the w
 nationalities and religions. They are quoted to document them, not endorsed.*
 
 Chat assistants are now asked for practical advice, including on personal safety, and a woman who asks one
-what to do when she is alone with a man deserves the same advice whoever he is. The RTS test [@rts2026] that
-started this study, heard in a France Inter debate on whether AI is racist [@franceinter2026], on Gemini and GPT-5, was a striking demonstration rather than a measurement: a handful of
-prompts, no repetition, no control condition.
+what to do when she is alone with a man deserves the same advice whoever he is. The viral test reported by RTS [@rts2026]
+that started this study, heard in a France Inter debate on whether AI is racist [@franceinter2026], on Google's AI
+Mode, Gemini and GPT-5, was a striking demonstration rather than a measurement: no stated number of prompts, no
+repetition, no control condition.
 
 I ask the question in a controlled setting: **does a language model give a woman alone with a man different
 advice depending on the man's nationality, all else being equal?** Three choices shape the study. The models
@@ -577,8 +578,9 @@ tibble::tribble(
 ) |> kable(booktabs = TRUE)
 ```
 
-The 24 nationalities cover contrasting regions and stereotypes: the list from the RTS report (France,
-Italy, Spain, United Kingdom, Switzerland, Sweden, Finland, Belgium, Germany, Algeria, Morocco),
+The 24 nationalities cover contrasting regions and stereotypes: the five named in the RTS report (Italy,
+Finland, Belgium, Switzerland, Algeria) and other Western European and Maghreb ones (France, Spain, United Kingdom,
+Sweden, Germany, Morocco),
 nationalities exposed to specific stereotypes in Western Europe (Serbia, Albania, Romania, Russia, Turkey,
 Afghanistan, Nigeria, India) and points of comparison outside Europe (United States, Japan, Brazil,
 Australia, Fiji).
@@ -3078,7 +3080,7 @@ changes the answer.
 - **It shows even without a judge.** With the nationality hidden, a simple program still guesses it from the
   answer six times more often than chance.
 
-These are not the large commercial chatbots that RTS tested, but open-weight models that anyone can download, and
+These are not the large commercial chatbots of the viral test reported by RTS, but open-weight models that anyone can download, and
 the same pattern shows up in all of them. Everything behind this report, prompts, answers, verdicts and
 code, is public and can be rerun on free GPUs.
 
@@ -3121,8 +3123,8 @@ table and number from that dataset. Built with [R](https://www.r-project.org), [
 anyone may share and adapt them, for any purpose, provided they credit the author.
 
 **How to cite.** Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by
-open-weight language models* (Version 1.4) \[Report\]. Zenodo.
-[https://doi.org/10.5281/zenodo.24028517](https://doi.org/10.5281/zenodo.24028517)
+open-weight language models* (Version 1.5) \[Report\]. Zenodo.
+[https://doi.org/10.5281/zenodo.24123961](https://doi.org/10.5281/zenodo.24123961)
 
 # Declarations {.unnumbered}
 

@@ -4,7 +4,7 @@ author: "Adrien Sales"
 subtitle: "Four square images for X: what seven open-weight AI models answer a woman alone with a man, when only his nationality changes"
 subject: "Nationality bias in the safety advice of seven open-weight LLMs: 52k answers, 24 nationalities, 11 situations"
 keywords: [AI bias, LLM, nationality, stereotypes, AI safety, open-weight models, Kaggle, Quarto]
-date: "2026-11-07"
+date: "2026-11-11"
 lang: en-GB
 format:
   pdf:
@@ -49,7 +49,7 @@ format:
         \definecolor{panel}{HTML}{1B1F27}
         \definecolor{linkblue}{HTML}{8EC1FF}
         \pagestyle{empty}
-        \newcommand{\zenododoi}{10.5281/zenodo.24028517}
+        \newcommand{\zenododoi}{10.5281/zenodo.24123961}
         \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)}}}
         \pagecolor{night}
         \setlength{\parindent}{0pt}\setlength{\parskip}{0.6em}\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000
@@ -126,7 +126,7 @@ knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 
 <!-- 1: the hook -->
 ```{=latex}
-\kicker{heat}{What a Swiss TV test (RTS) found}
+\kicker{heat}{What a viral test, reported by RTS, found}
 \headline{“I am alone with a man.” Only his nationality changes.}
 \vspace{0.3em}
 \begin{minipage}[t]{0.485\linewidth}

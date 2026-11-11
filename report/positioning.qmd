@@ -1,0 +1,415 @@
+---
+title: "She Is Alone With a Man: Alert, framework, measure"
+subtitle: "Where the study stands between the RTS article and UN report A/HRC/56/68 on AI and racial discrimination"
+author:
+  - name: Adrien Sales
+date: "2026-11-11"
+date-format: "MMMM YYYY"
+lang: en-GB
+subject: "Positioning of a nationality-bias benchmark of open-weight LLMs against the RTS article and UN report A/HRC/56/68"
+keywords: [AI bias, large language models, LLM, nationality, stereotypes, racial discrimination, human rights, United Nations, A/HRC/56/68, AI audit, open-weight models, Quarto]
+format:
+  pdf:
+    pdf-engine: xelatex
+    documentclass: scrartcl
+    papersize: a4
+    fontsize: 12pt
+    number-sections: true
+    geometry: [margin=2.1cm, top=1.8cm, bottom=1.8cm]
+    colorlinks: true
+    linkcolor: "blue!50!black"
+    urlcolor: "blue!50!black"
+    mainfont: LibertinusSerif
+    mainfontoptions:
+      - Extension=.otf
+      - UprightFont=*-Regular
+      - BoldFont=*-Bold
+      - ItalicFont=*-Italic
+      - BoldItalicFont=*-BoldItalic
+    sansfont: Inter
+    include-in-header:
+      text: |
+        \usepackage{microtype}
+        \usepackage[most]{tcolorbox}
+        \usepackage{pdfpages}
+        \usepackage{fontawesome6}
+        % the Zenodo DOI of the report this document positions (version 1.5), in the text
+        \newcommand{\zenododoi}{10.5281/zenodo.24123961}
+        \usepackage{hyperref}\usepackage{hyperxmp}% hyperxmp must come after hyperref
+        % hyperxmp keeps the author and the keywords in the XMP only: write them back to the Info dictionary
+        \makeatletter\AtEndDocument{\special{pdf:docinfo <</Author (\@pdfauthor) /Keywords (\@pdfkeywords)>>}}\makeatother
+        % the PDF author: the name, then the X handle
+        \AtBeginDocument{\hypersetup{pdfauthor={Adrien Sales (@rastadidi)},
+          pdfcopyright={Copyright (C) 2026 Adrien Sales, released under CC BY 4.0},
+          pdflicenseurl={https://creativecommons.org/licenses/by/4.0/}}}
+        \definecolor{heat}{HTML}{E8452C}
+        \definecolor{keyblue}{HTML}{2A78D6}
+        \definecolor{ink}{HTML}{1B1B1B}
+        \definecolor{muted}{HTML}{5B5A56}
+        \definecolor{cMuted}{HTML}{5B5A56}
+        \usepackage{tikz}
+        \usetikzlibrary{positioning,shapes.geometric,calc}
+        \definecolor{dim}{HTML}{A9A7A0}
+        \definecolor{amber}{HTML}{EDA100}
+        \definecolor{violet}{HTML}{8B7CF0}
+        \definecolor{green}{HTML}{1BAF7A}
+        \input{flags/flags.tex}
+        % a quote of an AI: the flag of the man, the sentence, then the model and the question it was asked
+        \newcommand{\quotetile}[5]{\begin{tcolorbox}[enhanced, colback=#1!7, frame hidden, borderline west={3pt}{0pt}{#1},
+          arc=0pt, left=8pt, right=8pt, top=5pt, bottom=5pt, before skip=6pt, after skip=6pt]
+          \begin{minipage}[c]{0.11\linewidth}\flag{0.42}{#2}\end{minipage}\hfill
+          \begin{minipage}[c]{0.87\linewidth}\raggedright{\itshape #3\par}\vspace{0.1em}
+          {\sffamily\scriptsize\color{muted}\textbf{#4}, asked: #5\par}\end{minipage}\end{tcolorbox}}
+        \addtokomafont{disposition}{\sffamily}
+        \addtokomafont{section}{\Large}
+        \setlength{\parskip}{0.45em}\setlength{\parindent}{0pt}
+        % running head on every page: the title of the paper on the left, the author on the right, the page below
+        \usepackage{scrlayer-scrpage}
+        \clearpairofpagestyles
+        \ihead*{\sffamily\footnotesize\color{muted}She Is Alone With a Man \textemdash{} Alert, framework, measure}
+        \ohead*{\sffamily\footnotesize\color{muted}Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{muted}\faXTwitter\,@rastadidi}}
+        % and again at the foot of the page, around the page number
+        \ifoot*{\sffamily\footnotesize\color{muted}She Is Alone With a Man \textemdash{} Alert, framework, measure}
+        \cfoot*{\pagemark}
+        \ofoot*{\sffamily\footnotesize\color{muted}Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{muted}\faXTwitter\,@rastadidi}}
+        \pagestyle{scrheadings}
+        % the licence, written over the cover as a link, at the right end of its last caption line
+        \definecolor{coverdim}{HTML}{8D8B85}
+        \newcommand{\coverlicence}{\put(537.4,58){\makebox[0pt][r]{\fontsize{8.8}{11}\selectfont\sffamily
+          \href{https://creativecommons.org/licenses/by/4.0/}{\color{coverdim}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}}}
+        \AtBeginDocument{\includepdf[pages=1, picturecommand*={\coverlicence}]{covers/cover_positioning.pdf}\setcounter{page}{1}}
+        % the cover carries the title: no title block on page 1, a compact heading instead
+        \renewcommand{\maketitle}{}
+        \newtcolorbox{bignum}[1][]{enhanced, colback=#1!7, colframe=#1, boxrule=0pt, leftrule=4pt, arc=0pt,
+          outer arc=0pt, left=10pt, right=10pt, top=8pt, bottom=8pt}
+        \newtcolorbox{quotebox}{enhanced, colback=white, frame hidden, borderline west={3pt}{0pt}{heat}, arc=0pt,
+          left=10pt, right=6pt, top=3pt, bottom=3pt, fontupper=\itshape}
+        % the abstract, for readers who want the study in one paragraph: method, main figures, conclusion
+        \newtcolorbox{abstractbox}{enhanced, colback=keyblue!4, frame hidden, borderline west={3pt}{0pt}{keyblue},
+          arc=0pt, left=11pt, right=11pt, top=7pt, bottom=7pt, fontupper=\sffamily\footnotesize, before upper=\raggedright}
+        % a share as a bar: grey track, coloured fill (#2 is a fraction of the column width)
+        % a thin grey rule between the body rows of every table, for reading across long rows; none under the header
+        \usepackage{etoolbox}\usepackage{booktabs}
+        \newif\ifLTrowrule
+        \makeatletter
+        \AtBeginEnvironment{longtable}{\global\LTrowrulefalse\renewcommand{\arraystretch}{1.25}\setlength{\aboverulesep}{0pt}}
+        \let\LT@origtabularcr\LT@tabularcr
+        \def\LT@tabularcr{\LT@origtabularcr\noalign{\ifLTrowrule{\color{black!18}\hrule height 0.4pt}\fi}}
+        \apptocmd{\midrule}{\noalign{\global\LTrowruletrue}}{}{}
+        \makeatother
+        % the reading guide of a chart, as in the full report
+        \definecolor{readbox}{HTML}{00A047}
+        \newtcolorbox{howtoread}{enhanced, breakable=false, colback=white, colframe=readbox!50, boxrule=0.4pt,
+          leftrule=2.5pt, arc=0pt, outer arc=0pt, left=7pt, right=7pt, top=5pt, bottom=5pt, fontupper=\small,
+          before skip=10pt, after skip=10pt}
+        \newcommand{\pbar}[2]{\begin{tikzpicture}\fill[black!10] (0,0) rectangle (\linewidth,7pt);\fill[#1] (0,0) rectangle (#2\linewidth,7pt);\end{tikzpicture}}
+        % a key figure: an icon, then the number
+        \newcommand{\kpi}[2]{{\fontsize{19}{19}\selectfont\color{keyblue!55}#1}\hspace{0.35em}\bignumber{keyblue}{#2}}
+        \newcommand{\bignumber}[2]{{\sffamily\bfseries\fontsize{34}{36}\selectfont\color{#1}#2}}
+bibliography: references.bib
+csl: ieee.csl
+link-citations: true
+link-bibliography: true
+execute:
+  echo: false
+  warning: false
+  message: false
+knitr:
+  opts_chunk:
+    dev: cairo_pdf
+    fig.align: center
+    out.width: "100%"
+---
+
+```{r}
+#| label: setup
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(knitr)
+  library(patchwork)
+})
+source("R/prep.R")
+COVER_FILE <- "covers/cover_positioning"
+COVER_SUBTITLE <- "A viral test raised the alarm.\nThe UN set the framework: A/HRC/56/68.\nThis study measures."; COVER_SUB_SIZE <- 25
+COVER_CAPTION <- paste0(
+  "RTS, \"Biais racistes : pourquoi les IA répliquent nos stéréotypes\" (2026)\n",
+  "United Nations, Human Rights Council, report A/HRC/56/68 of the Special Rapporteur on racism (June 2024)\n",
+  format(nrow(R), big.mark = ","), " answers in French of seven open-weight models · 24 nationalities · 11 situations · 3 ages\n\n",
+  month.name[as.integer(format(Sys.Date(), "%m"))], " ", format(Sys.Date(), "%Y"),
+  "   ·   x.com/rastadidi  ·  dev.to/adriens  ·  github.com/adriens  ·  linkedin.com/in/adrien-sales  ·  kaggle.com/adriensales")
+source("R/cover_page.R")  # draws covers/cover_positioning.pdf, inserted before page 1
+
+source("R/positioning.R")
+```
+
+```{=latex}
+\vspace*{-1.2em}
+{\sffamily\bfseries\fontsize{20}{23}\selectfont Alert, framework, measure\par}
+\vspace{0.2em}
+{\sffamily\color{muted} Where the study stands between the RTS article and UN report \href{https://docs.un.org/en/A/HRC/56/68}{\color{muted}A/HRC/56/68} \quad·\quad Adrien Sales\enspace\href{https://x.com/rastadidi}{\color{muted}\faXTwitter\,@rastadidi}\par}
+\vspace{0.5em}
+\begin{abstractbox}
+```
+`\textcolor{keyblue}{\textbf{ABSTRACT}}`{=latex}\enspace Three works deal with AI bias against groups of people. A news
+report by Swiss broadcaster RTS on a viral test [@rts2026] raised the alarm, with no stated method. The report of the UN Special Rapporteur
+on racism, [A/HRC/56/68](https://docs.un.org/en/A/HRC/56/68) [@un_hrc_56_68], explains how AI feeds racial discrimination and what States and companies
+should require. *She Is Alone With a Man* [@sales2026] measures the bias at scale: `r num(nrow(R), 0)` answers of
+seven open-weight models, `r n_countries` nationalities and a control. Of fifteen questions the UN report raises that bear on
+this study, the study measures thirteen and illustrates two; it leaves aside regulation, remedies and the sector cases of the report. It turns four UN recommendations, on testing, audits, disaggregated data and transparency, into a
+protocol anyone can rerun, in a domain the UN report does not cover: personal safety advice. **The UN asks for
+tests; here is one.**
+```{=latex}
+\end{abstractbox}
+\vspace{-0.6em}
+```
+
+# Three works, three roles
+
+```{r}
+#| label: tbl-roles
+#| tbl-cap: "The three works at a glance."
+#| tbl-colwidths: [16, 28, 28, 28]
+tibble::tribble(
+  ~` `, ~RTS, ~UN, ~`This study`,
+  "**Role**", "the alert", "the framework", "the measure",
+  "**Question**", "Does it happen?", "Why does it happen, and what should be required?", "How much, towards whom, in which models?",
+  "**Date**", "2026", "3 June 2024", "November 2026 (v1.5)",
+  "**Own test**", "a viral test, method not stated", "none (synthesis)", "51,975 answers"
+) |> kable()
+```
+
+**RTS, the alert.** *Biais racistes : pourquoi les IA répliquent nos stéréotypes* ("Racist biases: why AIs replicate our
+stereotypes") [@rts2026], discussed in the France Inter debate *"Is AI racist?"* of 3 September 2026
+[@franceinter2026], by Hélène Krähenbühl (26 August 2026). It reports a test that went viral on social media: the
+sentence *"Je suis seule avec un Algérien"* ("I am alone with an Algerian"), repeated with other nationalities.
+Google's AI Mode and Gemini suggested **ice-breakers** for an Italian, a Finn, a Belgian or a Swiss man, and told the
+user to **keep her distance** from an Algerian; GPT-5 nano and instant gave the same kind of answer. The article explains the bias by training data loaded with stereotypes, statistical
+associations, post-training and safety filters. It gives no count of prompts and no control. It started this study.
+
+**UN, the framework.** Report of the Special Rapporteur on contemporary forms of racism, Ashwini K.P., to the Human
+Rights Council at its 56th session [@un_hrc_56_68]. It describes four ways in which AI contributes to racial
+discrimination: data (§13–16), algorithm design (§17–18), intentionally discriminatory use (§19–20) and
+accountability, the "black box" (§21–23). It takes its examples from law enforcement and criminal justice, health
+care and education (§25), recalls international human rights law (ICERD [@icerd1965], §59–65) and ends with recommendations to
+States, companies and the UN (§68–70). A synthesis of submissions and literature, it runs no test of its own.
+
+**This study, the measure.** *She Is Alone With a Man* [@sales2026]. The same French prompt is put to seven
+open-weight models of 2 to 26 billion parameters (IBM, Alibaba, Google, Mistral AI, NVIDIA). Only the man's
+nationality changes (`r n_countries` countries, or none), across 11 situations, 3 ages, 3 paraphrases and 3
+samples: `r num(nrow(R), 0)` answers. A judge model blind to the nationality, Qwen3-32B [@qwen3; @zheng2023judge; @kaggle_judge], rated
+`r num(nrow(D), 0)` of them; a judge-free classifier read them all [@kaggle_guess]. Everything reruns on Kaggle's free GPUs, and
+every answer and verdict is published [@kaggle_collection; @kaggle_data].
+
+```{=latex}
+\clearpage
+```
+
+# Who covers what
+
+For each of fifteen questions that the UN report raises and that bear on this study, the level at which each work answers it:
+**measured** with controlled data, **illustrated** by examples, **stated** as a definition or a recommendation, or
+**not covered**. The questions and levels are my reading of the three works; the UN report is quoted in its original English.
+
+```{=latex}
+\begin{howtoread}
+\textbf{How to read it.} One row per question, one column per work. A full disc: the work measures it with
+controlled data; a crossed circle: it shows examples; an empty circle: it states it (definition or
+recommendation); a dash: it does not cover it.
+\end{howtoread}
+```
+
+```{r}
+#| label: fig-coverage
+#| fig-cap: "Coverage of the fifteen questions by the three works. The § numbers are the paragraphs of UN report [A/HRC/56/68](https://docs.un.org/en/A/HRC/56/68) [@un_hrc_56_68]."
+#| fig-height: 3.9
+cover_plot
+```
+
+```{r}
+#| label: fig-tally
+#| fig-cap: "The fifteen questions counted by level of answer, for each work."
+#| fig-height: 2.1
+tally
+```
+
+Each question side by side: where the UN report raises it and where the full report [@sales2026] answers it. The detail of each cell is in [the first appendix](#sec-detail); the issues of the UN report outside
+this study are in [the second](#sec-outside). @fig-sankey draws the same mapping as a flow, from
+the part of the UN report that raises each question to the part of the full report that answers it.
+
+```{r}
+#| label: tbl-refs
+#| tbl-cap: "Where each question is raised in the UN report and answered in the full report (version 1.5)."
+#| tbl-colwidths: [40, 26, 34]
+cov |>
+  transmute(Question = gsub("\\?$", "", question), `Raised by the UN` = ref,
+            `Answered in the report` = ifelse(`This study` == "a", "not covered", report)) |>
+  kable()
+```
+
+```{=latex}
+\clearpage
+```
+
+```{r}
+#| label: fig-sankey
+#| fig-cap: "From the UN report to the full report (version 1.5). One band per question: the height of a block counts questions, not an amount. Grey: issues outside this study."
+#| fig-height: 7.6
+#| fig-pos: H
+sankey_plot(7.5, 7.6)
+```
+
+
+
+
+# What the measure adds
+
+These figures come from the full report [@sales2026]. Neither the RTS article nor the UN report gives them: the first reports a viral test with no stated method, the
+second quotes figures from other systems (facial recognition, policing, health) and runs no test of its own.
+
+```{=latex}
+\begin{bignum}[heat]\sffamily
+\begin{minipage}[b]{0.43\linewidth}\raggedright
+\begin{minipage}[c]{0.33\linewidth}{\sffamily\bfseries\fontsize{26}{28}\selectfont\color{muted}`r num(p_none, 0)`\,\%}\end{minipage}%
+\begin{minipage}[c]{0.67\linewidth}\raggedright{\small with \textit{``a man''},\\ no nationality}\end{minipage}\par\smallskip
+\pbar{muted}{`r num(p_none / 100, 3)`}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.08\linewidth}\centering{\fontsize{24}{24}\selectfont\color{heat}$\rightarrow$}\par\vspace{0.3em}\end{minipage}\hfill
+\begin{minipage}[b]{0.43\linewidth}\raggedright
+\begin{minipage}[c]{0.38\linewidth}{\sffamily\bfseries\fontsize{26}{28}\selectfont\color{heat}`r num(p_nat, 0)`\,\%}\end{minipage}%
+\begin{minipage}[c]{0.62\linewidth}\raggedright{\small as soon as he has one,\\ \textbf{any} nationality}\end{minipage}\par\smallskip
+\pbar{heat}{`r num(p_nat / 100, 3)`}
+\end{minipage}\par\smallskip
+{\footnotesize\color{muted}Prejudiced answers of four of the seven AIs (8B and more), in a taxi, an elevator or an isolated street.}
+\end{bignum}
+```
+
+- **Naming a nationality is enough.** In a taxi, an elevator or an isolated street, prejudiced answers rise from
+  `r pc(p_none)` with "a man" to `r pc(p_nat)` as soon as he has a nationality, whichever it is.
+- **The nationality can be read from the answer.** With the nationality masked, a classifier with no judge [@kaggle_guess] finds it
+  `r pc(g_acc)` of the time, against `r pc(100 / n_countries)` by chance.
+- **Compliments follow wealth.** Spearman's ρ [@spearman1904] = `r num(rho_c, 2)` between the compliments a man receives and the GDP
+  per capita of his country [@worldbank_gdp], even within a continent: the North–South gap the UN fears (§58),
+  measured in the answers (@fig-wealth).
+- **Bigger is not fairer.** All seven models compliment the same men (Finns, Italians, Japanese) and rarely Afghans
+  or Nigerians, for whom each model has its own reflex: "his origin does not matter", a named risk, or a refusal to
+  help. The bias changes form with size; it does not go away.
+
+```{r}
+#| label: fig-wealth
+#| fig-cap: "The richer his country, the warmer the AI. One dot per nationality, seven AIs pooled; colour: World Bank income group [@worldbank_class]. GDP per capita in current US$, 2023 [@worldbank_gdp]; both are in the Kaggle dataset *Alone With a Stranger - World Bank wealth* [@kaggle_wealth]. A link, not a proof of cause."
+#| fig-height: 3.0
+wealth_plot
+```
+
+# Limits of this study
+
+- **Not the RTS models.** Gemini and GPT-5 are closed; the seven models here are open-weight and smaller (26 billion
+  parameters at most).
+- **One language.** Everything is in French. The UN notes that models perform worse outside English (§47): English
+  remains to be tested.
+- **A judge that is itself an LLM.** Qwen3-32B can be wrong; the judge-free classifier is the check, and finds the
+  same structure.
+- **The coverage is one reading.** One reader, the author, set the levels of @fig-coverage, @fig-tally and
+  @fig-sankey. @tbl-refs and [the first appendix](#sec-detail) give, for each cell, the paragraph, section or passage
+  it rests on, so that anyone can check it; a second reader, and their rate of agreement, would make it stronger.
+- **Nationality is not race.** ICERD (art. 1) [@icerd1965] covers "national origin", but the examples of the UN report are mostly
+  about race and ethnicity.
+
+# From UN recommendations to a working tool
+
+The UN report asks for tests, audits and disaggregated data, without saying how to run them. This study gives one
+working example, on a use the report does not cover: personal safety advice.
+
+```{r}
+#| label: tbl-bridge
+#| tbl-cap: "Four UN recommendations [@un_hrc_56_68] and what this study provides for each [@sales2026]."
+#| tbl-colwidths: [50, 50]
+tibble::tribble(
+  ~`What the UN recommends`, ~`What this study provides`,
+  "**Test before deployment** (§68 d): *\"data-testing protocols and thresholds that safeguard against algorithmic bias, including racial and ethnic bias\"*",
+  "**A ready-to-use protocol.** Change one word, the nationality, and compare with a control; judge rubric `rts-v4`; risk families declared before the confirmatory models.",
+  "**Audit regularly** (§68 m, §69 d): *\"regular audits of their impact [...] as well as potential biases generated by artificial intelligence models over time\"*",
+  "**An audit anyone can rerun.** One notebook per model on Kaggle's free GPU quota [@kaggle_collection]; each new model is compared with the seven already measured.",
+  "**Disaggregated data** (§68 k): *\"invest in disaggregated data collection [...] to better monitor and evaluate the impact of artificial intelligence technology\"*",
+  "**Rates by nationality, situation and age**, with Wilson intervals [@wilson1927], likelihood-ratio tests and Fisher tests with Holm correction [@holm1979]; every answer and every verdict is published.",
+  "**Transparency** (§21, §68 f): *\"full transparency about automated decision-making processes\"*",
+  "**Open models, a checkable judge.** Public weights and prompts; the judge quotes the answer before labelling it, so every verdict can be checked."
+) |> kable()
+```
+
+```{=latex}
+\begin{tcolorbox}[enhanced, colback=black!3, frame hidden, arc=2pt, left=10pt, right=10pt, top=6pt, bottom=6pt]
+\sffamily\footnotesize
+\href{https://doi.org/\zenododoi}{\textbf{The full report}}, its short version and a 16-slide carousel are on Zenodo;
+the data and the code are published under the name \textit{Alone With a Stranger}, on GitHub:
+\href{https://github.com/adriens/kaggle-bench-ai-biasses}{github.com/adriens/kaggle-bench-ai-biasses}.\par\medskip
+\textbf{How to cite the study.} Sales, A. (2026). \textit{She Is Alone With a Man: Nationality bias in the safety advice given by
+open-weight language models} (Version 1.5) [Report]. Zenodo. \href{https://doi.org/\zenododoi}{https://doi.org/\zenododoi}\par\medskip
+{\color{muted}Built with \href{https://www.r-project.org}{\color{muted}R}, \href{https://quarto.org}{\color{muted}Quarto} and \href{https://www.latex-project.org}{\color{muted}\LaTeX}.\hfill\href{https://creativecommons.org/licenses/by/4.0/}{\color{muted}\faCreativeCommons\,\faCreativeCommonsBy\enspace CC BY 4.0}}
+\end{tcolorbox}
+```
+
+```{=latex}
+{\sffamily\bfseries\small References}\par\vspace{-0.6em}
+\scriptsize
+```
+::: {#refs}
+:::
+
+```{=latex}
+\clearpage
+```
+
+# Appendix: the coverage, cell by cell {#sec-detail .unnumbered}
+
+What each work brings to each of the fifteen questions of @fig-coverage, cell by cell.
+
+```{r}
+#| label: tbl-coverage
+#| tbl-cap: "What each work brings to each question."
+#| tbl-colwidths: [19, 27, 27, 27]
+tibble::tribble(
+  ~Question, ~RTS, ~UN, ~`This study`,
+  "Technology is not neutral", "Same question, different advice; not \"explicitly programmed to discriminate\".", "The central thesis: the assumption of neutrality lets AI perpetuate discrimination.", "One word changes and the answers change, in all seven models.",
+  "Learned stereotypes", "Shown by the viral test; explained by training data \"loaded with stereotypes\".", "Biased or incomplete data, feedback loops: the mechanism is described.", "The seven models favour and suspect the same men.",
+  "Design choices, proxies", "Post-training and safety filters can reinforce the bias.", "Variables and success criteria chosen by designers can embed bias.", "In part: the Gemma family and Nemotron isolate the effect of size and of post-training.",
+  "National origin", "Italian, Finnish, Belgian, Swiss and Algerian men are named.", "In the definition; the examples are mostly about race and ethnicity.", "24 nationalities on every continent, Fiji included, and a control.",
+  "Generative AI, LLMs", "Google's AI Mode, Gemini, GPT-5 nano and instant.", "Mentioned mainly for education and the bias towards English.", "Seven open-weight LLMs from five companies.",
+  "Non-English language", "The viral sentence is in French.", "Models perform worse outside English.", "Every answer in French.",
+  "Control group", "No control, no count of prompts.", "No test of its own.", "\"A man\" with no nationality is the control.",
+  "Age, minors", "Not tested.", "Intersectional discrimination cited for facial recognition.", "Three ages, one of them 15: for a minor, any variation is a bias.",
+  "North and South", "Not covered.", "Risk of a debate led by the global North.", "Compliments follow GDP per capita.",
+  "Testing before deployment", "Not discussed.", "Recommended: testing protocols and thresholds.", "A reusable protocol; risk families declared in advance.",
+  "Audit, monitoring", "Not discussed.", "Recommended: regular audits, continuous monitoring.", "Reruns on free GPUs; each new model joins the seven.",
+  "Transparency", "Not discussed; the models tested are closed.", "Black box described; transparency recommended.", "Open models; code, answers and verdicts published.",
+  "\"Colour-blind\" approach", "Not covered.", "The previous mandate holder's call to reject it, repeated.", "Measured as the reflex \"his origin does not matter\", raised for some men only.",
+  "AI literacy", "Not discussed.", "Recommended: human-rights-centred public education.", "Short version, carousel and open data for non-specialists; not a measure.",
+  "Personal safety", "The starting case.", "Domains chosen: law enforcement, health, education.", "Eleven situations, from a first date to a taxi at night."
+) |> kable()
+```
+
+```{=latex}
+\clearpage
+```
+
+# Appendix: what the UN report covers outside this study {#sec-outside .unnumbered}
+
+The UN report also covers issues that lie outside the scope of this study. They are listed so that @fig-coverage is read against the whole report.
+
+```{r}
+#| label: tbl-outside
+#| tbl-cap: "Issues of the UN report that this study does not cover."
+#| tbl-colwidths: [32, 16, 52]
+tibble::tribble(
+  ~Issue, ~`UN §`, ~`Why it is outside this study`,
+  "Privacy of the data", "§16, §63", "The study uses no personal data: every prompt is synthetic.",
+  "Intentionally discriminatory use: surveillance, disinformation", "§19–20", "The study tests advice given in good faith, not a deliberate use.",
+  "Remedies and appeals for victims", "§23, §64, §68 g–h", "A legal and institutional question; the study gives evidence, not a remedy.",
+  "Sector cases: facial recognition, predictive policing, recidivism, autonomous weapons, health scores, grading, AI detectors", "§26–50", "Other systems and other decisions; the study covers chat assistants giving safety advice.",
+  "Regulation: national, regional and international initiatives, the EU AI Act and its exceptions", "§51–57", "A review of law and policy, not of model behaviour.",
+  "Binding or voluntary standards, prohibitions, no exceptions", "§68 a–c, e, i", "Choices for legislators.",
+  "Consultation of the groups concerned, training of AI teams", "§68 j, §69 b, e", "Governance of how models are built."
+) |> kable()
+```

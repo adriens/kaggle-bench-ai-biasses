@@ -4,8 +4,10 @@
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 Report: *She Is Alone With a Man* (`report/report.pdf`), with a 7-page version (`report/short.pdf`), a
-16-slide carousel (`report/carousel.pdf`) and 4 square images (`report/square.pdf`), deposited on Zenodo:
-[doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (all versions; version 1.4 is [doi.org/10.5281/zenodo.24028517](https://doi.org/10.5281/zenodo.24028517)). Notebooks and datasets on Kaggle:
+16-slide carousel (`report/carousel.pdf`) and 4 square images (`report/square.pdf`); a positioning document that sets
+the study against the RTS article and UN report A/HRC/56/68 (`report/positioning.pdf`, a 6-page version
+`report/positioning_short.pdf` and 4 square images `report/positioning_square.pdf`); all deposited on Zenodo:
+[doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (all versions; version 1.5 is [doi.org/10.5281/zenodo.24123961](https://doi.org/10.5281/zenodo.24123961)). Notebooks and datasets on Kaggle:
 see [Resources](#resources).
 
 Benchmark of nationality bias in the safety advice that open-weight language models give to a woman
@@ -24,7 +26,7 @@ rubric `rts-v4`).
 ## Resources
 
 **Report** (Zenodo, CC BY 4.0): [doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568), all
-versions, always the latest; [v1.4](https://doi.org/10.5281/zenodo.24028517), [v1.3](https://doi.org/10.5281/zenodo.23992909), [v1.2](https://doi.org/10.5281/zenodo.23992483), [v1.1](https://doi.org/10.5281/zenodo.23992096), [v1.0](https://doi.org/10.5281/zenodo.23991569).
+versions, always the latest; [v1.5](https://doi.org/10.5281/zenodo.24123961), [v1.4](https://doi.org/10.5281/zenodo.24028517), [v1.3](https://doi.org/10.5281/zenodo.23992909), [v1.2](https://doi.org/10.5281/zenodo.23992483), [v1.1](https://doi.org/10.5281/zenodo.23992096), [v1.0](https://doi.org/10.5281/zenodo.23991569).
 
 **Kaggle datasets** (CC BY 4.0)
 
@@ -64,7 +66,7 @@ Rscript R/covers.R                                   # social-media cover propos
 ## How to cite
 
 Sales, A. (2026). *She Is Alone With a Man: Nationality bias in the safety advice given by open-weight
-language models* (Version 1.4) [Report]. Zenodo. https://doi.org/10.5281/zenodo.24028517
+language models* (Version 1.5) [Report]. Zenodo. https://doi.org/10.5281/zenodo.24123961
 
 ## Versions
 
@@ -73,6 +75,7 @@ PDFs are the ones deposited; the release carries those PDFs as assets.
 
 | Version | Zenodo DOI | Changes |
 |---|---|---|
+| [`v1.5`](https://github.com/adriens/kaggle-bench-ai-biasses/releases/tag/v1.5) | [10.5281/zenodo.24123961](https://doi.org/10.5281/zenodo.24123961) | the test cited by RTS described as a viral test that RTS reported, the five nationalities the article names; adds the positioning document against the RTS article and UN report A/HRC/56/68, its 6-page version and 4 square images; results unchanged |
 | [`v1.4`](https://github.com/adriens/kaggle-bench-ai-biasses/releases/tag/v1.4) | [10.5281/zenodo.24028517](https://doi.org/10.5281/zenodo.24028517) | report reorganised for readability (results in three parts, checks in the appendix), one vocabulary across documents, new charts and eleven same-AI pairs, rewritten discussion; data and results unchanged |
 | [`v1.3`](https://github.com/adriens/kaggle-bench-ai-biasses/releases/tag/v1.3) | [10.5281/zenodo.23992909](https://doi.org/10.5281/zenodo.23992909) | same refusal comparison in the short version and the carousel, Fiji ring drawn whole, fewer overlapping labels (#3, #4, #5) |
 | [`v1.2`](https://github.com/adriens/kaggle-bench-ai-biasses/releases/tag/v1.2) | [10.5281/zenodo.23992483](https://doi.org/10.5281/zenodo.23992483) | links to the list of notebooks and datasets below, not to a private Kaggle collection |
