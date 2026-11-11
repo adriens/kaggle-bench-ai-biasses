@@ -3204,8 +3204,8 @@ audit.
 
 All notebooks and datasets of the project, published under the name *Alone With a Stranger*, are listed, with
 their links, in the GitHub repository [@kaggle_collection]; the source of every notebook, of the analysis scripts and of this report
-is on GitHub, at [github.com/adriens/kaggle-bench-ai-biasses](https://github.com/adriens/kaggle-bench-ai-biasses). A
-7-page version and a 16-slide carousel of the results sit next to this report, in the same Zenodo record,
+is on GitHub, at [github.com/adriens/kaggle-bench-ai-biasses](https://github.com/adriens/kaggle-bench-ai-biasses). An
+8-page version and a 16-slide carousel of the results sit next to this report, in the same Zenodo record,
 [doi.org/10.5281/zenodo.23991568](https://doi.org/10.5281/zenodo.23991568) (all versions). The
 generation notebooks, one per model [@kaggle_granite; @kaggle_qwen; @kaggle_gemma_e2b; @kaggle_gemma; @kaggle_gemma_26b;
 @kaggle_ministral; @kaggle_nemotron],
