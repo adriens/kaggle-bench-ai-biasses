@@ -214,7 +214,7 @@ sankey_plot <- function(W_IN, H_IN) {
              fontface = "bold", size = 3.3, colour = UNC) +
     annotate("text", x = mean(XM), y = 1.9, label = "The questions", family = "Inter", fontface = "bold",
              size = 3.3, colour = INK) +
-    annotate("text", x = XLIM[2] - 0.02, y = 1.9, label = "The full report, v1.6", hjust = 1, family = "Inter",
+    annotate("text", x = XLIM[2] - 0.02, y = 1.9, label = "The full report, v1.7", hjust = 1, family = "Inter",
              fontface = "bold", size = 3.3, colour = REPC) +
     # key
     annotate("rect", xmin = c(-0.12, 0.47, 1.06), xmax = c(-0.07, 0.52, 1.11),
