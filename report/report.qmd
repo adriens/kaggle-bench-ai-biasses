@@ -443,8 +443,11 @@ are open-weight, so that anyone can rerun them on free GPUs. The situations vary
 only matter where caution is expected. And one of the three ages is a minor, for whom the right answer is
 protective whoever the man is: any variation by country is a sign of bias.
 
-Existing bias benchmarks such as BBQ [@parrish2022bbq] ask closed questions with an expected answer. Here the
-answer is free and long, and bias can lie in the tone, in the choice of advice or in a single sentence. I
+Existing bias benchmarks such as BBQ [@parrish2022bbq] ask closed questions with an expected answer. Closer to
+this study, Hu et al. [@hu2025identity] let 77 models complete *"We are…"* and *"They are…"*: nearly all base
+models, and some chat models, favour "us" and disparage "them". Their groups are left abstract, the sentences are short and in English, and a
+sentiment classifier scores them. Here the group is a named nationality, the prompt is in French, and the
+answer is free and long: bias can lie in the tone, in the choice of advice or in a single sentence. I
 therefore read the answers twice: with a judge model [@zheng2023judge] guided by a fixed rubric (a
 scoring grid: the same questions, each with its definition, asked about every answer; @tbl-rubric),
 applied to answers in which the nationality is masked, and with text analysis that needs no judge at all.
@@ -3119,6 +3122,61 @@ association it tries to hide.
 **Relation to the RTS report.** I find the "encounter" versus "distrust" contrast described by RTS, attenuated:
 these open-weight models rarely tip into outright alarm, and the bias shows only with a repeated design and a control. Ministral is closer
 to the report's examples: it is the most alarmist model, and its alarm rises most for Nigeria.
+
+**Relation to published work.** The closest published study is Hu et al. [@hu2025identity], in *Nature
+Computational Science*. The two studies ask whether language models reproduce human prejudice between groups,
+and each establishes what the other cannot (@tbl-hu).
+
+*What Hu et al. establish.*
+
+- **The bias is general.** 77 models, 2,000 sentences each, completing *"We are…"* or *"They are…"*. With
+  the plain prompt, 52 of 56 models favour "us" and 50 of 56 disparage "them"; pooled, a "We are" sentence
+  is 93 % more likely to be positive, and a "They are" sentence 115 % more likely to be negative.
+- **It has a theory.** Social identity theory names the two movements, ingroup solidarity and outgroup
+  hostility, and the same probe applied to human text gives a reference level.
+- **It has a cause.** Fine-tuning small models on tweets from US Republicans and Democrats raises the
+  hostility: a "They are" sentence goes from 83 % to 550 % more likely to be negative. Removing the
+  "us"-positive and "them"-negative sentences from the training data lowers both movements.
+- **It is in real use.** In real conversations (WildChat and LMSYS-Chat-1M), the models' "They are" sentences
+  are 57 % more likely to be negative, and the users show the same bias.
+
+*What this study establishes.*
+
+- **Who "them" is.** Their "them" has no name; here it is one of 24 nationalities. All seven models, from
+  five companies, compliment the same men (Finns, Italians, Japanese) and rarely Afghans or Nigerians, and
+  the treatment follows the wealth of the man's country, even within a continent (Spearman ρ =
+  `r wr("compliment")` with compliments, `r wr("defensive")` with "his origin does not matter",
+  `r wr("risk")` with a link to a risk).
+- **In a situation with stakes, held constant.** A woman, or a 15-year-old girl, asks for safety advice in
+  one of 11 situations, in 3 wordings, against a control without nationality: only the nationality changes,
+  and it changes the advice.
+- **In forms a sentiment score does not count.** The bias is not only a negative sentence: one model
+  refuses to help (Gemma E2B), four say unasked that "his origin does not matter" (Granite, Qwen, Gemma 26B,
+  Nemotron), one names a risk (Ministral, in up to four answers in ten for an Afghan or a Nigerian man), and
+  the nationality can be guessed from answers in which it is masked.
+- **In French, and repeatable identically.** They call for other languages; and with fixed open weights,
+  free GPUs and all `r num(nrow(R), 0)` answers published, anyone can rerun this study and check every result.
+
+Together: a bias that nearly every model learns from its data (their result), falls on identifiable men
+and changes the advice a woman receives (this one).
+
+```{r}
+#| label: tbl-hu
+#| tbl-cap: "Hu et al. (2025) and this study, side by side."
+#| tbl-colwidths: [16, 42, 42]
+tibble::tribble(
+  ~` `, ~`Hu et al. (2025)`, ~`This study`,
+  "Question", "does the bias exist, and where does it come from?", "against whom, and what does it change for the user?",
+  "Groups", "an abstract \"us\" and \"them\"; US Republicans and Democrats for the fine-tuning", "24 named nationalities, plus a control without one",
+  "Contexts", "a random web sentence, only to vary the answers", "11 situations, 3 ages, 3 wordings, chosen and controlled",
+  "Task", "complete a sentence", "give a woman advice on her safety",
+  "Measure", "sentiment of each sentence", "a judge blind to the nationality, and a reading of the words with no judge",
+  "Models", "77, base and chat, 2019 to 2024, open and closed (GPT-4, text-bison)", "7 recent chat models from 5 companies, all open-weight",
+  "Language", "English", "French",
+  "Also shows", "the cause (training data) and real conversations", "the link with the wealth of the country",
+  "Openness", "code and data on OSF; closed models can change or be withdrawn", "code, every answer and verdict published; fixed weights, rerun on Kaggle's free GPUs"
+) |> kable(booktabs = TRUE)
+```
 
 # Limitations {#sec-limitations}
 

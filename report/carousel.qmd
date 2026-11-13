@@ -748,7 +748,7 @@ ggplot(gd, aes(lab, p, fill = lab)) +
 \takeaway{keyblue}{\faMagnifyingGlass}{Test who the people are.}{Safety tests must vary it, prompt after prompt.}
 \vfill
 \begin{tcolorbox}[enhanced, colback=panel, frame hidden, arc=4pt, left=10pt, right=10pt, top=8pt, bottom=8pt, before upper=\raggedright]
-{\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the full report}} (95 pages)\enspace·\enspace\href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the 8-page version}}\par}
+{\fontsize{12.5}{16}\selectfont\color{fg}\faFilePdf\enspace\textbf{Read more:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the full report}} (97 pages)\enspace·\enspace\href{https://doi.org/\zenododoi}{\color{linkblue}\underline{the 8-page version}}\par}
 \vspace{0.15em}
 {\fontsize{12.5}{16}\selectfont\color{fg}\faQuoteRight\enspace\textbf{Cite:} \href{https://doi.org/\zenododoi}{\color{linkblue}\underline{doi.org/\zenododoi}}\enspace(Zenodo, v1.8)\par}
 \vspace{0.15em}
