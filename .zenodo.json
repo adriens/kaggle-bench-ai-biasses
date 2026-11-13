@@ -12,6 +12,14 @@
   "language": "eng",
   "license": "cc-by-4.0",
   "access_right": "open",
+  "communities": [
+    {
+      "identifier": "open-weight-ai-bias-audits"
+    },
+    {
+      "identifier": "aiethics"
+    }
+  ],
   "keywords": [
     "AI bias",
     "large language models",
@@ -30,7 +38,13 @@
     "United Nations",
     "A/HRC/56/68",
     "racial discrimination",
-    "human rights"
+    "human rights",
+    "generative AI",
+    "algorithmic audit",
+    "reproducible research",
+    "women's safety",
+    "xenophobia",
+    "French"
   ],
   "related_identifiers": [
     {
